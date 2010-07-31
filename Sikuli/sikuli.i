@@ -20,6 +20,10 @@ public:
 };
 */
 
+class Point {
+   Point(int _x, int _y);
+};
+
 class Location : public Point{
    
 public: 
@@ -102,18 +106,10 @@ public:
    void setROI(Region roi);
    void setROI(Rectangle roi);
    
-   void setScreen(int screenId);
-      
    Location getCenter() const;
    
    Match getLastMatch();
    vector<Match> getLastMatches();
-   
-   void setThrowException(bool flag){ _throwException = flag; } 
-   void setAutoWaitTimeout(double sec){ _autoWaitTimeout = sec; }
-   
-   bool getThrowException(){ return _throwException; }
-   double getAutoWaitTimeout(){ return _autoWaitTimeout; }   
    
    //==================================================================
    // Pattern Matching Functions
@@ -141,6 +137,32 @@ public:
    bool waitVanish(Pattern target, double timeout);
    bool waitVanish(const char* target); 
    bool waitVanish(const char* target, double timeout);
+   
+   //==================================================================
+   // Spatial Operators
+   //==================================================================
+   
+public:   
+   Region nearby();
+   Region nearby(int range);
+   
+   Region right();
+   Region right(int range);
+   
+   Region left();
+   Region left(int range);
+   
+   Region above();
+   Region above(int range);
+   
+   Region below();
+   Region below(int range);
+   
+   Region wider(int range = 9999999);
+   Region taller(int range = 9999999);
+   
+   Region inside();
+      
    
    //==================================================================
    // Automation Functions
@@ -200,9 +222,26 @@ public:
    int type(Region& target, const char* text, int modifiers = 0);
    int type(Match& target, const char* text, int modifiers = 0);
    
-   
-   
 };
 
 
+
+class Match : public Region {
+   
+public:
+   
+   Match();
+   ~Match();
+   Match(int _x, int _y, int _w, int _h, double _score);
+   Match(const Match& m);
+   
+   int compareTo(const Match& m);
+   
+   Location getTarget() const;
+   
+   double getScore() const;
+   
+   void setTargetOffset(Location offset);
+   
+};
 
