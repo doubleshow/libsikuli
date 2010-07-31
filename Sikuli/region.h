@@ -26,11 +26,9 @@ public:
    static int DelayAfterDrag;
    static int DelayBeforeDrop;
    static int WaitScanRate;
+   static bool ThrowException;
+   static double AutoWaitTimeout;
 };
-
-
-   
-   
    
 struct Rectangle{
    
@@ -40,13 +38,19 @@ struct Rectangle{
       x = x_; y = y_; width = width_; height = height_;
    }
    
-   Rectangle intersection(Rectangle r) { return r;};
+   Rectangle intersection(Rectangle r) { 
+      int x2 = min(x+width,r.x+r.width);
+      int y2 = min(y+height,r.y+r.height);
+      int x1 = max(x,r.x);
+      int y1 = max(y,r.y);
+      return Rectangle(x1,y1,x2-x1,y2-y1);
+   };
    
    int x;
    int y;
    int width;
    int height;
-};   
+};    
 
 
 //#include <robot.h>
@@ -75,17 +79,7 @@ private:
 
 };
 
-class Screen{
-   
-public:
-   
-   ScreenImage capture(int x, int y, int w, int h)
-   {return ScreenImage();};
-   
-   int getNumberScreens();
-   Rectangle getBounds(int screen_id);
-   
-};
+
 
 
 
@@ -147,8 +141,8 @@ public:
    Pattern targetOffset(int dx_, int dy_);
    
    Location getTargetOffset();
-   
-   string getImgURL() { return imgURL;} ;
+   float getSimilarity();
+   const char* getImgURL();
    
    string toString();
    
@@ -183,8 +177,6 @@ private:
 class Match;
 
 
-// TODO: Map to actual os-dependent values
-   
 
 // TYPE MODE
 #define PRESS_RELEASE 0
@@ -197,6 +189,8 @@ class Match;
 #define K_META  4  
 #define K_ALT   8
    
+
+#define PADDING 50   
    
 class Vision;
    
@@ -211,15 +205,20 @@ public:
    Region();
    ~Region();
    
+//==================================================================
+// Setting/Getting Attributes
+//==================================================================
+   
+   
    int getX(){ return x; }
    int getY(){ return y; }
    int getW(){ return w; }
    int getH(){ return h; }
    
-   void setX(int _x){ x = _x; }
-   void setY(int _y){ y = _y; }
-   void setW(int _w){ w = _w; }
-   void setH(int _h){ h = _h; }   
+   void setX(int x_){ x = x_; }
+   void setY(int y_){ y = y_; }
+   void setW(int w_){ w = w_; }
+   void setH(int h_){ h = h_; }   
    
    
    Rectangle getROI();
@@ -227,20 +226,18 @@ public:
    void setROI(Region roi);
    void setROI(Rectangle roi);
    
+   static Region getFullScreen(int screenId = 0);
+   
    Location getCenter() const;
    
    Match getLastMatch();
    vector<Match> getLastMatches();
-
-//==================================================================
-// Settings
-//==================================================================
   
-   void setThrowException(bool flag){ _throwException = flag; } 
-   void setAutoWaitTimeout(double sec){ _autoWaitTimeout = sec; }
-   
-   bool getThrowException(){ return _throwException; }
-   double getAutoWaitTimeout(){ return _autoWaitTimeout; }   
+//   void setThrowException(bool flag){ _throwException = flag; } 
+//   void setAutoWaitTimeout(double sec){ _autoWaitTimeout = sec; }
+//   
+//   bool getThrowException(){ return _throwException; }
+//   double getAutoWaitTimeout(){ return _autoWaitTimeout; }   
    
 //==================================================================
 // Pattern Matching Functions
@@ -279,6 +276,12 @@ private:
       
    vector<Match> waitAll(Pattern target, double timeout) throw(FindFailed);
    vector<Match> waitAll(const char* target, double timeout) throw(FindFailed);
+   
+   Location getLocationFromPSRML(Pattern target);
+   Location getLocationFromPSRML(const char* target);
+   Location getLocationFromPSRML(Region target);
+   Location getLocationFromPSRML(Match target);
+   Location getLocationFromPSRML(Location target);   
  
 //==================================================================
 // Automation Functions
@@ -288,88 +291,56 @@ public:
    
    int click(int modifiers = 0);
    int click(Location target, int modifiers = 0);
-   template<class PSRML> int click(PSRML target, int modifiers = 0){
-      try{
-         Location loc = getLocationFromPSRML(target);
-         return click(loc, modifiers);
-      }catch (exception e){
-         return 0;
-      }
-   };
+   int click(Pattern& target, int modifiers = 0);
+   int click(char const* target, int modifiers = 0);
+   int click(Region& target, int modifiers = 0);
+   int click(Match& target, int modifiers = 0);
    
    int doubleClick(int modifiers = 0);
    int doubleClick(Location target, int modifiers = 0);
-   template<class PSRML> int doubleClick(PSRML target, int modifiers){
-      try{
-         Location loc = getLocationFromPSRML(target);
-         return doubleClick(loc, modifiers);
-      }catch (exception e){
-         return 0;
-      }
-   };
-   
+   int doubleClick(Pattern& target, int modifiers = 0);
+   int doubleClick(char const* target, int modifiers = 0);
+   int doubleClick(Region& target, int modifiers = 0);
+   int doubleClick(Match& target, int modifiers = 0);
+      
    int rightClick(int modifiers = 0);
    int rightClick(Location target, int modifiers = 0);   
-   template<class PSRML> int rightClick(PSRML target, int modifiers = 0){
-      try{
-         Location loc = getLocationFromPSRML(target);
-         return rightClick(loc, modifiers);
-      }catch (exception e){
-         return 0;
-      }
-   };
+   int rightClick(Pattern& target, int modifiers = 0);
+   int rightClick(char const* target, int modifiers = 0);
+   int rightClick(Region& target, int modifiers = 0);
+   int rightClick(Match& target, int modifiers = 0);
    
    int hover(Location target);
-   template<class PSRML> int hover(PSRML target){
-      try{
-         Location loc = getLocationFromPSRML(target);
-         return hover(loc);
-      }catch (exception e){
-         return 0;
-      }
-   };
-   
-   //int dragDrop(Location t1, Location t2, int modifiers);
-   template<class PSRML> int dragDrop(PSRML t1, PSRML t2, int modifiers){
-      int ret = 0;
-      pressModifiers(modifiers);
-      if (drag(t1) != 0){
-         _robot.delay((int) Settings::DelayAfterDrag*1000);
-         ret = dropAt(t2, Settings::DelayBeforeDrop);
-      }
-      return ret;
-   };
+   int hover(Pattern& target);
+   int hover(char const* target);
+   int hover(Region& target);
+   int hover(Match& target);
+
+   int dragDrop(Location t1, Location t2, int modifiers = 0);
+   int dragDrop(Pattern& t1, Pattern& t2, int modifiers = 0);
+   int dragDrop(char const* t1, char const* t2, int modifiers = 0);
+   int dragDrop(Region& t1, Region& t2, int modifiers = 0);
+   int dragDrop(Match& t1, Match& t2, int modifiers = 0);
    
    int drag(Location target);
-   template<class PSRML> int drag(PSRML target){
-      try{
-         Location loc = getLocationFromPSRML(target);
-         return drag(target);
-      }catch (exception e){
-         return 0;
-      }
-   };
+   int drag(Pattern& target);
+   int drag(char const* target);
+   int drag(Region& target);
+   int drag(Match& target);
    
-   int dropAt(Location target, double delay);
-   template<class PSRML> int dropAt(PSRML target, double delay){
-      try{
-         Location loc = getLocationFromPSRML(target);
-         return dropAt(target, delay);
-      }catch (exception e){
-         return 0;
-      } 
-   };
-
+   int dropAt(Location target, double delay = 0.0);
+   int dropAt(Pattern& target, double delay = 0.0);
+   int dropAt(char const* target, double delay = 0.0);
+   int dropAt(Region& target, double delay = 0.0);
+   int dropAt(Match& target, double delay = 0.0);
+   
    int type(const char* text, int modifiers = 0);   
    int type(Location target, const char* text, int modifiers = 0);
-   template<class PSRML> int type(PSRML target, const char* text, int modifiers = 0){
-      try{
-         Location loc = getLocationFromPSRML(target);
-         return type(loc, text, modifiers);
-      }catch (exception e){
-         return 0;   
-      }
-   }   
+   int type(Pattern& target, const char* text, int modifiers = 0);
+   int type(const char* target, const char* text, int modifiers = 0);
+   int type(Region& target, const char* text, int modifiers = 0);
+   int type(Match& target, const char* text, int modifiers = 0);
+
    
    template<class PSRML> int paste(PSRML target, string text);
    
@@ -411,6 +382,9 @@ public:
    Region below();
    Region below(int range);
    
+   Region wider(int range = 9999999);
+   Region taller(int range = 9999999);
+   
    Region inside();
    
 protected:
@@ -425,17 +399,14 @@ protected:
    int w;
    int h; 
    
-   bool _throwException;
-   double _autoWaitTimeout;
+//   bool _throwException;
+//   double _autoWaitTimeout;
+   
+   
+//   int _screenId;
    
 private:
-   
-   Location getLocationFromPSRML(Pattern target);
-   Location getLocationFromPSRML(const char* target);
-   Location getLocationFromPSRML(Region target);
-   Location getLocationFromPSRML(Match target);
-   Location getLocationFromPSRML(Location target);
-   
+      
    Location toRobotCoord(Location l);
    Match toGlobalCoord(Match m);
   
@@ -443,7 +414,7 @@ private:
    string _hold_keys;
    
    Robot _robot;
-   Screen _scr;
+   //Screen* _scr;
    
  
 };
@@ -487,8 +458,8 @@ class Vision{
    public:
       
       //   static Match find(ScreenImage& simg);
-   static Match find(ScreenImage simg, Pattern ptn);
-   static vector<Match> findAll(ScreenImage simg, Pattern ptn);
+   static Match find(ScreenImage simg, Pattern ptn) throw(FindFailed);
+   static vector<Match> findAll(ScreenImage simg, Pattern ptn) throw(FindFailed);
       
 };
    

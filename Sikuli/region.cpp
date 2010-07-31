@@ -16,7 +16,10 @@ using namespace sikuli;
 
 int Settings::DelayBeforeDrop = 10;
 int Settings::DelayAfterDrag = 10;
-int Settings::WaitScanRate = 5;
+int Settings::WaitScanRate = 3;
+bool Settings::ThrowException = true;
+double Settings::AutoWaitTimeout = 3.0;
+
 
 ////////////////////////////////////////////////////////////////////
 /// Match Class
@@ -115,6 +118,16 @@ Pattern::getTargetOffset(){
    return Location(dx, dy);
 }
 
+float
+Pattern::getSimilarity(){
+   return similarity;
+}
+
+const char* 
+Pattern::getImgURL() { 
+   return imgURL.c_str();
+}
+
 string 
 Pattern::toString(){
    stringstream ret;
@@ -158,10 +171,13 @@ Region::init(int x_, int y_, int w_, int h_){
    y = y_;
    w = w_;
    h = h_;
-   _throwException = true;
-   _autoWaitTimeout = 3.0;
+//   _throwException = true;
+//   _autoWaitTimeout = 3.0;
    _pLastMatch = NULL;//new Match();
    _pLastMatches = NULL;
+   
+  // setScreen(0);
+   
   // new vector<Match>();
    //_pLastMatches->push_back(Match());
    //_scr = initScreen();
@@ -169,6 +185,12 @@ Region::init(int x_, int y_, int w_, int h_){
    //_evtMgr = new EventManager(this);   
 }
 
+Region
+Region::getFullScreen(int screenId){
+   int x,y,w,h;
+   Robot::getDisplayBounds(screenId,x,y,w,h);
+   return Region(x,y,w,h);
+}   
 
 Rectangle 
 Region::getROI(){ 
@@ -225,6 +247,27 @@ Region::click(Location target, int modifiers){
 }
 
 int 
+Region::click(Pattern& target, int modifiers){
+   return click(getLocationFromPSRML(target),modifiers);
+}
+
+int 
+Region::click(char const* target, int modifiers){
+   return click(getLocationFromPSRML(target),modifiers);
+}
+
+int 
+Region::click(Region& target, int modifiers){
+   return click(getLocationFromPSRML(target),modifiers);
+}
+
+int 
+Region::click(Match& target, int modifiers){
+   return click(getLocationFromPSRML(target),modifiers);
+}
+
+
+int 
 Region::doubleClick(int modifiers){
    return _click(BUTTON1_MASK, modifiers, true);
 }
@@ -232,6 +275,26 @@ Region::doubleClick(int modifiers){
 int 
 Region::doubleClick(Location target, int modifiers){
    return _click(target, BUTTON1_MASK, modifiers, true);   
+}
+
+int 
+Region::doubleClick(Pattern& target, int modifiers){
+   return doubleClick(getLocationFromPSRML(target),modifiers);
+}
+
+int 
+Region::doubleClick(char const* target, int modifiers){
+   return doubleClick(getLocationFromPSRML(target),modifiers);
+}
+
+int 
+Region::doubleClick(Region& target, int modifiers){
+   return doubleClick(getLocationFromPSRML(target),modifiers);
+}
+
+int 
+Region::doubleClick(Match& target, int modifiers){
+   return doubleClick(getLocationFromPSRML(target),modifiers);
 }
 
 int 
@@ -245,27 +308,120 @@ Region::rightClick(Location target, int modifiers){
 }
 
 int 
+Region::rightClick(Pattern& target, int modifiers){
+   return rightClick(getLocationFromPSRML(target),modifiers);
+}
+
+int 
+Region::rightClick(char const* target, int modifiers){
+   return rightClick(getLocationFromPSRML(target),modifiers);
+}
+
+int 
+Region::rightClick(Region& target, int modifiers){
+   return rightClick(getLocationFromPSRML(target),modifiers);
+}
+
+int 
+Region::rightClick(Match& target, int modifiers){
+   return rightClick(getLocationFromPSRML(target),modifiers);
+}
+
+int 
 Region::hover(Location target){
-   _robot.mouseMove(target.x, target.y);
-   _robot.waitForIdle();
+   Robot::mouseMove(target.x, target.y);
+   Robot::waitForIdle();
    return 1;
 }
 
+int 
+Region::hover(Pattern& target){
+   return hover(getLocationFromPSRML(target));
+}
+
+int 
+Region::hover(char const* target){
+   return hover(getLocationFromPSRML(target));
+}
+
+int 
+Region::hover(Region& target){
+   return hover(getLocationFromPSRML(target));
+}
+
+int 
+Region::hover(Match& target){
+   return hover(getLocationFromPSRML(target));
+}
+
+int 
+Region::dragDrop(Location t1, Location t2, int modifiers){
+   int ret = 0;
+   pressModifiers(modifiers);
+   if (drag(t1) != 0){
+      Robot::delay((int) Settings::DelayAfterDrag*1000);
+      ret = dropAt(t2, Settings::DelayBeforeDrop);
+   }
+   releaseModifiers(modifiers);
+   return ret;
+}
+
+
 int
 Region::drag(Location target){
-   _robot.mouseMove(target.x, target.y);
-   _robot.mousePress(BUTTON1_MASK);
-   _robot.waitForIdle();
+   Robot::mouseMove(target.x, target.y);
+   Robot::delay(100);
+   Robot::drag();
+   Robot::delay(100);
    return 1;  
+}
+
+int 
+Region::drag(Pattern& target){
+   return drag(getLocationFromPSRML(target));
+}
+
+int 
+Region::drag(char const* target){
+   return drag(getLocationFromPSRML(target));
+}
+
+int 
+Region::drag(Region& target){
+   return drag(getLocationFromPSRML(target));
+}
+
+int 
+Region::drag(Match& target){
+   return drag(getLocationFromPSRML(target));
 }
 
 int
 Region::dropAt(Location target, double delay){
-   _robot.mouseMove(target.x, target.y);
-   _robot.delay((int) delay*1000);
-   _robot.mouseRelease(BUTTON1_MASK);
-   _robot.waitForIdle();
+   Robot::mouseMove(target.x, target.y);
+   Robot::delay((int) delay*1000);
+   Robot::drop();
    return 1;
+}
+
+int 
+Region::dropAt(Pattern& target, double delay){
+   return dropAt(getLocationFromPSRML(target),delay);
+}
+
+int 
+Region::dropAt(char const* target, double delay){
+   return dropAt(getLocationFromPSRML(target),delay);
+}
+
+int 
+Region::dropAt(Region& target, double delay){
+   return dropAt(getLocationFromPSRML(target),delay);
+}
+
+int 
+Region::dropAt(Match& target, double delay){
+   return dropAt(getLocationFromPSRML(target),delay);
 }
 
 template<class PSRML> int 
@@ -276,7 +432,7 @@ Region::paste(PSRML target, string text){
       return 0;
    }
    else{
-      _robot.paste(text);   
+      Robot::paste(text);   
       return 1;
    }
 }
@@ -285,13 +441,14 @@ int
 Region::type(const char* text, int modifiers){
    if (strlen(text) < 0)
       return 0;
+ 
    for (int i=0; i < strlen(text); i++){
-      pressModifiers(modifiers);
+      pressModifiers(modifiers);  
       type_ch(text[i], PRESS_RELEASE);
       releaseModifiers(modifiers);
-      _robot.delay(20);
-   }
-   _robot.waitForIdle();
+      Robot::delay(20);
+   }   
+   //Robot::waitForIdle();
    return 1;   
 }
 
@@ -299,6 +456,26 @@ int
 Region::type(Location target, const char* text, int modifiers){
    click(target, 0);
    return type(text, modifiers);
+}
+
+int
+Region::type(Pattern& target, const char* text, int modifiers){
+   return type(getLocationFromPSRML(target), text, modifiers);
+}
+
+int
+Region::type(const char* target, const char* text, int modifiers){
+   return type(getLocationFromPSRML(target), text, modifiers);
+}
+
+int
+Region::type(Region& target, const char* text, int modifiers){
+   return type(getLocationFromPSRML(target), text, modifiers);
+}
+
+int
+Region::type(Match& target, const char* text, int modifiers){
+   return type(getLocationFromPSRML(target), text, modifiers);
 }
 
 void 
@@ -440,48 +617,52 @@ Region::type_ch(char character, int mode){
 
 void 
 Region::doType(int mode, int keycode){
-   if(mode==PRESS_ONLY){
-      _robot.keyPress(keycode);
-   }
-   else if(mode==RELEASE_ONLY){
-      _robot.keyRelease(keycode);
-   }
-   else{
-      _robot.keyPress(keycode);
-      _robot.keyRelease(keycode);
-   }
+//   if(mode==PRESS_ONLY){
+//      Robot::keyPress(keycode);
+//   }
+//   else if(mode==RELEASE_ONLY){
+//      Robot::keyRelease(keycode);
+//   }
+//   else{
+      Robot::keyPressRelease(keycode);
+   //   Robot::keyPress(keycode);
+     // Robot::keyRelease(keycode);
+//   }
 }
 
 void 
-Region::doType(int mode, int keycode1, int keycode2){
-   if(mode==PRESS_ONLY){
-      _robot.keyPress(keycode1);
-      _robot.keyPress(keycode2);      
-   }
-   else if(mode==RELEASE_ONLY){
-      _robot.keyRelease(keycode1);
-      _robot.keyRelease(keycode2);      
-   }
-   else{
-      _robot.keyPress(keycode1);
-      _robot.keyPress(keycode2);
-   }
+Region::doType(int mode, int modifier, int keycode){
+//   if(mode==PRESS_ONLY){
+////      Robot::keyPress(keycode1);
+////      Robot::keyPress(keycode2);      
+//   }
+//   else if(mode==RELEASE_ONLY){
+////      Robot::keyRelease(keycode1);
+////      Robot::keyRelease(keycode2);      
+//   }
+//   else{
+   //Robot::keyPressRelease(keycode, modifier);
+      Robot::keyPress(modifier);
+      Robot::keyPress(keycode);      
+      Robot::keyRelease(keycode);
+      Robot::keyRelease(modifier);      
+
 }
 
 void 
 Region::mouseDown(int buttons){
    _hold_buttons = buttons;
-   _robot.mousePress(buttons);
-   _robot.waitForIdle();
+   Robot::mousePress(buttons);
+   Robot::waitForIdle();
 }
    
 void 
 Region::mouseUp(int buttons){
    if (buttons == 0)
-      _robot.mouseRelease(_hold_buttons);
+      Robot::mouseRelease(_hold_buttons);
    else
-      _robot.mouseRelease(buttons);
-   _robot.waitForIdle();
+      Robot::mouseRelease(buttons);
+   Robot::waitForIdle();
 }
          
 void 
@@ -497,33 +678,33 @@ Region::keyDown(string keys){
             _hold_keys += key;
          }
       }
-      _robot.waitForIdle();
+      Robot::waitForIdle();
    }
 }
 
 void 
 Region::pressModifiers(int modifiers){
-   if((modifiers & K_SHIFT) != 0) _robot.keyPress(VK_SHIFT);
-   if((modifiers & K_CTRL) != 0) _robot.keyPress(VK_CONTROL);
-   if((modifiers & K_ALT) != 0) _robot.keyPress(VK_ALT);
+   if(modifiers & K_SHIFT) Robot::keyPress(VK_SHIFT);
+   if(modifiers & K_CTRL) Robot::keyPress(VK_CONTROL);
+   if(modifiers & K_ALT) Robot::keyPress(VK_ALT);
 //   if((modifiers & K_META) != 0){
  //     if( Env.getOS() == OS.WINDOWS )
-//         _robot.keyPress(KeyEvent.VK_WINDOWS);
+//         Robot::keyPress(KeyEvent.VK_WINDOWS);
 //      else
-//         _robot.keyPress(KeyEvent.VK_META);
+//         Robot::keyPress(KeyEvent.VK_META);
 //   }
 }
 
 void 
 Region::releaseModifiers(int modifiers){
-   if((modifiers & K_SHIFT) != 0) _robot.keyRelease(VK_SHIFT);
-   if((modifiers & K_CTRL) != 0) _robot.keyRelease(VK_CONTROL);
-   if((modifiers & K_ALT) != 0) _robot.keyRelease(VK_ALT);//
+   if((modifiers & K_SHIFT) != 0) Robot::keyRelease(VK_SHIFT);
+   if((modifiers & K_CTRL) != 0) Robot::keyRelease(VK_CONTROL);
+   if((modifiers & K_ALT) != 0) Robot::keyRelease(VK_ALT);//
 //   if((modifiers & K_META) != 0){ 
 //      if( Env.getOS() == OS.WINDOWS )
-//         _robot.keyRelease(KeyEvent.VK_WINDOWS);
+//         Robot::keyRelease(KeyEvent.VK_WINDOWS);
 //      else
-//         _robot.keyRelease(KeyEvent.VK_META);
+//         Robot::keyRelease(KeyEvent.VK_META);
 //   }
 }
 
@@ -545,7 +726,7 @@ Region::keyUp(string keys){
 //         _hold_keys.substring(pos+1);
       }
    }
-   _robot.waitForIdle();
+   Robot::waitForIdle();
 }
 
 
@@ -553,22 +734,21 @@ int
 Region::_click(int buttons, int modifiers, bool dblClick){
    pressModifiers(modifiers);
    //_scr.showClick(loc);
-   _robot.mousePress(buttons);
-   _robot.mouseRelease(buttons);
    if( dblClick ){
-      _robot.mousePress(buttons);
-      _robot.mouseRelease(buttons);
+      Robot::doubleClick(buttons);
+   }else{
+      Robot::singleClick(buttons);
    }
    releaseModifiers(modifiers);
-   _robot.waitForIdle();
+   Robot::waitForIdle();
    return 1;
 }
 
 int 
 Region::_click(Location loc, int buttons, int modifiers, bool dblClick) {
 //   Debug.info( getClickMsg(loc, buttons, modifiers, dblClick) );
-   _robot.mouseMove(loc.x, loc.y);
-   sleep(0.1);
+   Robot::mouseMove(loc.x, loc.y);
+   sleep(1);
    return _click(buttons, modifiers, dblClick);
  }
 
@@ -589,8 +769,8 @@ Region::getLastMatches(){
 Match
 Region::find(Pattern ptn) throw(FindFailed) {
    Match m;
-   if (_autoWaitTimeout > 0)
-      m = wait(ptn, _autoWaitTimeout);
+   if (Settings::AutoWaitTimeout > 0)
+      m = wait(ptn, Settings::AutoWaitTimeout);
    else {
       m = findNow(ptn);
    }
@@ -609,11 +789,11 @@ Region::find(const char* imgURL) throw(FindFailed){
 vector<Match> 
 Region::findAll(Pattern ptn) throw(FindFailed) {
    vector<Match> ms;
-   if (_autoWaitTimeout > 0){
-      ms = waitAll(ptn, _autoWaitTimeout);
+   if (Settings::AutoWaitTimeout > 0){
+      ms = waitAll(ptn, Settings::AutoWaitTimeout);
    }else{
       ms  = findAllNow(ptn);
-      if(ms.empty() && _throwException)
+      if (Settings::AutoWaitTimeout && ms.empty())
          throw FindFailed(ptn);
    }
    *_pLastMatches = ms;
@@ -628,10 +808,15 @@ Region::findAll(const char* imgURL) throw(FindFailed) {
 
 Match 
 Region::findNow(Pattern ptn) throw(FindFailed){
-   //ScreenImage simg( = _scr.capture(x, y, w, h);
-   ScreenImage simg = _robot.capture();
-   Match m = Vision::find(simg, ptn);
-   cout << "Found pattern at: " << m.x << "," << m.y << endl;
+   cout << "(" << x << "," << y << ") - (" << x+w << "," << y+h << ")" << endl;
+   ScreenImage simg = Robot::capture(0, x, y, w, h);
+//   cv::namedWindow("test");
+//   cv::imshow("test",simg.getMat());
+//   cv::waitKey();
+   Match m = Vision::find(simg, ptn);//
+   m.x += x;
+   m.y += y;
+   cout << "Found pattern at: " << m.x << "," << m.y << " score = " << m.getScore() << endl;
    if (m.getScore() <= 0)
       throw FindFailed(ptn);
    return m;
@@ -644,7 +829,8 @@ Region::findNow(const char* imgURL) throw(FindFailed){
 
 vector<Match> 
 Region::findAllNow(Pattern ptn) throw(FindFailed){
-   ScreenImage simg = _scr.capture(x, y, w, h);
+   // ToDo: adjust capturing region for multi-monitor
+   ScreenImage simg = Robot::capture(0, x, 800-h-y, w, h);
    vector<Match> ms = Vision::findAll(simg, ptn);
    if (ms.empty())
       throw FindFailed(ptn);
@@ -658,18 +844,23 @@ Region::findAllNow(const char* imgURL) throw(FindFailed){
    
 
 #include <time.h>
+#define CLOCKS_PER_MSEC (CLOCKS_PER_SEC/1000)
+
 Match
 Region::wait(Pattern target) throw(FindFailed){
-   return wait(target, _autoWaitTimeout);
-}
+   return wait(target, Settings::AutoWaitTimeout );
+} 
 
 Match
 Region::wait(Pattern target, double timeout) throw(FindFailed){
-   Match m(-1,-1,-1,-1,-1);
-   int MaxTimePerScan = (int)(1000.0/Settings::WaitScanRate); 
-   long begin_t = time(NULL);
-   do{
-      long before_find = time(NULL);
+   Match m;
+
+   long max_clocks_per_scan = CLOCKS_PER_MSEC * Settings::WaitScanRate;
+   long clocks_limit = clock() + timeout * CLOCKS_PER_SEC;   
+   while (clock() < clocks_limit){
+      long before_find = clock();
+      
+      // [begin] findNow
       try {
          m = findNow(target);
          if (_pLastMatch == NULL)
@@ -678,13 +869,14 @@ Region::wait(Pattern target, double timeout) throw(FindFailed){
          return m;
       }catch (FindFailed e){
       }
-      long after_find = time(NULL);
-      if(after_find-before_find<MaxTimePerScan)
-         _robot.delay((int)(MaxTimePerScan-(after_find-before_find)));
-      else
-         _robot.delay(10);
-   }while( begin_t + timeout*1000 > time(NULL));
-   if(_throwException)
+      // [end]
+      
+      long actual_clocks_per_scan = clock() - before_find;
+      long mseconds_to_delay = (max_clocks_per_scan - actual_clocks_per_scan)/CLOCKS_PER_MSEC;
+      Robot::delay(max((long)10, mseconds_to_delay));
+   }  
+
+   if(Settings::ThrowException)
       throw FindFailed(target);
    return m;
 }
@@ -702,21 +894,26 @@ Region::wait(const char* target, double timeout) throw(FindFailed){
 vector<Match>
 Region::waitAll(Pattern target, double timeout) throw(FindFailed){
    vector<Match> ms;
-   int MaxTimePerScan = (int)(1000.0/Settings::WaitScanRate); 
-   long begin_t = time(NULL);
-   do{
-      long before_find = time(NULL);
+   
+   long max_clocks_per_scan = CLOCKS_PER_MSEC * Settings::WaitScanRate;
+   long clocks_limit = clock() + timeout * CLOCKS_PER_SEC;   
+   while (clock() < clocks_limit){
+      long before_find = clock();
+      
+      // [begin] findAllNow
       try{
          ms = findAllNow(target);
          return ms;
-      }catch (FindFailed ff){}
-      long after_find = time(NULL);
-      if(after_find-before_find<MaxTimePerScan)
-         _robot.delay((int)(MaxTimePerScan-(after_find-before_find)));
-      else
-         _robot.delay(10);
-   }while( begin_t + timeout*1000 > time(NULL));
-   if(_throwException)
+      }catch (FindFailed ff){
+      }
+      // [end]
+      
+      long actual_clocks_per_scan = clock() - before_find;
+      long mseconds_to_delay = (max_clocks_per_scan - actual_clocks_per_scan)/CLOCKS_PER_MSEC;
+      Robot::delay(max((long)10, mseconds_to_delay));
+   }  
+   
+   if(Settings::ThrowException)
       throw FindFailed(target);
    return ms;
 }
@@ -742,7 +939,7 @@ Region::exists(const char* target, double timeout){
 
 bool
 Region::exists(Pattern target){
-   return exists(target, _autoWaitTimeout);
+   return exists(target, Settings::AutoWaitTimeout);
 }
 bool
 Region::exists(const char* target){
@@ -751,27 +948,31 @@ Region::exists(const char* target){
 
 bool
 Region::waitVanish(Pattern target, double timeout){
-   int MaxTimePerScan = (int)(1000.0/Settings::WaitScanRate); 
-   long begin_t = time(NULL);
-   do{
-      long before_find = time(NULL);
+   
+   long max_clocks_per_scan = CLOCKS_PER_MSEC * Settings::WaitScanRate;
+   long clocks_limit = clock() + timeout * CLOCKS_PER_SEC;   
+   while (clock() < clocks_limit){
+      long before_find = clock();
+      
+      // [begin] findNow
       try {
          Match m = findNow(target);
       }catch (FindFailed e){
          return true;
       }      
-      long after_find = time(NULL);
-      if(after_find-before_find<MaxTimePerScan)
-         _robot.delay((int)(MaxTimePerScan-(after_find-before_find)));
-      else
-         _robot.delay(10);
-   }while( begin_t + timeout*1000 > time(NULL));
+      // [end]
+      
+      long actual_clocks_per_scan = clock() - before_find;
+      long mseconds_to_delay = (max_clocks_per_scan - actual_clocks_per_scan)/CLOCKS_PER_MSEC;
+      Robot::delay(max((long)10, mseconds_to_delay));
+   }  
+   
    return false;
 }
 
 bool
 Region::waitVanish(Pattern target){
-   return waitVanish(target, _autoWaitTimeout);
+   return waitVanish(target, Settings::AutoWaitTimeout);
 }
 
 bool
@@ -781,11 +982,10 @@ Region::waitVanish(const char* target, double timeout){
 
 bool
 Region::waitVanish(const char* target){
-   return waitVanish(target, _autoWaitTimeout);
+   return waitVanish(target, Settings::AutoWaitTimeout);
 }
 
-//final int PADDING = 50;
-#define PADDING 50
+#include "screen.h"
 
 Region 
 Region::nearby(){
@@ -794,7 +994,7 @@ Region::nearby(){
 
 Region 
 Region::nearby(int range){
-   Rectangle bounds;// = getScreen().getBounds();
+   Rectangle bounds = Screen(0).getBounds();
    Rectangle rect = Rectangle(x-range,y-range,w+range*2,h+range*2);
    rect = rect.intersection(bounds);
    return Region(rect);
@@ -807,10 +1007,10 @@ Region::right(){
 
 Region 
 Region::right(int range){
-   Rectangle bounds;// = getScreen().getBounds();
+   Rectangle bounds = Screen(0).getBounds();
    Rectangle rect = Rectangle(x+w,y,range,h);
    rect = rect.intersection(bounds);
-   return Region(rect);
+   return Region(rect);      
 }
 
 Region 
@@ -819,14 +1019,11 @@ Region::left(){
 }
 
 Region 
-Region::left(int range){
-   Rectangle bounds;// = getScreen().getBounds();
-   Region r(*this);
-   r.x = x-range < bounds.x? bounds.x: x-range;
-   r.y = y;
-   r.w = x - r.x;
-   r.h = h;
-   return r;
+Region::left(int range){//
+   Rectangle bounds = Screen(0).getBounds();
+   Rectangle rect = Rectangle(x-range,y,range,h);
+   rect = rect.intersection(bounds);
+   return Region(rect);   
 }
 
 Region 
@@ -836,26 +1033,39 @@ Region::above(){
 
 Region
 Region::above(int range){
-   Rectangle bounds;// TODO: = getScreen().getBounds();
-   Region r(*this);
-   r.x = x;
-   r.y = y-range < bounds.y? bounds.y : y-range;
-   r.w = w;
-   r.h = y-r.y;
-   return r;
+   Rectangle bounds = Screen(0).getBounds();
+   Rectangle rect = Rectangle(x,y-range,w,range);
+   rect = rect.intersection(bounds);
+   return Region(rect);
 }
 
 Region 
 Region::below(){
-   return below(999999);   
+   return below(9999999);   
 }
 
 Region 
 Region::below(int range){
-   Rectangle bounds; // TODO: = getScreen().getBounds();
+   Rectangle bounds = Screen(0).getBounds();
    Rectangle rect = Rectangle(x,y+h,w,range);
    rect = rect.intersection(bounds);
    return Region(rect);
+}
+
+Region
+Region::wider(int range){
+   Rectangle bounds = Screen(0).getBounds();
+   Rectangle rect = Rectangle(x-range,y,w+2*range,h);
+   rect = rect.intersection(bounds);
+   return Region(rect);   
+}
+
+Region
+Region::taller(int range){
+   Rectangle bounds = Screen(0).getBounds();
+   Rectangle rect = Rectangle(x,y-range,w,h+2*range);
+   rect = rect.intersection(bounds);
+   return Region(rect);   
 }
 
 Region 
@@ -895,16 +1105,31 @@ Region::getLocationFromPSRML(Location target){
 ////////////////////////////////////////////////////////////////////
 #include "finder.h"
 Match 
-Vision::find(ScreenImage simg, Pattern ptn) { 
+Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
    Finder f(simg.getMat());
-   f.find(ptn.getImgURL().c_str(), 0.5);
-   FindResult r = f.next();
-   return Match(r.x,r.y,r.w,r.h,r.score);
-};
+   f.find(ptn.getImgURL(), ptn.getSimilarity());
+   if (f.hasNext()){      
+      FindResult r = f.next();
+      return Match(r.x,r.y,r.w,r.h,r.score);
+   }else {
+      throw FindFailed(ptn);
+   }
+}
 
 vector<Match> 
-Vision::findAll(ScreenImage simg, Pattern ptn){ 
-   return vector<Match>();
-};
+Vision::findAll(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
+   vector<Match> ms;
+   Finder f(simg.getMat());
+   f.find(ptn.getImgURL(), ptn.getSimilarity());
+   while (f.hasNext()){      
+      FindResult r = f.next();
+      ms.push_back(Match(r.x,r.y,r.w,r.h,r.score));
+   }
+   
+   if (!ms.empty())
+      return ms;
+   else
+      throw FindFailed(ptn);
+}
 
 

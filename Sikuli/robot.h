@@ -108,17 +108,34 @@ class Robot{
    
 public:
    
-   void delay(int time);
-   void mouseMove(int x, int y);
-   void mousePress(int buttons);
-   void mouseRelease(int buttons);
-   void waitForIdle();
-   void keyPress(int key);
-   void keyRelease(int key);
-
-   void paste(string text);
+   //Robot();
    
-   cv::Mat capture();
+   static void delay(int time);
+   static void mouseMove(int x, int y);
+   static void mousePress(int buttons);
+   static void mouseRelease(int buttons);
+   static void waitForIdle();
+   static void keyPress(int key);
+   static void keyRelease(int key);
+   
+   static void singleClick(int button);
+   static void doubleClick(int button);
+   static void drag();
+   static void drop();
+   
+   static void keyPressRelease(int key, int modifiers = 0);
+
+   static void getDisplayBounds(int displayId, int& x, int& y, int& w, int& h);
+   
+   
+   static void paste(string text);
+
+   static cv::Mat capture(int displayId);   
+   static cv::Mat capture(int displayId, int x, int y, int w, int h);
+   
+private:
+   
+   static int _modifiers;
    
 };
 
