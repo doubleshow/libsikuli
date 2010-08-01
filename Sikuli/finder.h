@@ -16,9 +16,11 @@ public:
 	
 	int get_screen_height() const { return source.rows;};
 	int get_screen_width()  const {return source.cols;};
+
 	
-	void find();
+   void find();
    
+   virtual void find(const char* str, double min_similarity) = 0;   
    
    virtual bool hasNext() = 0;
    virtual FindResult next() = 0;
@@ -34,10 +36,10 @@ protected:
    double min_similarity;
 };
 
-class WordFinder : public BaseFinder {
+class TextFinder : public BaseFinder {
 	
 public:
-	WordFinder(Mat source);
+	TextFinder(Mat source);
    static void train(Mat& trainingImage);
 	
    void find(const char* word, double min_similarity);   

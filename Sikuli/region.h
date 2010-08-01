@@ -133,22 +133,28 @@ public:
    
    Pattern();
    Pattern(const Pattern& p);
-   Pattern(const char* imgURL_);
+   Pattern(const char* str);
    
    Pattern similar(float similarity_);
    Pattern exact();
-   
    Pattern targetOffset(int dx_, int dy_);
    
    Location getTargetOffset();
    float getSimilarity();
-   const char* getImgURL();
+   
    
    string toString();
    
+   const char* getText();
+   const char* getImageURL();
+
+   bool isImageURL();
+   bool isText();
+   
 private:
    
-   string imgURL;
+   bool bText;
+   string str;
    float similarity;
    int dx;
    int dy;
@@ -177,17 +183,13 @@ private:
 class Match;
 
 
+   
+#include "keys.h"
 
 // TYPE MODE
 #define PRESS_RELEASE 0
 #define PRESS_ONLY 1
 #define RELEASE_ONLY 2
-   
-//
-#define K_SHIFT 1
-#define K_CTRL  2
-#define K_META  4  
-#define K_ALT   8
    
 
 #define PADDING 50   
@@ -246,7 +248,7 @@ public:
 public:
    
    Match find(Pattern ptn) throw(FindFailed);
-   Match find(const char* imgURL) throw(FindFailed);
+   Match find(const char* target) throw(FindFailed);
    
    vector<Match> findAll(Pattern ptn) throw(FindFailed);
    vector<Match> findAll(const char* imgURL) throw(FindFailed);
@@ -398,13 +400,7 @@ protected:
    int y;
    int w;
    int h; 
-   
-//   bool _throwException;
-//   double _autoWaitTimeout;
-   
-   
-//   int _screenId;
-   
+
 private:
       
    Location toRobotCoord(Location l);
@@ -419,16 +415,13 @@ private:
  
 };
    
-//class Screen : public Region {
-//
-//public: 
-//   
-//   Rectangle getBounds();
-//   int getNumberScreens();
-//   void capture();
-//   
-//   
-//};
+class FullScreen : public Region {
+   
+public:
+   
+   FullScreen();
+   FullScreen(int screenId);
+};
    
 class Match : public Region {
    
@@ -454,14 +447,7 @@ private:
 };
 
    
-class Vision{
-   public:
-      
-      //   static Match find(ScreenImage& simg);
-   static Match find(ScreenImage simg, Pattern ptn) throw(FindFailed);
-   static vector<Match> findAll(ScreenImage simg, Pattern ptn) throw(FindFailed);
-      
-};
+
    
 
 };

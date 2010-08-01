@@ -2,26 +2,8 @@
 #define _OCR_H_
 
 #include "opencv2/opencv.hpp"
+#include "result.h"
 using namespace cv;
-
-
-#ifndef _MATCH_
-#define _MATCH_
-
-struct Match {
-   int x, y;
-   int w, h;
-   double score;
-   Match(){
-      x=0;y=0;w=0;h=0;score=-1;
-   }
-   Match(int _x, int _y, int _w, int _h, double _score){
-      x = _x; y = _y;
-      w = _w; h = _h;
-      score = _score;
-   }
-};
-#endif
 
 struct WordRect : public Rect{	
 	WordRect(Rect& r) : Rect(r) {};
@@ -29,8 +11,8 @@ struct WordRect : public Rect{
 };
 
 void train_by_image(const Mat& trainingImage);
-//vector<Match> find_word_by_image(const Mat& inputImage, const char word[]);
-//vector<Match> find_phrase(const Mat& inputImage, vector<string> targetWords);
+vector<FindResult> find_word_by_image(const Mat& inputImage, const char word[]);
+vector<FindResult> find_phrase(const Mat& inputImage, vector<string> targetWords);
 
 vector<string> recognize_words(const Mat& inputImageColor);   
 
@@ -40,7 +22,7 @@ void test_segment(const Mat& inputImage, const char word[]);
 #define DISPLAY_SEGMENT_LINEIMAGE_STEP 0
 #define DISPLAY_SEGMENT_LINEIMAGE_RESULT 0
 #define DISPLAY_RECOGNIZE 0
-#define DISPLAY_WORD_FIND_RESULT 0
+#define DISPLAY_WORD_FIND_RESULT 1
 
 #define DISPLAY_TEST_SEGMENT 1
 
@@ -54,5 +36,7 @@ void test_segment(const Mat& inputImage, const char word[]);
 #define MIN_CHAR_MATCH_THRESHOLD 0.4
 
 #define OUTPUT_RESULT_IMAGES 1
+
+//#define DEBUG
 
 #endif

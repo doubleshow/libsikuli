@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include "region.h"
+#include "vision.h"
 
 using namespace sikuli;
 
@@ -71,25 +72,43 @@ Match::setTargetOffset(Location offset){
 ////////////////////////////////////////////////////////////////////
 
 Pattern::Pattern(){
-   imgURL = "";
+   str = "";
    similarity = 0.7f;
    dx = 0;
    dy = 0;
 }
 
 Pattern::Pattern(const Pattern& p){
-   imgURL = p.imgURL;
+   str = p.str;
+   bText = p.bText;
    similarity = p.similarity;
    dx = p.dx;
    dy = p.dy;
 }
 
-Pattern::Pattern(const char* imgURL_){
-   imgURL = string(imgURL_);
+Pattern::Pattern(const char* str_){
+   str = string(str_);
+   
+   bText = str.length()>3 && str[0] == '/' && str[str.length()-1] == '/';
+   if (bText)
+      str = str.substr(1, str.length()-2);
+   
+   
    similarity = 0.7f;
    dx = 0;
    dy = 0;   
 }
+
+bool
+Pattern::isText(){
+   return bText;
+}
+
+bool
+Pattern::isImageURL(){
+   return !isText();
+}
+
 
 Pattern 
 Pattern::similar(float similarity_){
@@ -124,14 +143,20 @@ Pattern::getSimilarity(){
 }
 
 const char* 
-Pattern::getImgURL() { 
-   return imgURL.c_str();
+Pattern::getImageURL() { 
+   return str.c_str();
 }
+
+const char* 
+Pattern::getText() { 
+   return str.c_str();
+}
+
 
 string 
 Pattern::toString(){
    stringstream ret;
-   ret << "Pattern(\"" << imgURL + "\")";
+   ret << "Pattern(\"" << str + "\")";
    ret << ".similar(" << similarity << ")";
    if(dx!=0 || dy!=0)
       ret << ".targetOffset(" << dx << "," << dy << ")";
@@ -684,9 +709,9 @@ Region::keyDown(string keys){
 
 void 
 Region::pressModifiers(int modifiers){
-   if(modifiers & K_SHIFT) Robot::keyPress(VK_SHIFT);
-   if(modifiers & K_CTRL) Robot::keyPress(VK_CONTROL);
-   if(modifiers & K_ALT) Robot::keyPress(VK_ALT);
+   if(modifiers & KEY_SHIFT) Robot::keyPress(VK_SHIFT);
+   if(modifiers & KEY_CTRL) Robot::keyPress(VK_CONTROL);
+   if(modifiers & KEY_ALT) Robot::keyPress(VK_ALT);
 //   if((modifiers & K_META) != 0){
  //     if( Env.getOS() == OS.WINDOWS )
 //         Robot::keyPress(KeyEvent.VK_WINDOWS);
@@ -697,9 +722,9 @@ Region::pressModifiers(int modifiers){
 
 void 
 Region::releaseModifiers(int modifiers){
-   if((modifiers & K_SHIFT) != 0) Robot::keyRelease(VK_SHIFT);
-   if((modifiers & K_CTRL) != 0) Robot::keyRelease(VK_CONTROL);
-   if((modifiers & K_ALT) != 0) Robot::keyRelease(VK_ALT);//
+   if((modifiers & KEY_SHIFT) != 0) Robot::keyRelease(VK_SHIFT);
+   if((modifiers & KEY_CTRL) != 0) Robot::keyRelease(VK_CONTROL);
+   if((modifiers & KEY_ALT) != 0) Robot::keyRelease(VK_ALT);//
 //   if((modifiers & K_META) != 0){ 
 //      if( Env.getOS() == OS.WINDOWS )
 //         Robot::keyRelease(KeyEvent.VK_WINDOWS);
@@ -1101,35 +1126,18 @@ Region::getLocationFromPSRML(Location target){
 }
 
 ////////////////////////////////////////////////////////////////////
-/// Vision Class
+/// FullScreen Class
 ////////////////////////////////////////////////////////////////////
-#include "finder.h"
-Match 
-Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
-   Finder f(simg.getMat());
-   f.find(ptn.getImgURL(), ptn.getSimilarity());
-   if (f.hasNext()){      
-      FindResult r = f.next();
-      return Match(r.x,r.y,r.w,r.h,r.score);
-   }else {
-      throw FindFailed(ptn);
-   }
+
+FullScreen::FullScreen(){
+   int x,y,w,h;
+   Robot::getDisplayBounds(0,x,y,w,h);
+   init(x,y,w,h);   
 }
 
-vector<Match> 
-Vision::findAll(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
-   vector<Match> ms;
-   Finder f(simg.getMat());
-   f.find(ptn.getImgURL(), ptn.getSimilarity());
-   while (f.hasNext()){      
-      FindResult r = f.next();
-      ms.push_back(Match(r.x,r.y,r.w,r.h,r.score));
-   }
-   
-   if (!ms.empty())
-      return ms;
-   else
-      throw FindFailed(ptn);
+FullScreen::FullScreen(int screenId){
+   int x,y,w,h;
+   Robot::getDisplayBounds(screenId,x,y,w,h);
+   init(x,y,w,h);   
 }
-
 

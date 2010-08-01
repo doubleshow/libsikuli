@@ -12,7 +12,6 @@
 #include "opencv2/opencv.hpp"
 //#include "highgui.h"
 
-
 using namespace cv;
 
 void paste(const Mat& src, Mat& dest, int x, int y);

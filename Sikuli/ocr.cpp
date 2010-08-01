@@ -2,8 +2,6 @@
 #include <vector>
 #include <iomanip>
 
-
-
 #include "opencv2/opencv.hpp"
 //#include "highgui.h"
 
@@ -911,7 +909,7 @@ Mat visualize_segmentation(const Mat& inputImage, bool flipContrast = false){
 
 
 
-bool sort_by_score(Match& m1, Match& m2){
+bool sort_by_score(FindResult& m1, FindResult& m2){
 	return m1.score > m2.score;
 }
 
@@ -947,7 +945,7 @@ float match_char(Mat& inputCharImage, char targetChar){
    if (targetChar == 'l' || targetChar == 'I' || targetChar == 'i'){
       // non-image based matching for special characters
       
-      if ((inputCharImage.rows / inputCharImage.cols) > 5){
+      if ((inputCharImage.rows * 1.0 / inputCharImage.cols) >= 3){
          return 0.8;
       }else{
          return 0.0;
@@ -972,7 +970,7 @@ float match_2chars(Mat& input, char c1, char c2){
 float match_word(const Mat& inputImage, const WordRect& wordRect, const char targetWord[]){
 	float score = 0;
 
-#if DISPLAY_MATCH_WORD	
+#if 0 //DISPLAY_MATCH_WORD	
 	dout << wordRect.charRects.size() << endl;		
 	Mat m1(inputImage, wordRect);
 	Mat m1g;
@@ -1096,20 +1094,20 @@ void train_by_image(const Mat& trainingImage){
 }
 
 
-Mat visualize_matches(const Mat& inputImage, vector<Match> matches){
+Mat visualize_matches(const Mat& inputImage, vector<FindResult> matches){
    
    Mat resultImage = inputImage.clone();
 
    for (int i=0; i < matches.size(); ++i){
       
-      Match m = matches[i];        
+      FindResult m = matches[i];        
       Rect r(m.x,m.y,m.w,m.h);
       draw_rectangle(resultImage, r);
    }
    
    for (int i=0; i < matches.size(); ++i){
       
-      Match m = matches[i];        
+      FindResult m = matches[i];        
       Rect r(m.x,m.y,m.w,m.h);
       
       char buf[50];
@@ -1137,14 +1135,14 @@ Mat visualize_matches(const Mat& inputImage, vector<Match> matches){
 }
 
 
-Match 
+FindResult 
 match_words(const Mat& inputImage, 
             const vector<WordRect>& wordRects, 
             const vector<string>& targetWords){
    
    // if the words on this line are too few, skip
    if (wordRects.size() < targetWords.size())
-      return Match(0,0,0,0,-1);
+      return FindResult(0,0,0,0,-1);
    
    int i=0; // word rects
    int j=0; // target words
@@ -1184,7 +1182,7 @@ match_words(const Mat& inputImage,
    
    
    if (matchedWordRects.size() != targetWords.size())
-      return Match(0,0,0,0,-1);
+      return FindResult(0,0,0,0,-1);
 
    Rect r = matchedWordRects[0];
    for (int j=1; j < matchedWordRects.size(); ++j){
@@ -1192,17 +1190,17 @@ match_words(const Mat& inputImage,
    }
    
    
-   Match match;
-   match.score = 1.0;
-   match.x = r.x;
-   match.y = r.y;
-   match.h = r.height;
-   match.w = r.width;
+   FindResult FindResult;
+   FindResult.score = 1.0;
+   FindResult.x = r.x;
+   FindResult.y = r.y;
+   FindResult.h = r.height;
+   FindResult.w = r.width;
    
-   return match;
+   return FindResult;
 }
 
-vector<Match> 
+vector<FindResult> 
 find_phrase_helper(const Mat& inputImageColor, 
                    vector<string> targetWords,
                    bool flipContrast = false){
@@ -1220,7 +1218,7 @@ find_phrase_helper(const Mat& inputImageColor,
    if (flipContrast)
       absdiff(inputImageGray, 255, inputImageGray);
  
-   vector<Match> candidateMatches;
+   vector<FindResult> candidateMatches;
 
   	vector<Rect> linesRects = segment_image(inputImageColor);
    
@@ -1244,10 +1242,10 @@ find_phrase_helper(const Mat& inputImageColor,
       
 		vector<WordRect> wordRects = characterRects_to_wordRects(charRects);
       
-      Match match = match_words(inputImageGray, wordRects, targetWords);
+      FindResult FindResult = match_words(inputImageGray, wordRects, targetWords);
 
-      if (match.score > 0)
-         candidateMatches.push_back(match);
+      if (FindResult.score > 0)
+         candidateMatches.push_back(FindResult);
     
       
    }
@@ -1256,22 +1254,49 @@ find_phrase_helper(const Mat& inputImageColor,
 }
 
 
-vector<Match> 
+vector<FindResult> 
 find_phrase(const Mat& inputImageColor, 
             vector<string> targetWords){
    
-   vector<Match> candidateMatches;
+   vector<FindResult> candidateMatches;
    
    candidateMatches = find_phrase_helper(inputImageColor, targetWords);
    
-   vector<Match> candidateMatchesMore = find_phrase_helper(inputImageColor, targetWords, true);
+   vector<FindResult> candidateMatchesMore = find_phrase_helper(inputImageColor, targetWords, true);
    
    candidateMatches.insert(candidateMatches.end(), candidateMatchesMore.begin(), candidateMatchesMore.end() );
-  	sort(candidateMatches, sort_by_score);				
+  	sort(candidateMatches, sort_by_score);		
+   
+   
+   
+#if OUTPUT_RESULT_IMAGES   
+   
+   const char* word = targetWords[0].c_str();
+   
+   Mat resultImage = visualize_matches(inputImageColor, candidateMatches);
+   char buf[100];
+   sprintf(buf,"/tmp/ocr.%s.output.png", word);
+   imwrite(buf, resultImage);
+   
+   sprintf(buf,"/tmp/ocr.%s.input.png", word);
+   imwrite(buf, inputImageColor);
+   
+   Mat segResultImage1 = visualize_segmentation(inputImageColor);
+   sprintf(buf,"/tmp/ocr.%s.seg.1.png", word);
+   imwrite(buf, segResultImage1);
+   
+   Mat segResultImage2 = visualize_segmentation(inputImageColor,true);
+   sprintf(buf,"/tmp/ocr.%s.seg.2.png", word);
+   imwrite(buf, segResultImage2);
+   
+   
+#endif      
+   
+   
    return candidateMatches;
 }
 
-vector<Match> 
+vector<FindResult> 
 find_word_helper(const Mat& inputImageColor, 
                  const char word[],
                  bool flipContrast = false){
@@ -1285,7 +1310,7 @@ find_word_helper(const Mat& inputImageColor,
       absdiff(inputImageGray, 255, inputImageGray);
 
 	Rect bestRect;
-	vector<Match> candidateMatches;
+	vector<FindResult> candidateMatches;
 	
 	vector<Rect> linesRects = segment_image(inputImageColor);
 	
@@ -1330,7 +1355,7 @@ find_word_helper(const Mat& inputImageColor,
 			double score = 0;
 			score = match_word(inputImageGray, wordRect, word);
 
-			Match m;
+			FindResult m;
 			m.score = min(1.0, score / (strlen(word)));
 			m.x = wordRect.x;
          m.y = wordRect.y;
@@ -1350,14 +1375,14 @@ find_word_helper(const Mat& inputImageColor,
 
 
 
-vector<Match> find_word_by_image(const Mat& inputImageColor, 
+vector<FindResult> find_word_by_image(const Mat& inputImageColor, 
                                  const char word[]){
    
-   vector<Match> candidateMatches;
+   vector<FindResult> candidateMatches;
    
    candidateMatches = find_word_helper(inputImageColor, word);
    
-   vector<Match> candidateMatchesMore = find_word_helper(inputImageColor, word, true);
+   vector<FindResult> candidateMatchesMore = find_word_helper(inputImageColor, word, true);
    
    candidateMatches.insert(candidateMatches.end(), candidateMatchesMore.begin(), candidateMatchesMore.end() );
   	sort(candidateMatches, sort_by_score);				
@@ -1375,12 +1400,12 @@ vector<Match> find_word_by_image(const Mat& inputImageColor,
    Mat segResultImage1 = visualize_segmentation(inputImageColor);
    sprintf(buf,"/tmp/ocr.%s.seg.1.png", word);
    imwrite(buf, segResultImage1);
-
+   
    Mat segResultImage2 = visualize_segmentation(inputImageColor,true);
    sprintf(buf,"/tmp/ocr.%s.seg.2.png", word);
    imwrite(buf, segResultImage2);
    
-
+   
 #endif   
    
    return candidateMatches;

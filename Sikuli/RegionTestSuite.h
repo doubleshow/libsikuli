@@ -10,6 +10,7 @@
 #include <cxxtest/TestSuite.h>
 #include "region.h"
 #include "screen.h"
+#include "vision.h"
 using namespace sikuli;
 
 class RegionTestSuite : public CxxTest::TestSuite 
@@ -28,13 +29,32 @@ public:
 //      Match m = r.find("region.png");
 //      r.doubleClick("folder.png");
 //      
+////localhost/Users/tomyeh/Desktop/Videos/
+      //Region r = Region::getFullScreen();
+      
+      FullScreen r;
+      //r.click("folder.png");
+      
+      Vision::trainOCR("arial.png");
+//      r.click("/Project/");
+//      //sleep(1);
+//      r.hover("/New Smart Group/");
+//      r.hover("/Simple Filter Smart Group/");
 
-      Region r = Region::getFullScreen();
-      Match m = r.find("flash.png");
+      
+      r.click("apple.png");
+      //r.click("/System Preferences/");
+      r.type("sys\n");
+      sleep(1);
+      r.click("/Trackpad/");
+//      Match m = r.find("displays.png");
+//      m.hover("/Displays/");
+      
+      //Match m = r.find("flash.png");
       //m.above().wider(50).doubleClick("folder.png");
       //m.left().taller(50).doubleClick("folder.png");
       
-      r.find("folder.png").right().taller(50).doubleClick("flash.png");
+      //r.find("folder.png").right().taller(50).doubleClick("flash.png");
       
       //Region r;
       //r.click(Location(10,10), 1);

@@ -488,43 +488,65 @@ ChangeFinder::next(){
 //=====================================================================================
 #include "ocr.h"
 
-WordFinder::WordFinder(Mat inputImage)
+TextFinder::TextFinder(Mat inputImage)
 : BaseFinder(inputImage){
 };
 
 void
-WordFinder::train(Mat& trainingImage){	
+TextFinder::train(Mat& trainingImage){	
 	train_by_image(trainingImage);
 }
 
+
+// Code copied from 
+// http://oopweb.com/CPP/Documents/CPPHOWTO/Volume/C++Programming-HOWTO-7.html
+static void Tokenize(const string& str,
+              vector<string>& tokens,
+              const string& delimiters = " ")
+{
+   // Skip delimiters at beginning.
+   string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+   // Find first "non-delimiter".
+   string::size_type pos     = str.find_first_of(delimiters, lastPos);
+   
+   while (string::npos != pos || string::npos != lastPos)
+   {
+      // Found a token, add it to the vector.
+      tokens.push_back(str.substr(lastPos, pos - lastPos));
+      // Skip delimiters.  Note the "not_of"
+      lastPos = str.find_first_not_of(delimiters, pos);
+      // Find next "non-delimiter"
+      pos = str.find_first_of(delimiters, lastPos);
+    }
+}
+
+
 void
-WordFinder::find(const char* word, double _min_similarity){
-   this->min_similarity = _min_similarity;
-   BaseFinder::find();
-	TimingBlock tb("WordFinder::find");
-	//matches = find_word_by_image(roiSource, word);
-   //matches_iterator = matches.begin();
+TextFinder::find(const char* text, double _min_similarity){
+   vector<string> words;
+   Tokenize(text, words, " ");
+   return find(words, _min_similarity);
 }
 
 void
-WordFinder::find(vector<string> words, double _min_similarity){
+TextFinder::find(vector<string> words, double _min_similarity){
    this->min_similarity = _min_similarity;
    BaseFinder::find();
-	TimingBlock tb("WordFinder::find");
-	//matches = find_phrase(roiSource, words);
-   //matches_iterator = matches.begin();   
+	TimingBlock tb("TextFinder::find");
+	matches = find_phrase(roiSource, words);
+   matches_iterator = matches.begin();   
 }
 
 bool      
-WordFinder::hasNext(){
+TextFinder::hasNext(){
    
-//   dout << "[WordFinder] " << matches_iterator->score  << endl;
+//   dout << "[TextFinder] " << matches_iterator->score  << endl;
    return (matches_iterator != matches.end()) &&
-       (matches_iterator->score >= min_similarity);
+   (matches_iterator->score >= min_similarity);
 }
 
 FindResult
-WordFinder::next(){ 
+TextFinder::next(){ 
    
    FindResult ret;
    if (hasNext()){
@@ -539,7 +561,7 @@ WordFinder::next(){
    
 
 vector<string>
-WordFinder::recognize(const Mat& inputImage){	
+TextFinder::recognize(const Mat& inputImage){	
 	return recognize_words(inputImage);
 }
 
@@ -573,7 +595,7 @@ Finder::find(IplImage* target, double min_similarity){
    if (abs(min_similarity - 100)< 0.00001){
       cout << "training.." << endl;
       Mat im(target);
-      WordFinder::train(im);
+      TextFinder::train(im);
       
    }else{
    
@@ -594,10 +616,10 @@ Finder::find(const char *target, double min_similarity){
    if (abs(min_similarity - 100)< 0.00001){
       
       Mat im = imread(target,1);
-      WordFinder::train(im);
+      TextFinder::train(im);
       
    }else if (strncmp(ext,"png",3) != 0){
-      WordFinder* wf = new WordFinder(_source);
+      TextFinder* wf = new TextFinder(_source);
       
          // get name after bundle path, which is
          // assumed to be the query word
@@ -634,7 +656,7 @@ Finder::find_all(const char *target, double min_similarity){
    const char* ext = p + strlen(p) - 3;
    
    if (strncmp(ext,"png",3) != 0){
-      WordFinder* wf = new WordFinder(_source);
+      TextFinder* wf = new TextFinder(_source);
       
       // get name after bundle path, which is
       // assumed to be the query word
