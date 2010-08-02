@@ -7,16 +7,17 @@
  *
  */
 
+#ifndef _VISION_H_
+#define _VISION_H_
 
 #include "region.h"
 
 namespace sikuli {
+
 class Vision{
 public:
    
-   static Match find(ScreenImage simg, const char* search_string) throw(FindFailed); 
-   static Match find(ScreenImage simg, Pattern ptn) throw(FindFailed);
-   
+   static Match find(ScreenImage simg, Pattern ptn) throw(FindFailed);   
    static vector<Match> findAll(ScreenImage simg, Pattern ptn) throw(FindFailed);
    
    static void trainOCR(const char* trainingImagePath);
@@ -24,3 +25,5 @@ public:
 };
 
 }
+
+#endif // _VISION_H_

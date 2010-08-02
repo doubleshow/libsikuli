@@ -277,7 +277,7 @@ Region::click(Pattern& target, int modifiers){
 }
 
 int 
-Region::click(char const* target, int modifiers){
+Region::click(const char* target, int modifiers){
    return click(getLocationFromPSRML(target),modifiers);
 }
 
@@ -308,7 +308,7 @@ Region::doubleClick(Pattern& target, int modifiers){
 }
 
 int 
-Region::doubleClick(char const* target, int modifiers){
+Region::doubleClick(const char* target, int modifiers){
    return doubleClick(getLocationFromPSRML(target),modifiers);
 }
 
@@ -338,7 +338,7 @@ Region::rightClick(Pattern& target, int modifiers){
 }
 
 int 
-Region::rightClick(char const* target, int modifiers){
+Region::rightClick(const char* target, int modifiers){
    return rightClick(getLocationFromPSRML(target),modifiers);
 }
 
@@ -365,7 +365,7 @@ Region::hover(Pattern& target){
 }
 
 int 
-Region::hover(char const* target){
+Region::hover(const char* target){
    return hover(getLocationFromPSRML(target));
 }
 
@@ -391,6 +391,34 @@ Region::dragDrop(Location t1, Location t2, int modifiers){
    return ret;
 }
 
+int 
+Region::dragDrop(Pattern& t1, Pattern& t2, int modifiers ){
+   Location loc1 = getLocationFromPSRML(t1);
+   Location loc2 = getLocationFromPSRML(t2);
+   return dragDrop(loc1, loc2, modifiers);
+}
+   
+int 
+Region::dragDrop(const char* t1, const char* t2, int modifiers){
+   Location loc1 = getLocationFromPSRML(t1);
+   Location loc2 = getLocationFromPSRML(t2);
+   return dragDrop(loc1, loc2, modifiers);
+}
+
+int 
+Region::dragDrop(Region& t1, Region& t2, int modifiers){
+   Location loc1 = getLocationFromPSRML(t1);
+   Location loc2 = getLocationFromPSRML(t2);
+   return dragDrop(loc1, loc2, modifiers);
+};
+
+int 
+Region::dragDrop(Match& t1, Match& t2, int modifiers){
+   Location loc1 = getLocationFromPSRML(t1);
+   Location loc2 = getLocationFromPSRML(t2);
+   return dragDrop(loc1, loc2, modifiers);
+}      
+
 
 int
 Region::drag(Location target){
@@ -407,7 +435,7 @@ Region::drag(Pattern& target){
 }
 
 int 
-Region::drag(char const* target){
+Region::drag(const char* target){
    return drag(getLocationFromPSRML(target));
 }
 
@@ -435,7 +463,7 @@ Region::dropAt(Pattern& target, double delay){
 }
 
 int 
-Region::dropAt(char const* target, double delay){
+Region::dropAt(const char* target, double delay){
    return dropAt(getLocationFromPSRML(target),delay);
 }
 
@@ -1128,16 +1156,16 @@ Region::getLocationFromPSRML(Location target){
 ////////////////////////////////////////////////////////////////////
 /// FullScreen Class
 ////////////////////////////////////////////////////////////////////
-
-FullScreen::FullScreen(){
-   int x,y,w,h;
-   Robot::getDisplayBounds(0,x,y,w,h);
-   init(x,y,w,h);   
-}
-
-FullScreen::FullScreen(int screenId){
-   int x,y,w,h;
-   Robot::getDisplayBounds(screenId,x,y,w,h);
-   init(x,y,w,h);   
-}
+//
+//FullScreen::FullScreen(){
+//   int x,y,w,h;
+//   Robot::getDisplayBounds(0,x,y,w,h);
+//   init(x,y,w,h);   
+//}
+//
+//FullScreen::FullScreen(int screenId){
+//   int x,y,w,h;
+//   Robot::getDisplayBounds(screenId,x,y,w,h);
+//   init(x,y,w,h);   
+//}
 

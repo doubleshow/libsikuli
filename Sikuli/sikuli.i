@@ -3,22 +3,69 @@
 #define SWIG_FILE_WITH_INI
 //#include "finder.h"
 #include "region.h"
+#include "screen.h"
+#include "vision.h"
 using namespace sikuli;
 %}
-/*
-class Finder {
-public:
 
-	//Finder(Mat mat);	
-   Finder(const char* source);
-	~Finder();
-   
-	void find(const char *target, double min_similarity);
-   	
-	bool hasNext();
-	FindResult next();
-};
-*/
+%pythoncode
+%{
+_type = type
+def _swig_setattr_nondynamic(self,class_type,name,value,static=1):
+   if (name == "thisown"): return self.this.own(value)
+   if (name == "this"):
+      if _type(value).__name__ == 'SwigPyObject':
+         self.__dict__[name] = value
+         return
+   method = class_type.__swig_setmethods__.get(name,None)
+   if method: return method(self,value)
+   if (not static) or hasattr(self,name):
+      self.__dict__[name] = value
+   else:
+      raise AttributeError("You cannot add attributes to %s" % self)   
+%}
+
+#define KEY_SHIFT 1
+#define KEY_CTRL  2
+#define KEY_META  4  
+#define KEY_ALT   8
+
+enum specialKeys{
+   ALT,
+   CMD,
+   CTRL,
+   META,
+   SHIFT,
+   WIN,
+   ENTER,
+   TAB,
+   ESC,
+   BACKSPACE,
+   DELETE,
+   F1,
+   F2,
+   F3,
+   F4,
+   F5,
+   F6,
+   F7,
+   F8,
+   F9,
+   F10,
+   F11,
+   F12,
+   F13,
+   F14,
+   F15,
+   HOME,
+   END,
+   LEFT,
+   RIGHT,
+   DOWN,
+   UP,
+   PAGE_DOWN,
+   PAGE_UP
+}; 
 
 class Point {
    Point(int _x, int _y);
@@ -58,24 +105,32 @@ public:
 };
 
 
+
 class Pattern{
    
 public:
    
-   Pattern(const char* imgURL_);
+   Pattern();
+   Pattern(const Pattern& p);
+   Pattern(const char* str);
    
    Pattern similar(float similarity_);
    Pattern exact();
-   
    Pattern targetOffset(int dx_, int dy_);
    
    Location getTargetOffset();
+   float getSimilarity();
    
-   string getImgURL() { return imgURL;} ;
    
    string toString();
    
-};  
+   const char* getText();
+   const char* getImageURL();
+   
+   bool isImageURL();
+   bool isText();
+      
+}; 
 
 class Region{
    
@@ -173,45 +228,45 @@ public:
    int click(int modifiers = 0);
    int click(Location target, int modifiers = 0);
    int click(Pattern& target, int modifiers = 0);
-   int click(char const* target, int modifiers = 0);
+   int click(const char* target, int modifiers = 0);
    int click(Region& target, int modifiers = 0);
    int click(Match& target, int modifiers = 0);
    
    int doubleClick(int modifiers = 0);
    int doubleClick(Location target, int modifiers = 0);
    int doubleClick(Pattern& target, int modifiers = 0);
-   int doubleClick(char const* target, int modifiers = 0);
+   int doubleClick(const char* target, int modifiers = 0);
    int doubleClick(Region& target, int modifiers = 0);
    int doubleClick(Match& target, int modifiers = 0);
    
    int rightClick(int modifiers = 0);
    int rightClick(Location target, int modifiers = 0);   
    int rightClick(Pattern& target, int modifiers = 0);
-   int rightClick(char const* target, int modifiers = 0);
+   int rightClick(const char* target, int modifiers = 0);
    int rightClick(Region& target, int modifiers = 0);
    int rightClick(Match& target, int modifiers = 0);
    
    int hover(Location target);
    int hover(Pattern& target);
-   int hover(char const* target);
+   int hover(const char* target);
    int hover(Region& target);
    int hover(Match& target);
    
    int dragDrop(Location t1, Location t2, int modifiers = 0);
    int dragDrop(Pattern& t1, Pattern& t2, int modifiers = 0);
-   int dragDrop(char const* t1, char const* t2, int modifiers = 0);
+   int dragDrop(const char* t1, const char* t2, int modifiers = 0);
    int dragDrop(Region& t1, Region& t2, int modifiers = 0);
    int dragDrop(Match& t1, Match& t2, int modifiers = 0);
    
    int drag(Location target);
    int drag(Pattern& target);
-   int drag(char const* target);
+   int drag(const char* target);
    int drag(Region& target);
    int drag(Match& target);
    
    int dropAt(Location target, double delay = 0.0);
    int dropAt(Pattern& target, double delay = 0.0);
-   int dropAt(char const* target, double delay = 0.0);
+   int dropAt(const char* target, double delay = 0.0);
    int dropAt(Region& target, double delay = 0.0);
    int dropAt(Match& target, double delay = 0.0);
    
@@ -224,6 +279,30 @@ public:
    
 };
 
+%pythoncode 
+%{
+   
+import inspect
+import sys
+import __main__
+
+def Region__enter__(self): 
+   self._global_funcs = {}
+   for name in dir(self):
+      if inspect.ismethod(getattr(self,name)) and __main__.__dict__.has_key(name):
+         self._global_funcs[name] = __main__.__dict__[name]
+         #print "save " + name + " :" + str(__main__.__dict__[name])
+         __main__.__dict__[name] = eval("self."+name)
+   return self
+
+def Region__exit__(self, type, value, traceback): 
+   for name in self._global_funcs.keys():
+      __main__.__dict__[name] = self._global_funcs[name]
+
+Region.__enter__ = Region__enter__
+Region.__exit__ = Region__exit__
+
+%}
 
 
 class Match : public Region {
@@ -244,4 +323,64 @@ public:
    void setTargetOffset(Location offset);
    
 };
+
+class Screen : public Region{
+   
+public:
+   
+   Screen();
+   Screen(int id);
+   ~Screen();
+   
+   ScreenImage capture(int x, int y, int w, int h);
+   
+   Rectangle getBounds();
+   
+//   static int getNumberScreens();
+   
+};
+
+%pythoncode 
+%{ 
+
+#TODO: figure out how to expose type without overwriting the default type
+def Screen_exposeAllMethods(self, mod):
+   exclude_list = [ 'class', 'classDictInit', 'clone', 'equals', 'finalize', 
+                   'getClass', 'hashCode', 'notify', 'notifyAll', 
+                   'toGlobalCoord', 'toString',
+                   'capture', 'selectRegion']
+   dict = sys.modules[mod].__dict__
+   for name in dir(self):
+      if inspect.ismethod(getattr(self,name)) \
+         and name[0] != '_' and name[:7] != 'super__' and \
+         not name in exclude_list:
+         #if DEBUG: print "expose " + name
+         dict[name] = eval("self."+name)
+         #__main__.__dict__[name] = eval("self."+name)
+Screen._exposeAllMethods = Screen_exposeAllMethods
+%}
+   
+class Vision{
+public:
+   
+   static Match find(ScreenImage simg, Pattern ptn) throw(FindFailed);   
+   static vector<Match> findAll(ScreenImage simg, Pattern ptn) throw(FindFailed);
+   
+   static void trainOCR(const char* trainingImagePath);
+   
+};
+   
+%pythoncode 
+%{ 
+
+def initSikuli():
+   dict = globals()
+   dict['SCREEN'] = Screen()
+   dict['SCREEN']._exposeAllMethods(__name__)
+   #print "Sikuli is initialized." 
+  
+   
+initSikuli()
+   
+%}
 

@@ -10,20 +10,17 @@ from distutils.core import setup, Extension
 sikuli_module = Extension('_sikuli',
                            sources=[
                            'sikuli_wrap.cxx', 
-                           'region.cpp','robot.cpp',
-                           #'ocr.cpp','glgrab.c',
-                           'glgrab.c',
-                           #'cv-util.cpp','pyramid-template-matcher.cpp',
-                           'finder.cpp','ocr.cpp','cv-util.cpp','pyramid-template-matcher.cpp'],
-                           #'finder.cpp'],#,'ocr.cpp'],
+                           'region.cpp','screen.cpp',
+                           'robot.cpp','glgrab.c',
+                           'vision.cpp','finder.cpp','ocr.cpp','cv-util.cpp','pyramid-template-matcher.cpp'],
                            extra_link_args=[
                            '-framework,AppplicationServices',
                            '-framework,OpenGL'],
                            libraries=[
-                           'opencv_core.2.1.1',
-                           'opencv_highgui.2.1.1',
-                           'opencv_legacy.2.1.1',
-                           'opencv_objdetect.2.1.1'
+                           'opencv_core',
+                           'opencv_highgui',
+                           'opencv_legacy',
+                           'opencv_objdetect'
                            ]
                            )
 

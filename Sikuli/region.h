@@ -194,8 +194,6 @@ class Match;
 
 #define PADDING 50   
    
-class Vision;
-   
 class Region{
 
 
@@ -294,45 +292,45 @@ public:
    int click(int modifiers = 0);
    int click(Location target, int modifiers = 0);
    int click(Pattern& target, int modifiers = 0);
-   int click(char const* target, int modifiers = 0);
+   int click(const char* target, int modifiers = 0);
    int click(Region& target, int modifiers = 0);
    int click(Match& target, int modifiers = 0);
    
    int doubleClick(int modifiers = 0);
    int doubleClick(Location target, int modifiers = 0);
    int doubleClick(Pattern& target, int modifiers = 0);
-   int doubleClick(char const* target, int modifiers = 0);
+   int doubleClick(const char* target, int modifiers = 0);
    int doubleClick(Region& target, int modifiers = 0);
    int doubleClick(Match& target, int modifiers = 0);
       
    int rightClick(int modifiers = 0);
    int rightClick(Location target, int modifiers = 0);   
    int rightClick(Pattern& target, int modifiers = 0);
-   int rightClick(char const* target, int modifiers = 0);
+   int rightClick(const char* target, int modifiers = 0);
    int rightClick(Region& target, int modifiers = 0);
    int rightClick(Match& target, int modifiers = 0);
    
    int hover(Location target);
    int hover(Pattern& target);
-   int hover(char const* target);
+   int hover(const char* target);
    int hover(Region& target);
    int hover(Match& target);
 
    int dragDrop(Location t1, Location t2, int modifiers = 0);
    int dragDrop(Pattern& t1, Pattern& t2, int modifiers = 0);
-   int dragDrop(char const* t1, char const* t2, int modifiers = 0);
+   int dragDrop(const char* t1, const char* t2, int modifiers = 0);
    int dragDrop(Region& t1, Region& t2, int modifiers = 0);
    int dragDrop(Match& t1, Match& t2, int modifiers = 0);
    
    int drag(Location target);
    int drag(Pattern& target);
-   int drag(char const* target);
+   int drag(const char* target);
    int drag(Region& target);
    int drag(Match& target);
    
    int dropAt(Location target, double delay = 0.0);
    int dropAt(Pattern& target, double delay = 0.0);
-   int dropAt(char const* target, double delay = 0.0);
+   int dropAt(const char* target, double delay = 0.0);
    int dropAt(Region& target, double delay = 0.0);
    int dropAt(Match& target, double delay = 0.0);
    
@@ -415,13 +413,13 @@ private:
  
 };
    
-class FullScreen : public Region {
-   
-public:
-   
-   FullScreen();
-   FullScreen(int screenId);
-};
+//class FullScreen : public Region {
+//   
+//public:
+//   
+//   FullScreen();
+//   FullScreen(int screenId);
+//};
    
 class Match : public Region {
    

@@ -7,6 +7,8 @@
  *
  */
 
+#ifndef _SCREEN_H_
+#define _SCREEN_H_
 #include "region.h"
 
 namespace sikuli{
@@ -18,6 +20,7 @@ public:
    
    Screen();
    Screen(int id);
+   ~Screen();
    
    ScreenImage capture(int x, int y, int w, int h);
    
@@ -33,3 +36,5 @@ private:
 
 
 };
+
+#endif // _SCREEN_H_
