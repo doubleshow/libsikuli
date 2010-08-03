@@ -1,0 +1,13 @@
+
+Prerequisites
+ * opencv2.1
+
+Python
+
+$ python setup.rb install
+
+Test if it's properly built and installed
+
+$ cd examples/python
+$ python mute.rb
+

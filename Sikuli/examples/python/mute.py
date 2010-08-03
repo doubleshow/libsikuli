@@ -1,6 +1,5 @@
 from sikuli import *
-s = Screen()
-s.click('apple.png')
-s.type('sys\n')
-s.click('sound.png')
-s.click('mute.png')
+click('apple.png')
+type('sys\n')
+click('sound.png')
+click('mute.png')
