@@ -67,7 +67,9 @@ public:
       return _roi;
    }
    
-   string getFilename();
+   string getFilename(){
+      return _filename;
+   }
    
    cv::Mat getMat() { return _image;};
    

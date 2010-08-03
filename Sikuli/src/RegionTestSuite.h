@@ -32,7 +32,7 @@ public:
 ////localhost/Users/tomyeh/Desktop/Videos/
       //Region r = Region::getFullScreen();
       
-      FullScreen r;
+      Screen r;
       //r.click("folder.png");
       
       Vision::trainOCR("arial.png");

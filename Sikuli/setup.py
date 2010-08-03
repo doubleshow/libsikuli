@@ -1,18 +1,24 @@
 #!/usr/bin/env python
 
 """
-setup.py file for SWIG example
+
+setup.py file for libsikuli Python 
+
 """
 
 from distutils.core import setup, Extension
 
+sources = [
+   'sikuli-python_wrap.cxx', 
+   'region.cpp','screen.cpp',
+   'robot.cpp','glgrab.c',
+   'vision.cpp','finder.cpp','ocr.cpp',
+   'cv-util.cpp','pyramid-template-matcher.cpp']
+
+
 
 sikuli_module = Extension('_sikuli',
-                           sources=[
-                           'sikuli_wrap.cxx', 
-                           'region.cpp','screen.cpp',
-                           'robot.cpp','glgrab.c',
-                           'vision.cpp','finder.cpp','ocr.cpp','cv-util.cpp','pyramid-template-matcher.cpp'],
+                           sources = ['src/' + x for x in sources],
                            extra_link_args=[
                            '-framework,AppplicationServices',
                            '-framework,OpenGL'],
@@ -27,7 +33,7 @@ sikuli_module = Extension('_sikuli',
 setup (name = 'sikuli',
        version = '0.1',
        author      = "Tom Yeh",
-       description = """Simple swig example from docs""",
+       description = """libsikuli Python SWIG interface""",
        ext_modules = [sikuli_module],
        py_modules = ["sikuli"],
        )
