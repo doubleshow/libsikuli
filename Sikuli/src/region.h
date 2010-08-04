@@ -343,6 +343,13 @@ public:
    int type(Region& target, const char* text, int modifiers = 0);
    int type(Match& target, const char* text, int modifiers = 0);
 
+   int press(int key, int modifiers = 0);   
+   int press(Location target, int key, int modifiers = 0);
+   int press(Pattern& target, int key, int modifiers = 0);
+   int press(const char* target, int key, int modifiers = 0);
+   int press(Region& target, int key, int modifiers = 0);
+   int press(Match& target, int key, int modifiers = 0);
+   
    
    template<class PSRML> int paste(PSRML target, string text);
    
@@ -361,7 +368,9 @@ private:
    
    void doType(int mode, int keyCode);
    void doType(int mode, int keyCode1, int keycode2);
+  
    void type_ch(char character, int mode );  
+   void type_key(int key, int mode);
      
 //==================================================================
 // Spatial Operators

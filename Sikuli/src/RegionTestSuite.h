@@ -16,117 +16,129 @@ using namespace sikuli;
 class RegionTestSuite : public CxxTest::TestSuite 
 {
 public:
+   
+   
+   void tearDown() {
+      // sleep to let previous test complete
+      sleep(1);
+   }
+   
    void testCreation( void )
    {
       Region r(10,10,10,10);
       TS_ASSERT_EQUALS( r.getH(), 10);
    }
    
-   void testClick(void)
-   {//
- 
- //     Region r = Region::getFullScreen();
-//      Match m = r.find("region.png");
-//      r.doubleClick("folder.png");
-//      
-////localhost/Users/tomyeh/Desktop/Videos/
-      //Region r = Region::getFullScreen();
-      
-      Screen r;
-      //r.click("folder.png");
-      
-      Vision::trainOCR("arial.png");
-//      r.click("/Project/");
-//      //sleep(1);
-//      r.hover("/New Smart Group/");
-//      r.hover("/Simple Filter Smart Group/");
-
-      
-      r.click("apple.png");
-      //r.click("/System Preferences/");
-      r.type("sys\n");
-      sleep(1);
-      r.click("/Trackpad/");
-//      Match m = r.find("displays.png");
-//      m.hover("/Displays/");
-      
-      //Match m = r.find("flash.png");
-      //m.above().wider(50).doubleClick("folder.png");
-      //m.left().taller(50).doubleClick("folder.png");
-      
-      //r.find("folder.png").right().taller(50).doubleClick("flash.png");
-      
-      //Region r;
-      //r.click(Location(10,10), 1);
-      //Pattern p("dropbox.png");
-      //r.doubleClick(p,0);
-      //sleep(2);
-//     
-//      r.click("apple.png"); 
-//      r.type("sys\n");
-//      sleep(3);
-//      r.type("MouSe\n");
-//     
-      //r.click("tool.png");
-      //int ret = r.rightClick("apple.png");
-      
-      //r.rightClick("tool.png");
-      
-      //TS_ASSERT_EQUALS(ret, 1);
-     // r.hover("apple.png");
-      //sleep(1);
-      
-      //r.doubleClick("t1.png", K_CTRL);
-      
-      //r.doubleClick("t1.png");
-      
-      // Long Click
-      //r.hover("apple.png");//
-//      r.mouseDown(BUTTON1_MASK);
-//      sleep(2);
-//      r.mouseUp(BUTTON1_MASK);
-      //
-//      r.click(BUTTON1_MASK);
-//      sleep(2);
-//      r.click(BUTTON1_MASK);
-//      
-//      //r.click("t1.png");
-//      r.hover("t1.png");
-//      sleep(1);
-//      r.mouseDown(BUTTON1_MASK);
-//      sleep(2);
-//      r.mouseUp(BUTTON1_MASK);
-//      
-      
-      //Match m = r.find("t1.png");
-      
-      //r.waitVanish("t1.png", 5);
-      
-      //r.drag("flash.png");
-      //r.dropAt("t1.png",0.1);
-      
-      //Location(m.getTarget().x,m.getTarget().y-100),0.1);
-//      sleep(5);
-//      
-      
-      //r.hover("t1.png");
-      //r.click(K_CTRL);
-      //r.rightClick("t1.png");
-//      //r.click("t2.png", K_SHIFT);
-      //r.hover("tool.png");
-      //r.mouseDown(BUTTON3_MASK);
-      
-//      Screen scr;
-//      scr.getNumberScreens();
-      
-      
-      //
-//      Robot rb;
-//      int x,y,h,w;
-//      rb.getDisplayBounds(x,y,w,h);
-      
+   void testExists(void)
+   {
+      Screen s;
+      TS_ASSERT(s.exists("apple.png"));
+      TS_ASSERT(!s.exists("vista.png",0));      
    }
    
+   void testModifiers(void)
+   {
+      Screen s;
+      s.type("q", SHIFT + META);
+      TS_ASSERT(s.exists("logout.png"));
+      s.click("cancel.png");
+   }   
+
+   void testESC(void)
+   {
+      Screen s;
+      s.type("q", SHIFT + META);
+      TS_ASSERT(s.exists("logout.png"));
+      s.press(ESC);
+   }
    
+   void testClick(void)
+   {
+      Screen s;
+      s.click("apple.png");
+      TS_ASSERT(s.exists("about.png"));
+      s.press(ESC);
+   }
+   
+   void testHoverAndClick(void)
+   {  
+      Screen s;
+      s.hover("magnifying_glass.png");
+      sleep(1);
+      s.click();
+      TS_ASSERT(s.exists("spotlight.png"));
+      s.press(ESC);      
+      s.press(ESC);
+   }
+
+   void testType(void)
+   {
+      Screen s;
+      s.click("magnifying_glass.png");
+      s.wait("spotlight_label.png");
+      s.type("test TEST test TEST test");
+      TS_ASSERT(s.exists("spotlight_input.png"));
+      s.press(ESC);
+      s.press(ESC);
+   }  
+   
+   void testTrackPadWaitForToolTip(void)
+   {
+      Screen s;
+      s.click("apple.png");
+      s.type("sys\n");
+      s.click("trackpad.png");
+      s.find("tracking_speed.png").below(100).wider(100).hover("thumb.png");
+      TS_ASSERT_THROWS_NOTHING(s.wait("tracking_speed_tooltip.png",5));
+      s.type("w", META);
+   }
+   
+   void testDragDrop(void)
+   {
+      Screen s;
+      s.click("apple.png");
+      s.type("sys\n");
+      s.click("keyboard.png");
+      
+      Region slider = s.find("turn_off_label.png").below(100).wider(300);
+      Region t0 = slider.find("thumb.png");
+      
+      Region never   = s.find("never.png");
+      Region one_min = s.find("one_min.png");
+      
+      s.drag(t0);
+      s.dropAt(never);
+      
+      TS_ASSERT(s.exists(Pattern("thumb_at_never.png").similar(0.95)));
+      
+      Region t1 = slider.find("thumb.png");
+      s.drag(t1);
+      s.dropAt(t0);
+      
+      sleep(1);
+      
+      s.dragDrop(t0,never);
+      
+      TS_ASSERT(s.exists(Pattern("thumb_at_never.png").similar(0.95)));
+      
+      s.dragDrop(t1,t0);
+      
+      
+      sleep(1);
+      s.type("q", META);
+   }   
+   
+   void testOpenApp(void)
+   {
+      Screen s;
+      Robot r;
+      r.openApp("firefox.app");
+      TS_ASSERT(s.exists("firefox_menu.png"));
+   } 
    
 };
+
+
+   
+   
+  

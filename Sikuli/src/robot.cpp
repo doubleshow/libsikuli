@@ -14,6 +14,7 @@
 
 
 int Robot::_modifiers = 0;
+bool Robot::_dragged = false;
 
 #include <time.h>
 void
@@ -27,17 +28,29 @@ Robot::delay(int msec){
 void 
 Robot::mouseMove(int x, int y)
 {
+   
+   
    CGPoint newloc;
    CGEventRef eventRef;
    newloc.x = x;
    newloc.y = y;
    
-   eventRef = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, newloc,
-                                      kCGMouseButtonCenter);
-   //Apparently, a bug in xcode requires this next line
-   CGEventSetType(eventRef, kCGEventMouseMoved);
-   CGEventPost(kCGSessionEventTap, eventRef);
-   CFRelease(eventRef);
+   if(_dragged){
+      
+      eventRef = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDragged, newloc,
+                                                    kCGMouseButtonCenter);
+      CGEventSetType(eventRef, kCGEventLeftMouseDragged);
+      CGEventPost(kCGSessionEventTap, eventRef);
+      CFRelease(eventRef);  
+
+   }else{
+   
+      eventRef = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, newloc,
+                                         kCGMouseButtonCenter);
+      CGEventSetType(eventRef, kCGEventMouseMoved);
+      CGEventPost(kCGSessionEventTap, eventRef);
+      CFRelease(eventRef);
+   }
 }
 
 void 
@@ -80,20 +93,13 @@ Robot::singleClick(int button){
 void
 Robot::drag(){
    mousePress(BUTTON1_MASK);
-   sleep(2);
+   _dragged = true;
+   delay(3000);
 }
 
 void
 Robot::drop(){
-   CGEventRef ourEvent = CGEventCreate(NULL);   
-   CGPoint curloc = CGEventGetLocation(ourEvent);
-   CGEventRef eventRef = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDragged, curloc,
-                                                 kCGMouseButtonCenter);
-   CGEventSetType(eventRef, kCGEventLeftMouseDragged);
-   CGEventPost(kCGSessionEventTap, eventRef);
-   
-   CFRelease(eventRef);  
-   
+   _dragged = false;
    mouseRelease(BUTTON1_MASK);
 }
 
@@ -299,4 +305,40 @@ Robot::capture(int displayId, int x, int y, int w, int h){
    
    return bgr;//bgr.clone();//(bgr,true);//bgr.clone();
 }
+//#include <Carbon/Carbon.h>
+//#include "LSInfo.h"
+void
+Robot::openApp(const char* appname){
+   OSStatus err;
+   FSRef appRef;
+   
 
+   // Convert c string to CFStringRef
+   // http://www.carbondev.com/site/?page=CStrings+
+   CFStringRef 
+   str = CFStringCreateWithCString(kCFAllocatorDefault,
+                                   appname,
+                                   kCFStringEncodingMacRoman);
+
+   // Follow example code at
+   // http://developer.apple.com/mac/library/samplecode/LoginItemsAE/Listings/LoginItemsAE_c.html#//apple_ref/doc/uid/DTS10003788-LoginItemsAE_c-DontLinkElementID_4
+   
+   LSFindApplicationForInfo(kLSUnknownCreator,
+                            NULL,
+                            str,
+                            &appRef,
+                            NULL
+                            ); 
+   
+   LSApplicationParameters     appParams;
+   memset(&appParams, 0, sizeof(appParams));
+   appParams.version = 0;
+   appParams.flags = kLSLaunchDefaults;
+   appParams.application = &appRef;
+
+   ProcessSerialNumber psnPtr;
+   err = LSOpenApplication(&appParams, &psnPtr);
+   
+   
+   CFRelease(str);
+}

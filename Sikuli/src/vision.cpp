@@ -27,6 +27,8 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
       f = new TextFinder(simg.getMat());
       f->find(ptn.getText(), 0.6);//ptn.getSimilarity());
    }else if (ptn.isImageURL()){
+      //namedWindow("screen");
+      imwrite("/tmp/screen.png",simg.getMat());
       f = new TemplateFinder(simg.getMat());
       f->find(ptn.getImageURL(), ptn.getSimilarity());      
    }

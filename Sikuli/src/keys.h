@@ -13,12 +13,12 @@
 #define KEY_ALT   8
 
 enum specialKeys{
-   ALT,
-   CMD,
-   CTRL,
-   META,
-   SHIFT,
-   WIN,
+   ALT = 1,
+   CMD = 2,
+   CTRL = 4,
+   META = 8,
+   SHIFT = 16,
+   WIN = 32,
    ENTER,
    TAB,
    ESC,

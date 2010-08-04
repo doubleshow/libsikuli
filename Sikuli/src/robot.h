@@ -129,6 +129,9 @@ public:
    
    
    static void paste(string text);
+   
+   
+   static void openApp(const char* appname);
 
    static cv::Mat capture(int displayId);   
    static cv::Mat capture(int displayId, int x, int y, int w, int h);
@@ -136,6 +139,7 @@ public:
 private:
    
    static int _modifiers;
+   static bool _dragged;
    
 };
 

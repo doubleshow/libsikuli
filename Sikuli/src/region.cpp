@@ -73,7 +73,7 @@ Match::setTargetOffset(Location offset){
 
 Pattern::Pattern(){
    str = "";
-   similarity = 0.7f;
+   similarity = 0.8f;
    dx = 0;
    dy = 0;
 }
@@ -94,7 +94,7 @@ Pattern::Pattern(const char* str_){
       str = str.substr(1, str.length()-2);
    
    
-   similarity = 0.7f;
+   similarity = 0.8f;
    dx = 0;
    dy = 0;   
 }
@@ -355,7 +355,7 @@ Region::rightClick(Match& target, int modifiers){
 int 
 Region::hover(Location target){
    Robot::mouseMove(target.x, target.y);
-   Robot::waitForIdle();
+   Robot::delay(100);
    return 1;
 }
 
@@ -488,6 +488,14 @@ Region::paste(PSRML target, string text){
       Robot::paste(text);   
       return 1;
    }
+}
+
+int
+Region::press(int key, int modifiers){   
+   pressModifiers(modifiers);  
+   type_key(key, PRESS_RELEASE);
+   releaseModifiers(modifiers);
+   return 1;   
 }
 
 int
@@ -633,39 +641,39 @@ Region::type_ch(char character, int mode){
       case '/': doType(mode,VK_SLASH); break;
       case '?': doType(mode,VK_SHIFT, VK_SLASH); break;
       case ' ': doType(mode,VK_SPACE); break;
-/*
-      case '\u001b': doType(mode,VK_ESCAPE); break;
-      case '\ue000': doType(mode,VK_UP); break;
-      case '\ue001': doType(mode,VK_RIGHT); break;
-      case '\ue002': doType(mode,VK_DOWN); break;
-      case '\ue003': doType(mode,VK_LEFT); break;
-      case '\ue004': doType(mode,VK_PAGE_UP); break;
-      case '\ue005': doType(mode,VK_PAGE_DOWN); break;
-      case '\ue006': doType(mode,VK_DELETE); break;
-      case '\ue007': doType(mode,VK_END); break;
-      case '\ue008': doType(mode,VK_HOME); break;
-      case '\ue009': doType(mode,VK_INSERT); break;
-      case '\ue011': doType(mode,VK_F1); break;
-      case '\ue012': doType(mode,VK_F2); break;
-      case '\ue013': doType(mode,VK_F3); break;
-      case '\ue014': doType(mode,VK_F4); break;
-      case '\ue015': doType(mode,VK_F5); break;
-      case '\ue016': doType(mode,VK_F6); break;
-      case '\ue017': doType(mode,VK_F7); break;
-      case '\ue018': doType(mode,VK_F8); break;
-      case '\ue019': doType(mode,VK_F9); break;
-      case '\ue01A': doType(mode,VK_F10); break;
-      case '\ue01B': doType(mode,VK_F11); break;
-      case '\ue01C': doType(mode,VK_F12); break;
-      case '\ue01D': doType(mode,VK_F13); break;
-      case '\ue01E': doType(mode,VK_F14); break;
-      case '\ue01F': doType(mode,VK_F15); break;
-      case '\ue020': doType(mode,VK_SHIFT); break;
-      case '\ue021': doType(mode,VK_CONTROL); break;
-      case '\ue022': doType(mode,VK_ALT); break;
-      case '\ue023': doType(mode,VK_META); break;
-*/
  }
+}
+
+void 
+Region::type_key(int key, int mode){
+   switch (key) {
+       case ESC: doType(mode,VK_ESCAPE); break;
+       case UP: doType(mode,VK_UP); break;
+       case RIGHT: doType(mode,VK_RIGHT); break;
+       case DOWN: doType(mode,VK_DOWN); break;
+       case LEFT: doType(mode,VK_LEFT); break;
+       case PAGE_UP: doType(mode,VK_PAGE_UP); break;
+       case PAGE_DOWN: doType(mode,VK_PAGE_DOWN); break;
+       case DELETE: doType(mode,VK_DELETE); break;
+       case END: doType(mode,VK_END); break;
+       case HOME: doType(mode,VK_HOME); break;
+       //case INSERT: doType(mode,VK_INSERT); break;
+       case F1: doType(mode,VK_F1); break;
+       case F2: doType(mode,VK_F2); break;
+       case F3: doType(mode,VK_F3); break;
+       case F4: doType(mode,VK_F4); break;
+       case F5: doType(mode,VK_F5); break;
+       case F6: doType(mode,VK_F6); break;
+       case F7: doType(mode,VK_F7); break;
+       case F8: doType(mode,VK_F8); break;
+       case F9: doType(mode,VK_F9); break;
+       case F10: doType(mode,VK_F10); break;
+       case F11: doType(mode,VK_F11); break;
+       case F12: doType(mode,VK_F12); break;
+       case F13: doType(mode,VK_F13); break;
+       case F14: doType(mode,VK_F14); break;
+       case F15: doType(mode,VK_F15); break;
+   }
 }
 
 void 
@@ -677,9 +685,9 @@ Region::doType(int mode, int keycode){
 //      Robot::keyRelease(keycode);
 //   }
 //   else{
-      Robot::keyPressRelease(keycode);
-   //   Robot::keyPress(keycode);
-     // Robot::keyRelease(keycode);
+     // Robot::keyPressRelease(keycode);
+    Robot::keyPress(keycode);
+    Robot::keyRelease(keycode);
 //   }
 }
 
@@ -737,28 +745,28 @@ Region::keyDown(string keys){
 
 void 
 Region::pressModifiers(int modifiers){
-   if(modifiers & KEY_SHIFT) Robot::keyPress(VK_SHIFT);
-   if(modifiers & KEY_CTRL) Robot::keyPress(VK_CONTROL);
-   if(modifiers & KEY_ALT) Robot::keyPress(VK_ALT);
-//   if((modifiers & K_META) != 0){
+   if(modifiers & SHIFT) Robot::keyPress(VK_SHIFT);
+   if(modifiers & CTRL) Robot::keyPress(VK_CONTROL);
+   if(modifiers & ALT) Robot::keyPress(VK_ALT);
+   if(modifiers & META) {
  //     if( Env.getOS() == OS.WINDOWS )
 //         Robot::keyPress(KeyEvent.VK_WINDOWS);
 //      else
-//         Robot::keyPress(KeyEvent.VK_META);
-//   }
+      Robot::keyPress(VK_META);
+  }
 }
 
 void 
 Region::releaseModifiers(int modifiers){
-   if((modifiers & KEY_SHIFT) != 0) Robot::keyRelease(VK_SHIFT);
-   if((modifiers & KEY_CTRL) != 0) Robot::keyRelease(VK_CONTROL);
-   if((modifiers & KEY_ALT) != 0) Robot::keyRelease(VK_ALT);//
-//   if((modifiers & K_META) != 0){ 
-//      if( Env.getOS() == OS.WINDOWS )
+   if(modifiers & SHIFT) Robot::keyRelease(VK_SHIFT);
+   if(modifiers & CTRL) Robot::keyRelease(VK_CONTROL);
+   if(modifiers & ALT) Robot::keyRelease(VK_ALT);//
+   if(modifiers & META){ 
+//      if( Env.getOS() == OS.WINDOWS )
 //         Robot::keyRelease(KeyEvent.VK_WINDOWS);
 //      else
-//         Robot::keyRelease(KeyEvent.VK_META);
-//   }
+         Robot::keyRelease(VK_META);
+   }
 }
 
 // TODO: Re-implement using vector
@@ -1063,7 +1071,7 @@ Region::right(int range){
    Rectangle bounds = Screen(0).getBounds();
    Rectangle rect = Rectangle(x+w,y,range,h);
    rect = rect.intersection(bounds);
-   return Region(rect);      
+   return Region(rect).taller(10);      
 }
 
 Region 
@@ -1076,7 +1084,7 @@ Region::left(int range){//
    Rectangle bounds = Screen(0).getBounds();
    Rectangle rect = Rectangle(x-range,y,range,h);
    rect = rect.intersection(bounds);
-   return Region(rect);   
+   return Region(rect).taller(10);   
 }
 
 Region 
@@ -1089,7 +1097,7 @@ Region::above(int range){
    Rectangle bounds = Screen(0).getBounds();
    Rectangle rect = Rectangle(x,y-range,w,range);
    rect = rect.intersection(bounds);
-   return Region(rect);
+   return Region(rect).wider(10);
 }
 
 Region 
@@ -1100,9 +1108,9 @@ Region::below(){
 Region 
 Region::below(int range){
    Rectangle bounds = Screen(0).getBounds();
-   Rectangle rect = Rectangle(x,y+h,w,range);
+   Rectangle rect = Rectangle(x,y+h/2,w,range);
    rect = rect.intersection(bounds);
-   return Region(rect);
+   return Region(rect).wider(10);
 }
 
 Region
