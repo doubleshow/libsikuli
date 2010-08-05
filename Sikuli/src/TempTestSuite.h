@@ -8,9 +8,8 @@
  */
 
 #include <cxxtest/TestSuite.h>
-#include "region.h"
-#include "screen.h"
-#include "vision.h"
+
+#include "sikuli.h"
 using namespace sikuli;
 
 
@@ -18,20 +17,23 @@ class TempTestSuite : public CxxTest::TestSuite
 {
 public:
    
-   void testAddImagePaths(void)
+   void setUp(void)
    {
-      Settings::resetImagePaths();
-      Settings::addImagePath("test");
       Settings::addImagePath("images");
-      Settings::addImagePath("images/a");
-      TS_ASSERT_EQUALS(Settings::getImagePaths().size(), 3);
-      TS_ASSERT_SAME_DATA(Settings::getImagePaths()[0], "test", 4);
-      TS_ASSERT_SAME_DATA(Settings::getImagePaths()[1], "images", 4);
-      
+   }
+   
+   void testFindTopMost(void)
+   {
       Screen s;
-      TS_ASSERT_THROWS_NOTHING(s.find("aapple.png"));
-      TS_ASSERT_THROWS_NOTHING(s.findAll("aapple.png"));
+      s.click("apple.png");
+      s.type("sys\n");
       
+      sleep(2);
+      Pattern p = Pattern("checkbox.png").bottomMost();
+      Match m = s.find(p);
+      s.click(m);
+      
+
    }
 
    

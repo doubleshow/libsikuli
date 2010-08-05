@@ -10,10 +10,10 @@
 #ifndef _KEYS_H_
 #define _KEYS_H_
 
-#define KEY_SHIFT 1
-#define KEY_CTRL  2
-#define KEY_META  4  
-#define KEY_ALT   8
+//#define KEY_SHIFT 1
+//#define KEY_CTRL  2
+//#define KEY_META  4  
+//#define KEY_ALT   8
 
 enum specialKeys{
    ALT = 1,

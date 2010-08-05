@@ -17,8 +17,11 @@ namespace sikuli {
 class Vision{
 public:
    
-   static Match find(ScreenImage simg, Pattern ptn) throw(FindFailed);   
-   static vector<Match> findAll(ScreenImage simg, Pattern ptn) throw(FindFailed);
+   //static Match find(ScreenImage simg, Pattern ptn) throw(FindFailed);   
+   //static vector<Match> findAll(ScreenImage simg, Pattern ptn) throw(FindFailed);
+   static vector<Match> find(ScreenImage simg, Pattern ptn) throw(FindFailed);
+
+   
    
    static void initOCR(const char* ocrDataPath);
    

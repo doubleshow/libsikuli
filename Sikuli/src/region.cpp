@@ -775,7 +775,8 @@ Match
 Region::findNow(Pattern ptn) throw(FindFailed){
    cout << "[Region::findNow] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;
    ScreenImage simg = Robot::capture(0, x, y, w, h);
-   Match m = Vision::find(simg, ptn);//
+   Match m = Vision::find(simg, ptn)[0];
+   
    m.x += x;
    m.y += y;
    
@@ -798,7 +799,9 @@ Region::findAllNow(Pattern ptn) throw(FindFailed){
    // ToDo: adjust capturing region for multi-monitor
    cout << "[Region::findAll] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;   
    ScreenImage simg = Robot::capture(0, x, y, w, h);
-   vector<Match> ms = Vision::findAll(simg, ptn);
+   
+   vector<Match> ms = Vision::find(simg, ptn.all());
+   
    for (int i=0;i<ms.size();++i)
       ms[i].setTargetOffset(ptn.getTargetOffset());
    cout << "[Region::findAll] Found " << ms.size() << " matches" << endl;

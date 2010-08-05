@@ -19,6 +19,7 @@ Vision::initOCR(const char* ocrDataPath){
    TextFinder::train(im);
 }
 
+/*
 Match 
 Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
    
@@ -62,14 +63,111 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
    }   
    
 }
+*/
 
-vector<Match> 
-Vision::findAll(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
-   vector<Match> ms;
-   TemplateFinder f(simg.getMat());
+
+Mat searchImageInPaths(const char* image_filename) throw(FindFailed) {
    
    vector<const char*> image_paths = Settings::getImagePaths();
    
+   for (int i=0; i<image_paths.size(); ++i){
+      string fullpath = string(image_paths[i]) + 
+      "/" + string(image_filename);
+      
+      Mat im = imread(fullpath);
+      
+      if (im.data != NULL)
+         return im;
+   }
+   
+   throw FindFailed(Pattern(image_filename));
+}
+
+vector<FindResult> 
+getFindResults(TemplateFinder& f, const char* image_filename, bool all, double similarity) 
+   throw(FindFailed) { 
+
+   
+   vector<FindResult> results;
+      
+   Mat image = searchImageInPaths(image_filename);
+   
+   if (all){
+      f.find_all(image, similarity);
+      while (f.hasNext()){
+         results.push_back(f.next());
+      }
+   }
+   else{
+      f.find(image, similarity);
+      if (f.hasNext())
+         results.push_back(f.next());
+   }
+
+   if (results.empty())
+      throw FindFailed(Pattern(image_filename));
+   else
+      return results;
+}
+
+
+vector<Match> 
+Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
+   
+   TemplateFinder f(simg.getMat());   
+   
+   vector<FindResult> results;
+   
+   if (ptn.bAll()){
+      
+      results = getFindResults(f, ptn.getImageURL(), true, ptn.getSimilarity());
+   
+   }else{
+      
+      if (ptn.where() != ANYWHERE){
+      
+         results = getFindResults(f, ptn.getImageURL(), true, ptn.getSimilarity());      
+            
+         
+         cout << "found " << results.size() << " matches." << endl;
+         
+         // Filter Results
+         FindResult r = results[0];
+         for (int i=1; i<results.size(); ++i){
+            FindResult& ri = results[i];
+            if ((ptn.where() == TOPMOST && ri.y < r.y) ||
+                (ptn.where() == BOTTOMMOST && ri.y > r.y) ||
+                (ptn.where() == LEFTMOST && ri.x < r.x) ||
+                (ptn.where() == RIGHTMOST && ri.x > r.x))
+               r = ri;
+         }
+         
+         results.clear();
+         results.push_back(r);
+      }
+      else {
+
+         results = getFindResults(f, ptn.getImageURL(), false, ptn.getSimilarity());
+            
+      }
+      
+   }
+   
+   // Convert FindResults to Matches
+   vector<Match> matches;
+   for (int i=0; i<results.size(); ++i){
+      FindResult& r = results[i];
+      matches.push_back(Match(r.x,r.y,r.w,r.h,r.score));
+   }
+   
+   return matches;
+}
+/*
+vector<Match> 
+Vision::find1(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
+   
+   TemplateFinder f(simg.getMat());   
+   vector<const char*> image_paths = Settings::getImagePaths();
    for (int i=0; i<image_paths.size(); ++i){
       string image_url;
       image_url = string(image_paths[i]) + 
@@ -83,15 +181,42 @@ Vision::findAll(ScreenImage simg, Pattern ptn) throw(FindFailed){
       }
    }
    
-   
+   vector<FindResult> results;
    while (f.hasNext()){      
       FindResult r = f.next();
-      ms.push_back(Match(r.x,r.y,r.w,r.h,r.score));
+      results.push_back(r);
    }
    
-   if (!ms.empty())
-      return ms;
+   
+   // Filter Results
+   if (ptn.where() != ANYWHERE && !results.empty()){
+      
+      FindResult r = results[0];
+      for (int i=1; i<results.size(); ++i){
+         FindResult& ri = results[i];
+         if ((ptn.where() == TOPMOST && ri.y < r.y) ||
+             (ptn.where() == BOTTOMMOST && ri.y > r.y) ||
+             (ptn.where() == LEFTMOST && ri.x < r.x) ||
+             (ptn.where() == RIGHTMOST && ri.x > r.x))
+            r = ri;
+      }
+      
+      results.clear();
+      results.push_back(r);
+   }
+   
+   
+   
+   // Convert FindResults to Matches
+   vector<Match> matches;
+   for (int i=0; i<results.size(); ++i){
+      FindResult& r = results[i];
+      matches.push_back(Match(r.x,r.y,r.w,r.h,r.score));
+   }
+   
+   if (!matches.empty())
+      return matches;
    else
       throw FindFailed(ptn);
 }
-
+*/

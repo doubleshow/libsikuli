@@ -16,6 +16,10 @@ Pattern::Pattern(){
    similarity = 0.8f;
    dx = 0;
    dy = 0;
+   _bAll = false;
+   _ordering = SCORE;
+   _position = ANYWHERE;
+   _limit = 1;
 }
 
 Pattern::Pattern(const Pattern& p){
@@ -24,6 +28,11 @@ Pattern::Pattern(const Pattern& p){
    similarity = p.similarity;
    dx = p.dx;
    dy = p.dy;
+   
+   _bAll = p._bAll;
+   _ordering = p._ordering;
+   _position = p._position;
+   _limit= p._limit;
 }
 
 Pattern::Pattern(const char* str_){
@@ -37,6 +46,11 @@ Pattern::Pattern(const char* str_){
    similarity = 0.8f;
    dx = 0;
    dy = 0;   
+   
+   _bAll = false;
+   _ordering = SCORE;
+   _position = ANYWHERE;
+   _limit = 1;   
 }
 
 bool
@@ -48,6 +62,7 @@ bool
 Pattern::isImageURL(){
    return !isText();
 }
+
 
 
 Pattern 
@@ -69,6 +84,51 @@ Pattern::targetOffset(int dx_, int dy_){
    Pattern ret(*this);
    ret.dx = dx_;
    ret.dy = dy_;
+   return ret;
+}
+
+
+Pattern 
+Pattern::all(){
+   Pattern ret(*this);
+   ret._bAll = true;
+   return ret;
+}
+
+Pattern 
+Pattern::one(){
+   Pattern ret(*this);
+   ret._bAll = false;
+   return ret;
+}
+
+
+Pattern 
+Pattern::topMost(){
+   Pattern ret(*this);
+   ret._position = TOPMOST;
+   return ret;
+}
+
+Pattern 
+Pattern::bottomMost(){
+   Pattern ret(*this);
+   ret._position = BOTTOMMOST;
+   return ret;
+}
+
+Pattern 
+Pattern::leftMost(){
+   Pattern ret(*this);
+   ret._position = LEFTMOST;
+   return ret;
+}
+
+
+Pattern 
+Pattern::rightMost(){
+   Pattern ret(*this);
+   ret._position = RIGHTMOST;
    return ret;
 }
 
