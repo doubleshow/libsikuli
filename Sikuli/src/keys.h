@@ -7,6 +7,9 @@
  *
  */
 
+#ifndef _KEYS_H_
+#define _KEYS_H_
+
 #define KEY_SHIFT 1
 #define KEY_CTRL  2
 #define KEY_META  4  
@@ -48,3 +51,5 @@ enum specialKeys{
    PAGE_DOWN,
    PAGE_UP
 }; 
+
+#endif // _KEYS_H_

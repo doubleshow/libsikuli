@@ -8,9 +8,8 @@
  */
 
 #include <cxxtest/TestSuite.h>
-#include "region.h"
-#include "screen.h"
-#include "vision.h"
+#include "sikuli.h"
+
 using namespace sikuli;
 
 class RegionTestSuite : public CxxTest::TestSuite 
@@ -173,7 +172,7 @@ public:
    
    void testOCR(void)
    {
-      Vision::initOCR("arial.png");
+      initOCR("arial.png");
       
       Screen s;
       s.click("apple.png");

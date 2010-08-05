@@ -3,7 +3,7 @@
  *  sikuli
  *
  *  Created by Tom Yeh on 7/23/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
+ *  Copyright 2010 sikuli.org. All rights reserved.
  *
  */
 #ifndef _SIKULI_REGION_
@@ -15,29 +15,13 @@
 
 #include "robot.h"
 
+//#include "sikuli.h"
+#include "pattern.h"
+#include "location.h"
 
 using namespace std;
 
 namespace sikuli{
-   
-   
-class Settings{
-public:
-   static int DelayAfterDrag;
-   static int DelayBeforeDrop;
-   static int WaitScanRate;
-   static bool ThrowException;
-   static double AutoWaitTimeout;
-   
-   
-   static void addImagePath(const char* image_path);
-   static vector<const char*> getImagePaths();
-   static void resetImagePaths();
-   
-private:
-   
-   static vector<string> _image_paths;
-};
    
 struct Rectangle{
    
@@ -61,8 +45,6 @@ struct Rectangle{
    int height;
 };    
 
-
-//#include <robot.h>
 class ScreenImage{
    
 public:
@@ -89,88 +71,6 @@ private:
    cv::Mat _image;
 
 };
-
-
-
-
-
-
-struct Point {
-
-   Point(int _x, int _y) : x(_x), y(_y) {};   
-   int x;
-   int y;
-};
-
-class Location : public Point{
-   
-public: 
-   
-   Location() : Point(-1,-1){};
-   Location(int _x, int _y) : Point(_x,_y){}      
-   Location(const Location& loc) : Point(loc.x, loc.y){};
-   
-   Location offset(int dx, int dy){
-      return Location(x+dx, y+dy);
-   }
-      
-   Location left(int dx){
-      return Location(x-dx, y);
-   }
-      
-   Location right(int dx){
-      return Location(x+dx, y);
-   }
-      
-   Location above(int dy){
-      return Location(x, y-dy);
-   }
-      
-   Location below(int dy){
-      return Location(x, y+dy);
-   }
-      
-//      public String toString(){
-//         return "(" + x + "," + y + ")";
-//      }
-};
-   
-   
-   
-   
-class Pattern{
-   
-public:
-   
-   Pattern();
-   Pattern(const Pattern& p);
-   Pattern(const char* str);
-   
-   Pattern similar(float similarity_);
-   Pattern exact();
-   Pattern targetOffset(int dx_, int dy_);
-   
-   Location getTargetOffset();
-   float getSimilarity();
-   
-   
-   string toString();
-   
-   const char* getText();
-   const char* getImageURL();
-
-   bool isImageURL();
-   bool isText();
-   
-private:
-   
-   bool bText;
-   string str;
-   float similarity;
-   int dx;
-   int dy;
-
-};   
   
 class FindFailed : public exception {
    

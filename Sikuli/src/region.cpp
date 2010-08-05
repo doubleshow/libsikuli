@@ -11,34 +11,9 @@
 #include <sstream>
 #include "region.h"
 #include "vision.h"
+#include "settings.h"
 
 using namespace sikuli;
-
-
-int Settings::DelayBeforeDrop = 10;
-int Settings::DelayAfterDrag = 10;
-int Settings::WaitScanRate = 3;
-bool Settings::ThrowException = true;
-double Settings::AutoWaitTimeout = 3.0;
-vector<string> Settings::_image_paths = vector<string>();
-
-void
-Settings::addImagePath(const char* image_path){
-   _image_paths.push_back(string(image_path));
-}
-
-vector<const char*> 
-Settings::getImagePaths(){
-   vector<const char*> ret;
-   for (int i=0; i<_image_paths.size(); ++i)
-      ret.push_back(_image_paths[i].c_str());
-   return ret;
-}
-
-void 
-Settings::resetImagePaths(){
-   _image_paths.clear();
-}
 
 ////////////////////////////////////////////////////////////////////
 /// Match Class
@@ -87,101 +62,6 @@ Match::setTargetOffset(Location offset){
    _target.y += offset.y;
 }
 
-////////////////////////////////////////////////////////////////////
-/// Pattern Class
-////////////////////////////////////////////////////////////////////
-
-Pattern::Pattern(){
-   str = "";
-   similarity = 0.8f;
-   dx = 0;
-   dy = 0;
-}
-
-Pattern::Pattern(const Pattern& p){
-   str = p.str;
-   bText = p.bText;
-   similarity = p.similarity;
-   dx = p.dx;
-   dy = p.dy;
-}
-
-Pattern::Pattern(const char* str_){
-   str = string(str_);
-   
-   bText = str.length()>3 && str[0] == '/' && str[str.length()-1] == '/';
-   if (bText)
-      str = str.substr(1, str.length()-2);
-   
-   
-   similarity = 0.8f;
-   dx = 0;
-   dy = 0;   
-}
-
-bool
-Pattern::isText(){
-   return bText;
-}
-
-bool
-Pattern::isImageURL(){
-   return !isText();
-}
-
-
-Pattern 
-Pattern::similar(float similarity_){
-   Pattern ret(*this);
-   ret.similarity = similarity_;
-   return ret;
-}
-
-Pattern 
-Pattern::exact(){
-   Pattern ret(*this);
-   ret.similarity = 1.0f;
-   return ret;
-}
-
-Pattern 
-Pattern::targetOffset(int dx_, int dy_){
-   Pattern ret(*this);
-   ret.dx = dx_;
-   ret.dy = dy_;
-   return ret;
-}
-
-Location 
-Pattern::getTargetOffset(){
-   return Location(dx, dy);
-}
-
-float
-Pattern::getSimilarity(){
-   return similarity;
-}
-
-const char* 
-Pattern::getImageURL() { 
-   return str.c_str();
-}
-
-const char* 
-Pattern::getText() { 
-   return str.c_str();
-}
-
-
-string 
-Pattern::toString(){
-   stringstream ret;
-   ret << "Pattern(\"" << str + "\")";
-   ret << ".similar(" << similarity << ")";
-   if(dx!=0 || dy!=0)
-      ret << ".targetOffset(" << dx << "," << dy << ")";
-   return ret.str();
-}
 
 ////////////////////////////////////////////////////////////////////
 /// Region Class
