@@ -36,8 +36,26 @@ public:
    
    void testTemp(void)
    {
+      Screen s;
+      s.click("apple.png");
+      s.type("sys\n");
+      s.click("sharing.png");
+      
+      sleep(2);
+      Pattern p = Pattern("checkbox.png").limit(5);
+      vector<Match> ms = s.findAll(p);
+      TS_ASSERT_EQUALS(ms.size(), 5);
+      
+      p = Pattern("checkbox.png");
+      ms = s.findAll(p);
+      TS_ASSERT(ms.size() > 5);
+            
+      p = Pattern("checkbox.png").limit(0);
+      ms = s.findAll(p);
+      TS_ASSERT(ms.size() > 5);
       
       
+      s.type("q",CMD);
    }
    
 };

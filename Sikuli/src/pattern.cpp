@@ -19,7 +19,7 @@ Pattern::Pattern(){
    _bAll = false;
    _ordering = SCORE;
    _position = ANYWHERE;
-   _limit = 1;
+   _limit = 999999;
 }
 
 Pattern::Pattern(const Pattern& p){
@@ -50,7 +50,7 @@ Pattern::Pattern(const char* str_){
    _bAll = false;
    _ordering = SCORE;
    _position = ANYWHERE;
-   _limit = 1;   
+   _limit = 999999;   
 }
 
 bool
@@ -103,13 +103,19 @@ Pattern::one(){
 }
 
 Pattern 
+Pattern::limit(int n){
+   Pattern ret(*this);
+   if (n>0)
+      ret._limit = max(1,n);  // can not be fewer than one match
+   return ret;
+}
+
+Pattern 
 Pattern::orderBy(int ordering){
    Pattern ret(*this);
    ret._ordering = ordering;
    return ret;
 }
-
-
 
 Pattern 
 Pattern::topMost(){
@@ -158,6 +164,11 @@ Pattern::getImageURL() {
 int
 Pattern::getOrdering(){
    return _ordering;
+}
+
+int
+Pattern::getLimit(){
+   return _limit;
 }
 
 const char* 

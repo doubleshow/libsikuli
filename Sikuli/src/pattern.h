@@ -57,6 +57,10 @@ public:
    Pattern leftMost();
    Pattern rightMost();
    
+   // no effect if n < 1
+   Pattern limit(int n);
+   
+   
    Pattern orderBy(int ordering);
    
    string toString();
@@ -74,6 +78,8 @@ public:
    
    
    int getOrdering();
+   int getLimit();
+   
    //int getDesiredLocation();
    
 private:

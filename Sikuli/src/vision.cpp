@@ -178,9 +178,11 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
       
    }
    
+   
    // Convert FindResults to Matches
    vector<Match> matches;
-   for (int i=0; i<results.size(); ++i){
+   int n = min((int)results.size(), (int)ptn.getLimit());
+   for (int i=0; i< n; ++i){
       FindResult& r = results[i];
       matches.push_back(Match(r.x,r.y,r.w,r.h,r.score));
    }
