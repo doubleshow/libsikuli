@@ -17,11 +17,32 @@ class RegionTestSuite : public CxxTest::TestSuite
 {
 public:
    
+   void setUp() {
+      Settings::addImagePath("images");
+   }
    
    void tearDown() {
       // sleep to let previous test complete
       sleep(1);
+      
+      Settings::resetImagePaths();
    }
+   
+   void testAddImagePaths(void)
+   {
+      Settings::resetImagePaths();
+      Settings::addImagePath("test");
+      Settings::addImagePath("images");
+      Settings::addImagePath("images/a");
+      TS_ASSERT_EQUALS(Settings::getImagePaths().size(), 3);
+      TS_ASSERT_SAME_DATA(Settings::getImagePaths()[0], "test", 4);
+      TS_ASSERT_SAME_DATA(Settings::getImagePaths()[1], "images", 4);
+      
+      Screen s;
+      TS_ASSERT_THROWS_NOTHING(s.find("aapple.png"));
+      TS_ASSERT_THROWS_NOTHING(s.findAll("aapple.png"));
+      
+   }   
    
    void testCreation( void )
    {
@@ -135,6 +156,46 @@ public:
       r.openApp("firefox.app");
       TS_ASSERT(s.exists("firefox_menu.png"));
    } 
+   
+   void testFindAll(void)
+   {
+      Screen s;
+      s.click("apple.png");
+      s.type("sys\n");
+      s.click("keyboard.png");
+      
+      Region r = s.find("keyboard_settings.png");
+      vector<Match> ms = r.findAll("thumb.png");
+      
+      TS_ASSERT_EQUALS(ms.size(), 3);
+      s.type("q",CMD);
+   }
+   
+   void testOCR(void)
+   {
+      Vision::initOCR("arial.png");
+      
+      Screen s;
+      s.click("apple.png");
+      s.click("/System Preferences/");
+      s.click("/Trackpad/");
+      TS_ASSERT(s.exists(Pattern("tracking_speed.png").similar(0.95)));
+      s.type("q",CMD);
+      
+   }   
+   
+   void testTargetOffset(void)
+   {
+      Screen s;
+      s.click("apple.png");
+      s.type("sys\n");
+      
+      Pattern p("trackpad.png");
+      p = p.targetOffset(0,-100);
+      s.click(p);
+      TS_ASSERT(s.exists("security_tabs.png"));
+      s.type("q",CMD);
+   }
    
 };
 

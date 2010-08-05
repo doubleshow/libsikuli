@@ -20,7 +20,25 @@ int Settings::DelayAfterDrag = 10;
 int Settings::WaitScanRate = 3;
 bool Settings::ThrowException = true;
 double Settings::AutoWaitTimeout = 3.0;
+vector<string> Settings::_image_paths = vector<string>();
 
+void
+Settings::addImagePath(const char* image_path){
+   _image_paths.push_back(string(image_path));
+}
+
+vector<const char*> 
+Settings::getImagePaths(){
+   vector<const char*> ret;
+   for (int i=0; i<_image_paths.size(); ++i)
+      ret.push_back(_image_paths[i].c_str());
+   return ret;
+}
+
+void 
+Settings::resetImagePaths(){
+   _image_paths.clear();
+}
 
 ////////////////////////////////////////////////////////////////////
 /// Match Class
@@ -37,11 +55,13 @@ Match::~Match(){
 Match::Match(const Match& m){
    init(m.x, m.y, m.w, m.h);
    score = m.score;
+   _target = Location(getCenter());   
 }
 
 Match::Match(int _x, int _y, int _w, int _h, double _score){
    init(_x,_y,_w,_h);
    score = _score;
+   _target = Location(getCenter());
 }
 
 int
@@ -57,7 +77,7 @@ Match::getScore() const{
 
 Location
 Match::getTarget() const{
-   return getCenter();
+   return _target;
 }
 
 void
@@ -748,6 +768,7 @@ Region::pressModifiers(int modifiers){
    if(modifiers & SHIFT) Robot::keyPress(VK_SHIFT);
    if(modifiers & CTRL) Robot::keyPress(VK_CONTROL);
    if(modifiers & ALT) Robot::keyPress(VK_ALT);
+   if(modifiers & CMD) Robot::keyPress(VK_META);
    if(modifiers & META) {
  //     if( Env.getOS() == OS.WINDOWS )
 //         Robot::keyPress(KeyEvent.VK_WINDOWS);
@@ -761,6 +782,7 @@ Region::releaseModifiers(int modifiers){
    if(modifiers & SHIFT) Robot::keyRelease(VK_SHIFT);
    if(modifiers & CTRL) Robot::keyRelease(VK_CONTROL);
    if(modifiers & ALT) Robot::keyRelease(VK_ALT);//
+   if(modifiers & CMD) Robot::keyRelease(VK_META);   
    if(modifiers & META){ 
 //      if( Env.getOS() == OS.WINDOWS )
 //         Robot::keyRelease(KeyEvent.VK_WINDOWS);
@@ -857,6 +879,8 @@ Region::findAll(Pattern ptn) throw(FindFailed) {
       if (Settings::AutoWaitTimeout && ms.empty())
          throw FindFailed(ptn);
    }
+   if (_pLastMatches == NULL)
+      _pLastMatches = new vector<Match>();
    *_pLastMatches = ms;
    return ms;
 }
@@ -869,15 +893,16 @@ Region::findAll(const char* imgURL) throw(FindFailed) {
 
 Match 
 Region::findNow(Pattern ptn) throw(FindFailed){
-   cout << "(" << x << "," << y << ") - (" << x+w << "," << y+h << ")" << endl;
+   cout << "[Region::findNow] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;
    ScreenImage simg = Robot::capture(0, x, y, w, h);
-//   cv::namedWindow("test");
-//   cv::imshow("test",simg.getMat());
-//   cv::waitKey();
    Match m = Vision::find(simg, ptn);//
    m.x += x;
    m.y += y;
-   cout << "Found pattern at: " << m.x << "," << m.y << " score = " << m.getScore() << endl;
+   
+   m.setTargetOffset(ptn.getTargetOffset());
+ 
+   cout << "[Region::findNow] Found at (" << m.x << "," << m.y << ") score = " << m.getScore()  << endl;
+   
    if (m.getScore() <= 0)
       throw FindFailed(ptn);
    return m;
@@ -891,8 +916,12 @@ Region::findNow(const char* imgURL) throw(FindFailed){
 vector<Match> 
 Region::findAllNow(Pattern ptn) throw(FindFailed){
    // ToDo: adjust capturing region for multi-monitor
-   ScreenImage simg = Robot::capture(0, x, 800-h-y, w, h);
+   cout << "[Region::findAll] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;   
+   ScreenImage simg = Robot::capture(0, x, y, w, h);
    vector<Match> ms = Vision::findAll(simg, ptn);
+   for (int i=0;i<ms.size();++i)
+      ms[i].setTargetOffset(ptn.getTargetOffset());
+   cout << "[Region::findAll] Found " << ms.size() << " matches" << endl;
    if (ms.empty())
       throw FindFailed(ptn);
    return ms;
@@ -1161,19 +1190,5 @@ Region::getLocationFromPSRML(Location target){
    return target;
 }
 
-////////////////////////////////////////////////////////////////////
-/// FullScreen Class
-////////////////////////////////////////////////////////////////////
-//
-//FullScreen::FullScreen(){
-//   int x,y,w,h;
-//   Robot::getDisplayBounds(0,x,y,w,h);
-//   init(x,y,w,h);   
-//}
-//
-//FullScreen::FullScreen(int screenId){
-//   int x,y,w,h;
-//   Robot::getDisplayBounds(screenId,x,y,w,h);
-//   init(x,y,w,h);   
-//}
+
 

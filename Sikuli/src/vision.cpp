@@ -13,8 +13,8 @@
 using namespace sikuli;
 
 void
-Vision::trainOCR(const char* trainingImagePath){
-   Mat im = imread(trainingImagePath,1);
+Vision::initOCR(const char* ocrDataPath){
+   Mat im = imread(ocrDataPath,1);
    TextFinder::train(im);
 }
 
@@ -30,7 +30,26 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
       //namedWindow("screen");
       imwrite("/tmp/screen.png",simg.getMat());
       f = new TemplateFinder(simg.getMat());
-      f->find(ptn.getImageURL(), ptn.getSimilarity());      
+      
+         
+      // TODO: make this implementation prettier and use os dependent 
+      // file separators
+      vector<const char*> image_paths = Settings::getImagePaths();
+      
+      for (int i=0; i<image_paths.size(); ++i){
+         string image_url;
+         image_url = string(image_paths[i]) + 
+            "/" + ptn.getImageURL();
+      
+         try{
+            f->find(image_url.c_str(), ptn.getSimilarity()); 
+            break;
+         }catch (cv::Exception) {
+            
+         }
+      }
+      
+      
    }
    
    if (f->hasNext()){      
@@ -47,8 +66,24 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
 vector<Match> 
 Vision::findAll(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
    vector<Match> ms;
-   Finder f(simg.getMat());
-   f.find(ptn.getImageURL(), ptn.getSimilarity());
+   TemplateFinder f(simg.getMat());
+   
+   vector<const char*> image_paths = Settings::getImagePaths();
+   
+   for (int i=0; i<image_paths.size(); ++i){
+      string image_url;
+      image_url = string(image_paths[i]) + 
+      "/" + ptn.getImageURL();
+      
+      try{
+         f.find_all(image_url.c_str(), ptn.getSimilarity()); 
+         break;
+      }catch (cv::Exception) {
+         
+      }
+   }
+   
+   
    while (f.hasNext()){      
       FindResult r = f.next();
       ms.push_back(Match(r.x,r.y,r.w,r.h,r.score));

@@ -28,6 +28,15 @@ public:
    static int WaitScanRate;
    static bool ThrowException;
    static double AutoWaitTimeout;
+   
+   
+   static void addImagePath(const char* image_path);
+   static vector<const char*> getImagePaths();
+   static void resetImagePaths();
+   
+private:
+   
+   static vector<string> _image_paths;
 };
    
 struct Rectangle{
@@ -163,24 +172,24 @@ private:
 
 };   
   
-   class FindFailed : public exception {
-      
-   public:
-      FindFailed(string _msg) : msg(_msg) {};
-      FindFailed(Pattern _ptn) : ptn(_ptn) {};
-      
-      virtual const char* what() const throw(){
-         return msg.c_str();
-      }
-      
-      virtual ~FindFailed() throw() {};
-      
-   private:
-      
-      string msg;
-      Pattern ptn;
-      
-   };
+class FindFailed : public exception {
+   
+public:
+   FindFailed(string _msg) : msg(_msg) {};
+   FindFailed(Pattern _ptn) : ptn(_ptn) {};
+   
+   virtual const char* what() const throw(){
+      return msg.c_str();
+   }
+   
+   virtual ~FindFailed() throw() {};
+   
+private:
+   
+   string msg;
+   Pattern ptn;
+   
+};
    
 class Match;
 
@@ -418,7 +427,7 @@ private:
    int _hold_buttons;// = 0;
    string _hold_keys;
    
-   Robot _robot;
+   //Robot _robot;
    //Screen* _scr;
    
  

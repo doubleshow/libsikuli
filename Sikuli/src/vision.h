@@ -20,7 +20,7 @@ public:
    static Match find(ScreenImage simg, Pattern ptn) throw(FindFailed);   
    static vector<Match> findAll(ScreenImage simg, Pattern ptn) throw(FindFailed);
    
-   static void trainOCR(const char* trainingImagePath);
+   static void initOCR(const char* ocrDataPath);
    
 };
 

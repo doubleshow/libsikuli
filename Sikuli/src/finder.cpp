@@ -83,6 +83,8 @@ TemplateFinder::~TemplateFinder(){
 void 
 TemplateFinder::find(const char *target_image_filename, double min_similarity){     
    Mat target = imread(target_image_filename, 1);
+   if (target.data == NULL)
+      throw cv::Exception();
    find(target, min_similarity);
 }   
 
@@ -94,6 +96,9 @@ TemplateFinder::find(IplImage* target, double min_similarity){
 void 
 TemplateFinder::find_all(const char *target_image_filename, double min_similarity){
    Mat target = imread(target_image_filename, 1);
+   if (target.data == NULL)
+      throw cv::Exception();
+
    find_all(target, min_similarity);
 }   
 
