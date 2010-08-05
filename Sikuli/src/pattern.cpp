@@ -102,6 +102,14 @@ Pattern::one(){
    return ret;
 }
 
+Pattern 
+Pattern::orderBy(int ordering){
+   Pattern ret(*this);
+   ret._ordering = ordering;
+   return ret;
+}
+
+
 
 Pattern 
 Pattern::topMost(){
@@ -145,6 +153,11 @@ Pattern::getSimilarity(){
 const char* 
 Pattern::getImageURL() { 
    return str.c_str();
+}
+
+int
+Pattern::getOrdering(){
+   return _ordering;
 }
 
 const char* 

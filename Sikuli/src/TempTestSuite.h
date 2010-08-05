@@ -22,21 +22,23 @@ public:
       Settings::addImagePath("images");
    }
    
-   void testFindTopMost(void)
-   {
-      Screen s;
-      s.click("apple.png");
-      s.type("sys\n");
-      
-      sleep(2);
-      Pattern p = Pattern("checkbox.png").bottomMost();
-      Match m = s.find(p);
-      s.click(m);
-      
-
-   }
-
+//   void testFindTopMost(void)
+//   {
+//      Screen s;
+//      s.click("apple.png");
+//      
+//      sleep(2);
+//      Pattern p = Pattern("mac.png").bottomMost();
+//      Match m = s.find(p);
+//      s.click(m);
+//
+//   }
    
+   void testTemp(void)
+   {
+      
+      
+   }
    
 };
    

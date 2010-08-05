@@ -3,7 +3,7 @@
  *  sikuli
  *
  *  Created by Tom Yeh on 7/29/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
+ *  Copyright 2010 sikuli.org. All rights reserved.
  *
  */
 
@@ -110,7 +110,7 @@ public:
       s.click("trackpad.png");
       s.find("tracking_speed.png").below(100).wider(100).hover("thumb.png");
       TS_ASSERT_THROWS_NOTHING(s.wait("tracking_speed_tooltip.png",5));
-      s.type("w", META);
+      s.type("q", CMD);
    }
    
    void testDragDrop(void)
@@ -145,7 +145,7 @@ public:
       
       
       sleep(1);
-      s.type("q", META);
+      s.type("q", CMD);
    }   
    
    void testOpenApp(void)
@@ -195,6 +195,31 @@ public:
       TS_ASSERT(s.exists("security_tabs.png"));
       s.type("q",CMD);
    }
+   
+   void testPatternOrderBy(void)
+   {
+      
+      Screen s;
+      s.click("apple.png");
+      s.type("sys\n");
+      s.click("trackpad.png");
+      
+      sleep(1);
+      
+      Pattern p = Pattern("thumb.png").orderBy(RIGHTLEFT);
+      vector<Match> ms = s.findAll(p);
+      s.hover(ms[2]);
+      sleep(2);
+      TS_ASSERT(s.exists("tracking_speed_tooltip.png"));
+      
+      s.hover(ms[0]);
+      sleep(2);
+      TS_ASSERT(s.exists("scrolling_speed_tooltip.png"));
+      
+      s.type("q", CMD);
+      
+   }
+   
    
 };
 

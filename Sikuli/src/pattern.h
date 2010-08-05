@@ -57,7 +57,7 @@ public:
    Pattern leftMost();
    Pattern rightMost();
    
-   
+   Pattern orderBy(int ordering);
    
    string toString();
    
@@ -73,6 +73,7 @@ public:
    int where() { return _position; };
    
    
+   int getOrdering();
    //int getDesiredLocation();
    
 private:

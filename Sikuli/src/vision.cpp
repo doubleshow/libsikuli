@@ -111,6 +111,19 @@ getFindResults(TemplateFinder& f, const char* image_filename, bool all, double s
 }
 
 
+bool sort_by_y_asc(const FindResult& r1, const FindResult& r2){
+   return r1.y < r2.y;
+}
+bool sort_by_y_dsc(const FindResult& r1, const FindResult& r2){
+   return r1.y > r2.y;
+}
+bool sort_by_x_asc(const FindResult& r1, const FindResult& r2){
+   return r1.x < r2.x;
+}
+bool sort_by_x_dsc(const FindResult& r1, const FindResult& r2){
+   return r1.x > r2.x;
+}
+
 vector<Match> 
 Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
    
@@ -121,6 +134,18 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
    if (ptn.bAll()){
       
       results = getFindResults(f, ptn.getImageURL(), true, ptn.getSimilarity());
+      
+      
+      if (ptn.getOrdering() == TOPDOWN){
+         sort(results.begin(), results.end(), sort_by_y_asc);
+      }else if (ptn.getOrdering() == BOTTOMUP){
+         sort(results.begin(), results.end(), sort_by_y_dsc);
+      }else if (ptn.getOrdering() == LEFTRIGHT){
+         sort(results.begin(), results.end(), sort_by_x_asc);
+      }else if (ptn.getOrdering() == RIGHTLEFT){
+         sort(results.begin(), results.end(), sort_by_x_dsc);
+      }
+   
    
    }else{
       
