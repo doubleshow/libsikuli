@@ -248,11 +248,11 @@ public:
    int type(Match& target, const char* text, int modifiers = 0);
 
    int press(int key, int modifiers = 0);   
-   int press(Location target, int key, int modifiers = 0);
-   int press(Pattern& target, int key, int modifiers = 0);
-   int press(const char* target, int key, int modifiers = 0);
-   int press(Region& target, int key, int modifiers = 0);
-   int press(Match& target, int key, int modifiers = 0);
+//   int press(Location target, int key, int modifiers = 0);
+//   int press(Pattern& target, int key, int modifiers = 0);
+//   int press(const char* target, int key, int modifiers = 0);
+//   int press(Region& target, int key, int modifiers = 0);
+//   int press(Match& target, int key, int modifiers = 0);
    
    
    template<class PSRML> int paste(PSRML target, string text);
