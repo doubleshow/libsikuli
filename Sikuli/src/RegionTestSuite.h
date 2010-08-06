@@ -244,6 +244,18 @@ public:
       s.type("q",CMD);
    }   
    
+   void testReadImageFromURL(void)
+   {
+      Settings::resetImagePaths();
+      Settings::addImagePath("http://localhost:4567/");
+      
+      Screen s;
+      s.click("apple.png");
+      s.click("http://localhost:4567/mac.png");
+      s.click("apple_in_workdir.png");
+   }
+   
+   
 };
 
 

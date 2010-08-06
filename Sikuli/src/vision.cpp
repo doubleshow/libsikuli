@@ -64,18 +64,69 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
    
 }
 */
+#include <stdio.h>
+#include <curl/curl.h>
+#include <curl/types.h>
+#include <curl/easy.h>
+#include <string>
 
+size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+   int written = fwrite(ptr, size, nmemb, stream);
+   return written;
+}
 
-Mat searchImageInPaths(const char* image_filename) throw(FindFailed) {
+Mat imread_url(const char* url){
+   CURL *curl;
+   FILE *fp;
+   CURLcode res;
+   //const char* url = "http://localhost/aaa.txt";
+   char outfilename[FILENAME_MAX];
+   tmpnam(outfilename);
+   curl = curl_easy_init();
+   if (curl) {
+      fp = fopen(outfilename,"wb");
+      curl_easy_setopt(curl, CURLOPT_URL, url);//"http://localhost:4567/apple.png");
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+      res = curl_easy_perform(curl);
+      /* always cleanup */
+      curl_easy_cleanup(curl);
+      fclose(fp);
+   }
    
+   Mat im = imread(outfilename);
+   return im;
+}
+
+Mat imread_helper(const char* image_url){
+   Mat im;
+   if (strncmp(image_url, "http", 4) == 0)
+      // reading the image from a web address
+      im = imread_url(image_url);
+   else 
+      // reading the image from the local file system
+      im = imread(image_url);
+ 
+   return im;
+}
+
+Mat readImageFromPaths(const char* image_filename) throw(FindFailed) {
+
+   Mat im;
+
+   // First try to read the image using the filename as is
+   im = imread_helper(image_filename);
+   if (im.data != NULL)
+      return im;
+   
+   // Then, try to read the image at each image path
    vector<const char*> image_paths = Settings::getImagePaths();
    
    for (int i=0; i<image_paths.size(); ++i){
       string fullpath = string(image_paths[i]) + 
       "/" + string(image_filename);
       
-      Mat im = imread(fullpath);
-      
+      im = imread_helper(fullpath.c_str());
       if (im.data != NULL)
          return im;
    }
@@ -90,7 +141,7 @@ getFindResults(TemplateFinder& f, const char* image_filename, bool all, double s
    
    vector<FindResult> results;
       
-   Mat image = searchImageInPaths(image_filename);
+   Mat image = readImageFromPaths(image_filename);
    
    if (all){
       f.find_all(image, similarity);

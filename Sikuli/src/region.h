@@ -144,12 +144,7 @@ public:
    Match getLastMatch();
    vector<Match> getLastMatches();
   
-//   void setThrowException(bool flag){ _throwException = flag; } 
-//   void setAutoWaitTimeout(double sec){ _autoWaitTimeout = sec; }
-//   
-//   bool getThrowException(){ return _throwException; }
-//   double getAutoWaitTimeout(){ return _autoWaitTimeout; }   
-   
+
 //==================================================================
 // Pattern Matching Functions
 //==================================================================
@@ -333,14 +328,7 @@ private:
  
 };
    
-//class FullScreen : public Region {
-//   
-//public:
-//   
-//   FullScreen();
-//   FullScreen(int screenId);
-//};
-   
+
 class Match : public Region {
    
 public:

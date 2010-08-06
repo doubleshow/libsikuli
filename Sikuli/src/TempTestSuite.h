@@ -12,7 +12,6 @@
 #include "sikuli.h"
 using namespace sikuli;
 
-
 class TempTestSuite : public CxxTest::TestSuite 
 {
 public:
@@ -36,26 +35,13 @@ public:
    
    void testTemp(void)
    {
+      Settings::resetImagePaths();
+      Settings::addImagePath("http://localhost:4567/");
+      
       Screen s;
       s.click("apple.png");
-      s.type("sys\n");
-      s.click("sharing.png");
-      
-      sleep(2);
-      Pattern p = Pattern("checkbox.png").limit(5);
-      vector<Match> ms = s.findAll(p);
-      TS_ASSERT_EQUALS(ms.size(), 5);
-      
-      p = Pattern("checkbox.png");
-      ms = s.findAll(p);
-      TS_ASSERT(ms.size() > 5);
-            
-      p = Pattern("checkbox.png").limit(0);
-      ms = s.findAll(p);
-      TS_ASSERT(ms.size() > 5);
-      
-      
-      s.type("q",CMD);
+      s.click("http://localhost:4567/mac.png");
+      s.click("apple_in_workdir.png");
    }
    
 };
