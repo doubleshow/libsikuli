@@ -1,11 +1,11 @@
 %module sikuli
 %{
 #define SWIG_FILE_WITH_INI
-#include "region.h"
-#include "screen.h"
-#include "vision.h"
+#include "sikuli.h"
 using namespace sikuli;
 %}
+
+
 
 %pythoncode
 %{
@@ -24,9 +24,13 @@ def _swig_setattr_nondynamic(self,class_type,name,value,static=1):
       raise AttributeError("You cannot add attributes to %s" % self)   
 %}
 
+%include "std_vector.i"
+%template(Matches) std::vector<sikuli::Match>;
+
+%include "sikuli.h"
 %include "region.h"
 %include "screen.h"
-   
+
 %pythoncode
 %{
 

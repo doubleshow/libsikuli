@@ -15,5 +15,5 @@ namespace sikuli{
 void initOCR(const char* ocrData){
    Vision::initOCR(ocrData);
 }
-
-};
+   
+}

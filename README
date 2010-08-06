@@ -24,7 +24,7 @@ $ git clone git://github.com/doubleshow/libsikuli.git
 
 Run the Python setup script
 
-$ cd Sikuli
+$ cd sikuli
 $ python setup.rb install
 
 Test if it's working by running an example script

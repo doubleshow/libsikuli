@@ -711,7 +711,7 @@ int
 Region::_click(Location loc, int buttons, int modifiers, bool dblClick) {
 //   Debug.info( getClickMsg(loc, buttons, modifiers, dblClick) );
    Robot::mouseMove(loc.x, loc.y);
-   sleep(1);
+   Robot::delay(20);
    return _click(buttons, modifiers, dblClick);
  }
 
