@@ -35,13 +35,18 @@ public:
    
    void testTemp(void)
    {
-      Settings::resetImagePaths();
-      Settings::addImagePath("http://localhost:4567/");
-      
       Screen s;
-      s.click("apple.png");
-      s.click("http://localhost:4567/mac.png");
-      s.click("apple_in_workdir.png");
+      s.click("magnifying_glass.png");
+      sleep(1);
+      s.paste("test");
+//test      Robot::paste("test");
+//      Settings::resetImagePaths();
+//      Settings::addImagePath("http://localhost:4567/");
+//      
+//      Screen s;
+//      s.click("apple.png");
+//      s.click("http://localhost:4567/mac.png");
+//      s.click("apple_in_workdir.png");
    }
    
 };

@@ -205,8 +205,30 @@
 					
 				</mx:Canvas>
 		
-		
+		<mx:Canvas label="TestPaste" width="100%" height="100%"		
+				show="initTestPaste(event)"
+				click="checkTestPaste(event)">
+				<mx:Script>
+					<![CDATA[
+						
+						private function initTestPaste(event:Event):void{
+						testPasteInput.text = ''
+					}
+					
+					private function checkTestPaste(event:Event):void{
+						if (testPasteInput.text == "paSte tHis text here!!!")
+							result.text = "SUCCESS"
+					}	
+						
+					]]>
+				</mx:Script>
+			<mx:TextInput x="113" y="68" width="232" id="testPasteInput" change="checkTestPaste(event)"/>
+			<mx:Label x="40" y="70" text="Paste here"/>
 
+		
+		
+		
+		</mx:Canvas>
 
 	</mx:ViewStack>
 	

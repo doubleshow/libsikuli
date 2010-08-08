@@ -255,7 +255,13 @@ public:
 //   int press(Match& target, int key, int modifiers = 0);
    
    
-   template<class PSRML> int paste(PSRML target, string text);
+   //template<class PSRML> int paste(PSRML target, const char* text);
+   int paste(const char* text);   
+   int paste(const Location& target, const char* text);
+   int paste(const Pattern& target, const char* text);
+   int paste(const char* target, const char* text);
+   int paste(const Region& target, const char* text);
+   int paste(const Match& target, const char* text);
    
    void mouseDown(int buttons);
    void mouseUp(int buttons);

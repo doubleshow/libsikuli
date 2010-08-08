@@ -69,4 +69,10 @@ public:
  void runTest() { suite_FlashTestSuite.testOrdering(); }
 } testDescription_FlashTestSuite_testOrdering;
 
+static class TestDescription_FlashTestSuite_testPaste : public CxxTest::RealTestDescription {
+public:
+ TestDescription_FlashTestSuite_testPaste() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 135, "testPaste" ) {}
+ void runTest() { suite_FlashTestSuite.testPaste(); }
+} testDescription_FlashTestSuite_testPaste;
+
 #include <cxxtest/Root.cpp>

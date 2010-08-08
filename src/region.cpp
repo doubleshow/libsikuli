@@ -377,17 +377,41 @@ Region::dropAt(Match& target, double delay){
    return dropAt(getLocationFromPSRML(target),delay);
 }
 
-template<class PSRML> int 
-Region::paste(PSRML target, string text){
-   // use clipboard
-   click(target, 0);
-   if (text.empty()){
+int
+Region::paste(const char* text){
+   if (strlen(text)==0){
       return 0;
-   }
-   else{
-      Robot::paste(text);   
+   }else{
+      Robot::paste(text);  
       return 1;
    }
+}
+
+int
+Region::paste(const Location& target, const char* text){
+   click(target, 0);
+   Robot::delay(50);
+   return paste(text);
+}
+
+int
+Region::paste(const Pattern& target, const char* text){
+   return paste(getLocationFromPSRML(target), text);
+}
+
+int
+Region::paste(const char* target, const char* text){
+   return paste(getLocationFromPSRML(target), text);
+}
+
+int
+Region::paste(const Region& target, const char* text){
+   return paste(getLocationFromPSRML(target), text);
+}
+
+int
+Region::paste(const Match& target, const char* text){
+   return paste(getLocationFromPSRML(target), text);
 }
 
 int

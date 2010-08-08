@@ -1,5 +1,5 @@
 /*
- *  RegionTestSuite.h
+ *  FlashTestSuite.h
  *  sikuli
  *
  *  Created by Tom Yeh on 7/29/10.
@@ -19,7 +19,7 @@ public:
    Screen s;
    
    void setUp() {
-      Robot::openApp("Firefox.app");
+      Robot::openApp("Google Chrome.app");
       Settings::addImagePath("flash/images");
    }
    
@@ -53,7 +53,7 @@ public:
    void testRightClick(void)
    {
       s.rightClick("clickHere.png");
-      TS_ASSERT(s.exists("context_menu.png"));
+      TS_ASSERT(s.exists("about_adobe_flash_player.png"));
       s.press(ESC);
    }
    
@@ -132,8 +132,12 @@ public:
       
    }
    
-   
-   
+   void testPaste(void)
+   {
+      switchToTest("TestPaste.png");
+      s.paste("paste_target.png", "paSte tHis text here!!!");
+      TS_ASSERT(s.exists("success.png"));
+   }
    
 };
 

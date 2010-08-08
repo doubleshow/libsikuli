@@ -108,13 +108,9 @@ class Robot{
    
 public:
    
-   //Robot();
-   
-   static void delay(int time);
    static void mouseMove(int x, int y);
    static void mousePress(int buttons);
    static void mouseRelease(int buttons);
-   static void waitForIdle();
    static void keyPress(int key);
    static void keyRelease(int key);
    
@@ -123,13 +119,12 @@ public:
    static void drag();
    static void drop();
    
-   static void keyPressRelease(int key, int modifiers = 0);
-
    static void getDisplayBounds(int displayId, int& x, int& y, int& w, int& h);
    
+   static void paste(const char* text);
    
-   static void paste(string text);
-   
+   static void waitForIdle();
+   static void delay(int time);
    
    static void openApp(const char* appname);
 
@@ -138,6 +133,9 @@ public:
    
 private:
    
+   static void mouseMoveTo(int x, int y, bool dragged);
+   static void mouseMoveFromTo(int x0, int y0, int x1, int y1, bool dragged);
+
    static int _modifiers;
    static bool _dragged;
    

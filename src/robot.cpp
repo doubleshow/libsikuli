@@ -19,15 +19,11 @@ bool Robot::_dragged = false;
 #include <time.h>
 void
 Robot::delay(int msec){
-//   struct timespec interval, remainder; 
-//   interval.tv_sec = 0; 
-//   interval.tv_nsec = msec*1000; 
-//   nanosleep(&interval, &remainder);
    usleep(1000*msec);
 }
 
 void
-mouseMoveTo(int x, int y, bool dragged)
+Robot::mouseMoveTo(int x, int y, bool dragged)
 {
    CGPoint newloc;
    CGEventRef eventRef;
@@ -53,9 +49,8 @@ mouseMoveTo(int x, int y, bool dragged)
 }
    
 void 
-mouseMoveFromTo(int x0, int y0, int x1, int y1, bool dragged){
+Robot::mouseMoveFromTo(int x0, int y0, int x1, int y1, bool dragged){
    
-//   int steps = 20;
    int stepsize = 50;
    
    int xsteps = (x1-x0)/stepsize;
@@ -65,10 +60,6 @@ mouseMoveFromTo(int x0, int y0, int x1, int y1, bool dragged){
  
    int xstep = (x1-x0)/steps;
    int ystep = (y1-y0)/steps;
-   
-   
-   //int xstep = (x1 - x0) / steps;
-   //int ystep = (y1 - y0) / steps;
    
    for (int i=0; i < steps; i++){
       int xi = x0 + i * xstep;
@@ -94,24 +85,6 @@ Robot::mouseMove(int x, int y)
    
    
    mouseMoveFromTo(curloc.x,curloc.y,x,y,_dragged);
- //  
-//   
-//   if(_dragged){
-//      
-//      eventRef = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDragged, newloc,
-//                                                    kCGMouseButtonCenter);
-//      CGEventSetType(eventRef, kCGEventLeftMouseDragged);
-//      CGEventPost(kCGSessionEventTap, eventRef);
-//      CFRelease(eventRef);  
-//
-//   }else{
-//   
-//      eventRef = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, newloc,
-//                                         kCGMouseButtonCenter);
-//      CGEventSetType(eventRef, kCGEventMouseMoved);
-//      CGEventPost(kCGSessionEventTap, eventRef);
-//      CFRelease(eventRef);
-//   }
 }
 
 void 
@@ -156,7 +129,6 @@ void
 Robot::drag(){
    mousePress(BUTTON1_MASK);
    _dragged = true;
-   //delay(100);
 }
 
 void
@@ -274,37 +246,57 @@ Robot::keyRelease(int keycode){
    }
 }
 
-void
-Robot::keyPressRelease(int keycode, int modifiers){
-   CGEventRef eventRef;
-   eventRef = CGEventCreateKeyboardEvent (NULL, (CGKeyCode)keycode, true);
-   
-   CGEventFlags flags = CGEventGetFlags(eventRef);
-   switch (modifiers){
-      case VK_SHIFT:
-         flags |= kCGEventFlagMaskShift;
-         break;
-      case VK_CONTROL:
-         flags |= kCGEventFlagMaskControl;
-         break;
-   }
-   CGEventSetFlags(eventRef, flags);
-
-   CGEventPost(kCGSessionEventTap, eventRef);
-   CFRelease(eventRef);   
-   
-   eventRef = CGEventCreateKeyboardEvent (NULL, (CGKeyCode)keycode, false);
-   CGEventPost(kCGSessionEventTap, eventRef);
-   CFRelease(eventRef);
-}
-
-
 void 
 Robot::waitForIdle(){
+   //TODO:
 }
 
 void 
-Robot::paste(string text){
+Robot::paste(const char* text){
+   
+   // Put the string data to the pasteboard
+   OSStatus err;
+   PasteboardRef pbRef;
+   err = PasteboardCreate(kPasteboardClipboard,
+                          &pbRef);
+   PasteboardClear(pbRef);
+   CFStringRef strRef;
+   strRef = CFStringCreateWithCString(kCFAllocatorDefault,
+                                   text,
+                                   kCFStringEncodingMacRoman);
+   CFDataRef dataRef;
+   dataRef = CFStringCreateExternalRepresentation(NULL, strRef,                                                 
+                                                 kCFStringEncodingUTF8, '?');
+   
+   PasteboardPutItemFlavor(pbRef, (PasteboardItemID)1, 
+                           kUTTypeUTF8PlainText, dataRef, 
+                           kPasteboardFlavorNoFlags);
+   
+   CFRelease(pbRef);
+   CFRelease(strRef);
+   CFRelease(dataRef);
+   
+   
+   // Simulate CMD+V to paste the text at the current cursor location
+   {
+      CGEventRef eventRef;
+      eventRef = CGEventCreateKeyboardEvent(NULL, (CGKeyCode)VK_V, true);
+      CGEventFlags flags = CGEventGetFlags(eventRef);
+      flags |= kCGEventFlagMaskCommand;
+      CGEventSetFlags(eventRef, flags);
+      CGEventPost(kCGSessionEventTap, eventRef);
+      CFRelease(eventRef);
+   }   
+   {
+      CGEventRef eventRef;
+      eventRef = CGEventCreateKeyboardEvent(NULL, (CGKeyCode)VK_V, false);
+      CGEventFlags flags = CGEventGetFlags(eventRef);
+      flags |= kCGEventFlagMaskCommand;
+      CGEventSetFlags(eventRef, flags);
+      CGEventPost(kCGSessionEventTap, eventRef);
+      CFRelease(eventRef);
+   }
+
 }
 
 void
@@ -316,7 +308,6 @@ Robot::getDisplayBounds(int displayId, int& x, int& y, int& w, int& h){
    y = p.y;
    w = s.width;
    h = s.height;
-   //return Rectangle(p.x,p.y,p.width,p.height);
 }
 
 using namespace cv;
@@ -404,3 +395,47 @@ Robot::openApp(const char* appname){
    
    CFRelease(str);
 }
+
+/* Some useful windows code examples 
+ 
+ #include <windows.h>    //windows api is nice things
+ 
+ //text to send
+ LPCTSTR sText = "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+ 
+ int main()
+ {
+ if (!OpenClipboard(NULL)){ return 1; }    //if failed to open clipboard, die
+ EmptyClipboard();    //empty the clipboard
+ 
+ HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, (lstrlen(sText)+1));    //allocate memory as big as the text-string
+ LPTSTR sMem = (TCHAR*)GlobalLock(hMem);        //make memory-data space, lock the memory
+ memcpy(sMem, sText, (lstrlen(sText)+1));    //copy text-data into memory-data
+ GlobalUnlock(hMem);        //unlock the memory
+ SetClipboardData(CF_TEXT, hMem);    //put the data (text) to the clipboard
+ 
+ CloseClipboard();    //we don't want to put anymore data to it so..
+ 
+ while(!GetAsyncKeyState(VK_F5)){ Sleep(100); }    //wait until F5 is pressed
+ 
+ bool bEnd = false;    //wheter to stop spamming
+ while( bEnd == false ){    //while not told to stop, run the loop
+ if(GetAsyncKeyState(VK_F8)){ bEnd = !bEnd; }    //if F8 is pressed, stop spamming
+ 
+ //CTRL+V is standard Windows-shortcut for Paste
+ keybd_event(VK_CONTROL, 0, 0, 0);    //press down CTRL (control)
+ keybd_event(VkKeyScan('v'),0xB2,0 , 0);    //press down the key 'v'
+ keybd_event(VkKeyScan('v'),0xB2, KEYEVENTF_KEYUP,0);    //release the key 'v'
+ keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);    //release CTRL (control)
+ 
+ //and press Return to send text (in MSN)
+ keybd_event(VK_RETURN, 0, 0, 0);    //press down Return-key
+ keybd_event(VK_RETURN, 0, KEYEVENTF_KEYUP, 0);    //release Return-key
+ }
+ 
+ EmptyClipboard();    //empty the clipboard
+ 
+ return 0;
+ } 
+ 
+ */
