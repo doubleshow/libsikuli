@@ -19,10 +19,65 @@ bool Robot::_dragged = false;
 #include <time.h>
 void
 Robot::delay(int msec){
-   struct timespec interval, remainder; 
-   interval.tv_sec = 0; 
-   interval.tv_nsec = msec*1000; 
-   nanosleep(&interval, &remainder);
+//   struct timespec interval, remainder; 
+//   interval.tv_sec = 0; 
+//   interval.tv_nsec = msec*1000; 
+//   nanosleep(&interval, &remainder);
+   usleep(1000*msec);
+}
+
+void
+mouseMoveTo(int x, int y, bool dragged)
+{
+   CGPoint newloc;
+   CGEventRef eventRef;
+   newloc.x = x;
+   newloc.y = y;
+   
+   if(dragged){
+      
+      eventRef = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDragged, newloc,
+                                         kCGMouseButtonCenter);
+      CGEventSetType(eventRef, kCGEventLeftMouseDragged);
+      CGEventPost(kCGSessionEventTap, eventRef);
+      CFRelease(eventRef);  
+      
+   }else{
+      
+      eventRef = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, newloc,
+                                         kCGMouseButtonCenter);
+      CGEventSetType(eventRef, kCGEventMouseMoved);
+      CGEventPost(kCGSessionEventTap, eventRef);
+      CFRelease(eventRef);
+   }
+}
+   
+void 
+mouseMoveFromTo(int x0, int y0, int x1, int y1, bool dragged){
+   
+//   int steps = 20;
+   int stepsize = 50;
+   
+   int xsteps = (x1-x0)/stepsize;
+   int ysteps = (y1-y0)/stepsize;
+   
+   int steps = max(max(abs(xsteps),abs(ysteps)),1);
+ 
+   int xstep = (x1-x0)/steps;
+   int ystep = (y1-y0)/steps;
+   
+   
+   //int xstep = (x1 - x0) / steps;
+   //int ystep = (y1 - y0) / steps;
+   
+   for (int i=0; i < steps; i++){
+      int xi = x0 + i * xstep;
+      int yi = y0 + i * ystep;
+      mouseMoveTo(xi,yi,dragged);
+      Robot::delay(50);
+   }
+   mouseMoveTo(x1,y1,dragged);
+   Robot::delay(50);
 }
 
 void 
@@ -30,27 +85,33 @@ Robot::mouseMove(int x, int y)
 {
    
    
-   CGPoint newloc;
+   CGPoint curloc;
    CGEventRef eventRef;
-   newloc.x = x;
-   newloc.y = y;
    
-   if(_dragged){
-      
-      eventRef = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDragged, newloc,
-                                                    kCGMouseButtonCenter);
-      CGEventSetType(eventRef, kCGEventLeftMouseDragged);
-      CGEventPost(kCGSessionEventTap, eventRef);
-      CFRelease(eventRef);  
-
-   }else{
+   eventRef = CGEventCreate(NULL);
+   curloc = CGEventGetLocation(eventRef);
+   CFRelease(eventRef);
    
-      eventRef = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, newloc,
-                                         kCGMouseButtonCenter);
-      CGEventSetType(eventRef, kCGEventMouseMoved);
-      CGEventPost(kCGSessionEventTap, eventRef);
-      CFRelease(eventRef);
-   }
+   
+   mouseMoveFromTo(curloc.x,curloc.y,x,y,_dragged);
+ //  
+//   
+//   if(_dragged){
+//      
+//      eventRef = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDragged, newloc,
+//                                                    kCGMouseButtonCenter);
+//      CGEventSetType(eventRef, kCGEventLeftMouseDragged);
+//      CGEventPost(kCGSessionEventTap, eventRef);
+//      CFRelease(eventRef);  
+//
+//   }else{
+//   
+//      eventRef = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, newloc,
+//                                         kCGMouseButtonCenter);
+//      CGEventSetType(eventRef, kCGEventMouseMoved);
+//      CGEventPost(kCGSessionEventTap, eventRef);
+//      CFRelease(eventRef);
+//   }
 }
 
 void 
@@ -59,8 +120,9 @@ Robot::mousePress(int buttons){
    CGEventRef eventRef;
    
    CGEventRef ourEvent = CGEventCreate(NULL);
-   
    curloc = CGEventGetLocation(ourEvent);
+   CFRelease(ourEvent);
+   
    
    CGEventType mouseEvent;
    if (buttons & BUTTON1_MASK)
@@ -94,13 +156,13 @@ void
 Robot::drag(){
    mousePress(BUTTON1_MASK);
    _dragged = true;
-   delay(3000);
+   //delay(100);
 }
 
 void
 Robot::drop(){
-   _dragged = false;
    mouseRelease(BUTTON1_MASK);
+   _dragged = false;
 }
 
 void

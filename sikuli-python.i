@@ -28,9 +28,14 @@ def _swig_setattr_nondynamic(self,class_type,name,value,static=1):
 %template(Matches) std::vector<sikuli::Match>;
 
 %include "sikuli.h"
+%include "keys.h"
+%include "pattern.h"
+%include "location.h"
 %include "region.h"
 %include "screen.h"
+%include "settings.h"
 
+   
 %pythoncode
 %{
 

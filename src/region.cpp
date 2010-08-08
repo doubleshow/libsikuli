@@ -284,7 +284,7 @@ Region::dragDrop(Location t1, Location t2, int modifiers){
    int ret = 0;
    pressModifiers(modifiers);
    if (drag(t1) != 0){
-      Robot::delay((int) Settings::DelayAfterDrag*1000);
+      //Robot::delay((int) Settings::DelayAfterDrag*1000);
       ret = dropAt(t2, Settings::DelayBeforeDrop);
    }
    releaseModifiers(modifiers);
@@ -352,7 +352,7 @@ Region::drag(Match& target){
 int
 Region::dropAt(Location target, double delay){
    Robot::mouseMove(target.x, target.y);
-   Robot::delay((int) delay*1000);
+   //Robot::delay((int) delay*1000);
    Robot::drop();
    return 1;
 }
