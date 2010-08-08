@@ -5,17 +5,15 @@
 	borderColor="#B9D8EE">
 			<mx:Script>
 			<![CDATA[
-				private function resetHandler(event:MouseEvent):void{
-					result.text = ''
-				}
-				
 				private function tabChangeHandler(event:Event):void{
 					result.text = ''
+					debug.text = ''
 				}
 			]]>
 		</mx:Script>
+	<mx:Panel x="136" y="10">
 		
-	<mx:TabNavigator x="10" y="10" width="600" height="291"
+	<mx:ViewStack id="myViewStack" x="124" y="10" width="600" height="291"
 		change="tabChangeHandler(event)">
 		
 		<mx:Canvas label="TestClick" width="100%" height="100%">
@@ -118,7 +116,6 @@
 			<mx:Image x="343" y="41" source="@Embed(source='flower.png')"/>
 			<mx:Image x="296" y="130" source="@Embed(source='flower.png')"/>
 		
-	
 			<mx:Image x="463" y="10" source="@Embed(source='folder.png')"/>
 			<mx:Image x="463" y="51" source="@Embed(source='folder.png')"/>
 			<mx:Image x="463" y="91" source="@Embed(source='folder.png')"/>
@@ -133,10 +130,97 @@
 			
 		</mx:Canvas>
 		
-	</mx:TabNavigator>
+		<mx:Canvas label="TestSpatialOp" width="100%" height="100%"
+			show="initTestSpatialOp(event)">
+			<mx:Script>
+				<![CDATA[
+					
+					private var spatialOpBtnPressHistory:String = ''
+					
+					private function initTestSpatialOp(event:Event):void{
+						spatialOpBtnPressHistory = ''
+					}
+					
+					private function checkTestSpatialOpResult(event:MouseEvent):void{
+						var btn:Button = event.target as Button
+						spatialOpBtnPressHistory = spatialOpBtnPressHistory + "{" + btn.id + "}"
+						debug.text = spatialOpBtnPressHistory
+						if (spatialOpBtnPressHistory == "{leftBtn}{belowBtn}{rightBtn}{aboveBtn}")
+							result.text = "SUCCESS"
+					}
+					
+				]]>
+			</mx:Script>
+			
+			<mx:Image x="84" y="62" source="@Embed(source='computer.png')"/>
+			
+			<mx:Button x="23.5" y="100" label="click" id="leftBtn" click="checkTestSpatialOpResult(event)"/>
+			<mx:Button x="192" y="100" label="click" id="rightBtn" click="checkTestSpatialOpResult(event)"/>
+			<mx:Button x="102.5" y="23" label="click" id="aboveBtn" click="checkTestSpatialOpResult(event)"/>
+			<mx:Button x="104.5" y="191" label="click" id="belowBtn" click="checkTestSpatialOpResult(event)"/>
+		</mx:Canvas>
+
+		
+		<mx:Canvas label="TestOrdering" width="100%" height="100%"		
+				show="initTestOrdering(event)"
+				click="checkTestOrdering(event)">
+			<mx:Script>
+				<![CDATA[
+					
+					private var testOrderingHistory:String = ''
+					
+					private function initTestOrdering(event:Event):void{
+						testOrderingHistory = ''
+					}
+					
+					private function checkTestOrdering(event:MouseEvent):void{
+						var btn:Button = event.target as Button
+						testOrderingHistory = testOrderingHistory + "{" + btn.id + "}"
+						debug.text = testOrderingHistory
+						if (testOrderingHistory == "{leftMost}{bottomMost}{rightMost}{topMost}{left3rd}{bottom2nd}{right3rd}{top2nd}")
+							result.text = "SUCCESS"
+					}
+					
+				]]>
+			</mx:Script>
+							<mx:Button x="29" y="170" label="Button" id="leftMost"/>
+							<mx:Button x="102" y="170" label="Button"/>
+							<mx:Button x="175" y="170" label="Button" id="left3rd"/>
+							<mx:Button x="248" y="170" label="Button"/>
+							<mx:Button x="321" y="170" label="Button" id="right3rd"/>
+							<mx:Button x="394" y="170" label="Button"/>
+							<mx:Button x="467" y="170" label="Button" id="rightMost"/>
+							<mx:Button x="248" y="200" label="Button" id="bottom2nd"/>
+							<mx:Button x="248" y="230" label="Button" id="bottomMost"/>
+						 	<mx:Button x="248" y="140" label="Button" id="top2nd"/>
+							<mx:Button x="248" y="110" label="Button" id="topMost"/>
+							<mx:Text x="10" y="10" width="549">
+								<mx:text>
+               Click the left-most, bottom-most, right-most,
+				and top-most button in sequence. Then, click on the 3rd button from the left,
+				2nd button from the bottom, and 3rd button from the right, and 2nd button from the top.
+          					  </mx:text>
+
+							</mx:Text>
+					
+				</mx:Canvas>
+		
+		
+
+
+	</mx:ViewStack>
 	
+	</mx:Panel>
 	<mx:Label id="result"
-		text="" x="10" y="309" width="600" height="37" 
+		text="" x="136" y="349" width="600" height="37" 
 		fontSize="22" color="#71FA42" fontWeight="bold"/>
+	
+	<mx:ButtonBar direction="vertical"
+   x="10" y="10" dataProvider="{myViewStack}">
+
+	</mx:ButtonBar>
+	<mx:TextArea x="136" y="394" text="" width="600" id="debug"/>
+	
+
 	
 </mx:Application>

@@ -111,7 +111,7 @@ Pattern::limit(int n){
 }
 
 Pattern 
-Pattern::orderBy(int ordering){
+Pattern::order(int ordering){
    Pattern ret(*this);
    ret._ordering = ordering;
    return ret;

@@ -89,6 +89,51 @@ public:
       TS_ASSERT(s.exists("success.png"));      
    }
    
+   void testSpatialOp(void)
+   {
+      switchToTest("TestSpatialOp.png");
+      
+      Match computer = s.find("computer.png");
+      s.hover(computer);
+      
+      s.click(computer.left().find("clickButton.png"));
+      s.click(computer.below().find("clickButton.png"));
+      s.click(computer.right().find("clickButton.png"));
+      s.click(computer.above().find("clickButton.png"));
+      
+      TS_ASSERT(s.exists("success.png"));
+   }
+
+   void testOrdering(void)
+   {
+      switchToTest("TestOrdering.png");
+
+      
+      Pattern p; 
+      p = Pattern("button.png").leftMost();
+      s.click(p);
+      p = Pattern("button.png").bottomMost();
+      s.click(p);
+      p = Pattern("button.png").rightMost();
+      s.click(p);
+      p = Pattern("button.png").topMost();
+      s.click(p);
+      
+      p = Pattern("button.png").order(LEFTRIGHT);
+      s.click(s.findAll(p)[2]);
+      p = Pattern("button.png").order(BOTTOMUP);
+      s.click(s.findAll(p)[1]);
+      p = Pattern("button.png").order(RIGHTLEFT);
+      s.click(s.findAll(p)[2]);
+      p = Pattern("button.png").order(TOPDOWN);
+      s.click(s.findAll(p)[1]);
+      
+      TS_ASSERT(s.exists("success.png"));
+      
+   }
+   
+   
+   
    
 };
 

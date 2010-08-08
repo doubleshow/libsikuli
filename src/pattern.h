@@ -61,7 +61,7 @@ public:
    Pattern limit(int n);
    
    
-   Pattern orderBy(int ordering);
+   Pattern order(int ordering);
    
    string toString();
    

@@ -197,10 +197,10 @@ public:
    
    int click(int modifiers = 0);
    int click(Location target, int modifiers = 0);
-   int click(Pattern& target, int modifiers = 0);
+   int click(Pattern target, int modifiers = 0);
    int click(const char* target, int modifiers = 0);
-   int click(Region& target, int modifiers = 0);
-   int click(Match& target, int modifiers = 0);
+   int click(Region target, int modifiers = 0);
+   int click(Match target, int modifiers = 0);
    
    int doubleClick(int modifiers = 0);
    int doubleClick(Location target, int modifiers = 0);

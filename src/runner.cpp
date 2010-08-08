@@ -57,4 +57,16 @@ public:
  void runTest() { suite_FlashTestSuite.testFindAll(); }
 } testDescription_FlashTestSuite_testFindAll;
 
+static class TestDescription_FlashTestSuite_testSpatialOp : public CxxTest::RealTestDescription {
+public:
+ TestDescription_FlashTestSuite_testSpatialOp() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 92, "testSpatialOp" ) {}
+ void runTest() { suite_FlashTestSuite.testSpatialOp(); }
+} testDescription_FlashTestSuite_testSpatialOp;
+
+static class TestDescription_FlashTestSuite_testOrdering : public CxxTest::RealTestDescription {
+public:
+ TestDescription_FlashTestSuite_testOrdering() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 107, "testOrdering" ) {}
+ void runTest() { suite_FlashTestSuite.testOrdering(); }
+} testDescription_FlashTestSuite_testOrdering;
+
 #include <cxxtest/Root.cpp>

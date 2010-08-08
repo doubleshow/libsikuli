@@ -172,7 +172,7 @@ Region::click(Location target, int modifiers){
 }
 
 int 
-Region::click(Pattern& target, int modifiers){
+Region::click(Pattern target, int modifiers){
    return click(getLocationFromPSRML(target),modifiers);
 }
 
@@ -182,12 +182,12 @@ Region::click(const char* target, int modifiers){
 }
 
 int 
-Region::click(Region& target, int modifiers){
+Region::click(Region target, int modifiers){
    return click(getLocationFromPSRML(target),modifiers);
 }
 
 int 
-Region::click(Match& target, int modifiers){
+Region::click(Match target, int modifiers){
    return click(getLocationFromPSRML(target),modifiers);
 }
 
