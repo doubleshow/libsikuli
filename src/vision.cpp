@@ -10,6 +10,7 @@
 #include "vision.h"
 #include "finder.h"
 #include "settings.h"
+#include "exceptions.h"
 
 using namespace sikuli;
 
@@ -20,83 +21,10 @@ Vision::initOCR(const char* ocrDataPath){
 }
 
 
-#include <stdio.h>
-#include <curl/curl.h>
-#include <curl/types.h>
-#include <curl/easy.h>
-#include <string>
-
-size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-   int written = fwrite(ptr, size, nmemb, stream);
-   return written;
-}
-
-Mat imread_url(const char* url){
-   CURL *curl;
-   FILE *fp;
-   CURLcode res;
-   char outfilename[FILENAME_MAX];
-   tmpnam(outfilename);
-   curl = curl_easy_init();
-   if (curl) {
-      fp = fopen(outfilename,"wb");
-      curl_easy_setopt(curl, CURLOPT_URL, url);
-      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-      curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-      res = curl_easy_perform(curl);
-      /* always cleanup */
-      curl_easy_cleanup(curl);
-      fclose(fp);
-   }
-   
-   Mat im = imread(outfilename);
-   return im;
-}
-
-Mat imread_helper(const char* image_url){
-   Mat im;
-   if (strncmp(image_url, "http", 4) == 0)
-      // reading the image from a web address
-      im = imread_url(image_url);
-   else 
-      // reading the image from the local file system
-      im = imread(image_url);
- 
-   return im;
-}
-
-Mat readImageFromPaths(const char* image_filename) throw(FindFailed) {
-
-   Mat im;
-
-   // First try to read the image using the filename as is
-   im = imread_helper(image_filename);
-   if (im.data != NULL)
-      return im;
-   
-   // Then, try to read the image at each image path
-   vector<const char*> image_paths = Settings::getImagePaths();
-   
-   for (int i=0; i<image_paths.size(); ++i){
-      string fullpath = string(image_paths[i]) + 
-      "/" + string(image_filename);
-      
-      im = imread_helper(fullpath.c_str());
-      if (im.data != NULL)
-         return im;
-   }
-   
-   throw FindFailed(Pattern(image_filename));
-}
-
 vector<FindResult> 
-getFindResults(TemplateFinder& f, const char* image_filename, bool all, double similarity) 
-   throw(FindFailed) { 
-
+getFindResults(TemplateFinder& f, Mat image, bool all, double similarity) {
    
    vector<FindResult> results;
-      
-   Mat image = readImageFromPaths(image_filename);
    
    if (all){
       f.find_all(image, similarity);
@@ -109,11 +37,7 @@ getFindResults(TemplateFinder& f, const char* image_filename, bool all, double s
       if (f.hasNext())
          results.push_back(f.next());
    }
-
-   if (results.empty())
-      throw FindFailed(Pattern(image_filename));
-   else
-      return results;
+   return results;
 }
 
 
@@ -135,11 +59,14 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
    
    TemplateFinder f(simg.getMat());   
    
-   vector<FindResult> results;
+   Mat image = imread(ptn.getImageURL());
+   if (image.data == NULL)
+      throw FindFailed(ptn);
    
+   vector<FindResult> results;
    if (ptn.bAll()){
       
-      results = getFindResults(f, ptn.getImageURL(), true, ptn.getSimilarity());
+      results = getFindResults(f, image, true, ptn.getSimilarity());
       
       
       if (ptn.getOrdering() == TOPDOWN){
@@ -157,32 +84,38 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
       
       if (ptn.where() != ANYWHERE){
       
-         results = getFindResults(f, ptn.getImageURL(), true, ptn.getSimilarity());      
+         results = getFindResults(f, image, true, ptn.getSimilarity());      
             
          
          cout << "found " << results.size() << " matches." << endl;
          
-         // Filter Results
-         FindResult r = results[0];
-         for (int i=1; i<results.size(); ++i){
-            FindResult& ri = results[i];
-            if ((ptn.where() == TOPMOST && ri.y < r.y) ||
-                (ptn.where() == BOTTOMMOST && ri.y > r.y) ||
-                (ptn.where() == LEFTMOST && ri.x < r.x) ||
-                (ptn.where() == RIGHTMOST && ri.x > r.x))
-               r = ri;
+         if (!results.empty()){
+            // Filter Results
+            FindResult r = results[0];
+            for (int i=1; i<results.size(); ++i){
+               FindResult& ri = results[i];
+               if ((ptn.where() == TOPMOST && ri.y < r.y) ||
+                   (ptn.where() == BOTTOMMOST && ri.y > r.y) ||
+                   (ptn.where() == LEFTMOST && ri.x < r.x) ||
+                   (ptn.where() == RIGHTMOST && ri.x > r.x))
+                  r = ri;
+            }
+            
+            results.clear();
+            results.push_back(r);
          }
-         
-         results.clear();
-         results.push_back(r);
       }
       else {
 
-         results = getFindResults(f, ptn.getImageURL(), false, ptn.getSimilarity());
+         results = getFindResults(f, image, false, ptn.getSimilarity());
             
       }
       
    }
+   
+   
+   if (results.empty())
+      throw FindFailed(ptn);
    
    
    // Convert FindResults to Matches

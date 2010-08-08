@@ -90,6 +90,9 @@ private:
    int dx;
    int dy;
    
+   string _imageURL;
+   string _resolved_imageURL;
+   
    bool _bAll;
    int  _limit;
    int  _ordering;

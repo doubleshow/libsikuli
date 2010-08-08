@@ -35,10 +35,13 @@ public:
    
    void testTemp(void)
    {
-      Screen s;
-      s.click("magnifying_glass.png");
-      sleep(1);
-      s.paste("test");
+      TS_ASSERT_THROWS(Pattern p1("tesdc.png"), sikuli::FileNotFound);
+      Pattern p2("apple.png");
+      
+      //Screen s;
+      //s.click("magnifying_glass.png");
+      //sleep(1);
+      //s.paste("test");
 //test      Robot::paste("test");
 //      Settings::resetImagePaths();
 //      Settings::addImagePath("http://localhost:4567/");

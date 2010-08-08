@@ -602,36 +602,34 @@ Region::type_key(int key, int mode){
 
 void 
 Region::doType(int mode, int keycode){
-//   if(mode==PRESS_ONLY){
-//      Robot::keyPress(keycode);
-//   }
-//   else if(mode==RELEASE_ONLY){
-//      Robot::keyRelease(keycode);
-//   }
-//   else{
-     // Robot::keyPressRelease(keycode);
+   if(mode==PRESS_ONLY){
+      Robot::keyPress(keycode);
+   }
+   else if(mode==RELEASE_ONLY){
+      Robot::keyRelease(keycode);
+   }
+   else{
     Robot::keyPress(keycode);
     Robot::keyRelease(keycode);
-//   }
+   }
 }
 
 void 
 Region::doType(int mode, int modifier, int keycode){
-//   if(mode==PRESS_ONLY){
-////      Robot::keyPress(keycode1);
-////      Robot::keyPress(keycode2);      
-//   }
-//   else if(mode==RELEASE_ONLY){
-////      Robot::keyRelease(keycode1);
-////      Robot::keyRelease(keycode2);      
-//   }
-//   else{
-   //Robot::keyPressRelease(keycode, modifier);
+   if(mode==PRESS_ONLY){
+      Robot::keyPress(modifier);
+      Robot::keyPress(keycode);      
+   }
+   else if(mode==RELEASE_ONLY){
+      Robot::keyRelease(keycode);      
+      Robot::keyRelease(modifier);      
+   }
+   else{
       Robot::keyPress(modifier);
       Robot::keyPress(keycode);      
       Robot::keyRelease(keycode);
-      Robot::keyRelease(modifier);      
-
+      Robot::keyRelease(modifier);  
+   }
 }
 
 void 

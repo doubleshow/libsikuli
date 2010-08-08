@@ -11,13 +11,13 @@
 
 #include <vector>
 #include <string>
-#include <exception>
 
 #include "robot.h"
 
 //#include "sikuli.h"
 #include "pattern.h"
 #include "location.h"
+#include "exceptions.h"
 
 using namespace std;
 
@@ -72,24 +72,7 @@ private:
 
 };
   
-class FindFailed : public exception {
-   
-public:
-   FindFailed(string _msg) : msg(_msg) {};
-   FindFailed(Pattern _ptn) : ptn(_ptn) {};
-   
-   virtual const char* what() const throw(){
-      return msg.c_str();
-   }
-   
-   virtual ~FindFailed() throw() {};
-   
-private:
-   
-   string msg;
-   Pattern ptn;
-   
-};
+
    
 class Match;
 
