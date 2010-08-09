@@ -69,8 +69,312 @@ Robot::releaseModifiers(int modifiers){
 }
 
 
+int 
+Robot::hover(int x, int y){
+   mouseMove(x,y);
+   delay(100);
+   return 1;
+}
+
+int
+Robot::dragDrop(int x1, int y1, int x2, int y2, int modifiers){
+   int ret = 0;
+   pressModifiers(modifiers);
+   if (drag(x1,y1) != 0){
+      //delay((int) Settings::DelayAfterDrag*1000);
+      ret = dropAt(x2,y2);
+   }
+   releaseModifiers(modifiers);
+   return ret;
+}
+
+int
+Robot::drag(int x, int y){
+   mouseMove(x,y);
+   delay(100);
+   drag();
+   delay(100);
+   return 1;  
+}
+
+int
+Robot::dropAt(int x, int y, double delay){
+   mouseMove(x, y);
+   //delay((int) delay*1000);
+   drop();
+   return 1;
+}
+
+int 
+Robot::paste(const char* text){
+   if (strlen(text)==0){
+      return 0;
+   }
+   else{
+      pasteText(text);
+      return 1;
+   }
+}
+
+int 
+Robot::paste(int x, int y, const char* text){
+   click(x,y,BUTTON1_MASK,0,false); 
+   delay(100);
+   return paste(text);
+}
+
+int
+Robot::type(const char* text, int modifiers){
+   if (strlen(text) < 0)
+      return 0;
+   
+   for (int i=0; i < strlen(text); i++){
+      pressModifiers(modifiers);  
+      type_ch(text[i], PRESS_RELEASE);
+      releaseModifiers(modifiers);
+      delay(20);
+   }   
+   waitForIdle();
+   return 1;   
+}
+
+int
+Robot::type(int x, int y, const char* text, int modifiers){
+   click(x,y,BUTTON1_MASK,0,false);
+   delay(50);
+   return type(text, modifiers);
+}
 
 
+void 
+Robot::type_ch(char character, int mode){
+   switch (character) {
+      case 'a': doType(mode,VK_A); break;
+      case 'b': doType(mode,VK_B); break;
+      case 'c': doType(mode,VK_C); break;
+      case 'd': doType(mode,VK_D); break;
+      case 'e': doType(mode,VK_E); break;
+      case 'f': doType(mode,VK_F); break;
+      case 'g': doType(mode,VK_G); break;
+      case 'h': doType(mode,VK_H); break;
+      case 'i': doType(mode,VK_I); break;
+      case 'j': doType(mode,VK_J); break;
+      case 'k': doType(mode,VK_K); break;
+      case 'l': doType(mode,VK_L); break;
+      case 'm': doType(mode,VK_M); break;
+      case 'n': doType(mode,VK_N); break;
+      case 'o': doType(mode,VK_O); break;
+      case 'p': doType(mode,VK_P); break;
+      case 'q': doType(mode,VK_Q); break;
+      case 'r': doType(mode,VK_R); break;
+      case 's': doType(mode,VK_S); break;
+      case 't': doType(mode,VK_T); break;
+      case 'u': doType(mode,VK_U); break;
+      case 'v': doType(mode,VK_V); break;
+      case 'w': doType(mode,VK_W); break;
+      case 'x': doType(mode,VK_X); break;
+      case 'y': doType(mode,VK_Y); break;
+      case 'z': doType(mode,VK_Z); break;
+      case 'A': doType(mode,VK_SHIFT, VK_A); break;
+      case 'B': doType(mode,VK_SHIFT, VK_B); break;
+      case 'C': doType(mode,VK_SHIFT, VK_C); break;
+      case 'D': doType(mode,VK_SHIFT, VK_D); break;
+      case 'E': doType(mode,VK_SHIFT, VK_E); break;
+      case 'F': doType(mode,VK_SHIFT, VK_F); break;
+      case 'G': doType(mode,VK_SHIFT, VK_G); break;
+      case 'H': doType(mode,VK_SHIFT, VK_H); break;
+      case 'I': doType(mode,VK_SHIFT, VK_I); break;
+      case 'J': doType(mode,VK_SHIFT, VK_J); break;
+      case 'K': doType(mode,VK_SHIFT, VK_K); break;
+      case 'L': doType(mode,VK_SHIFT, VK_L); break;
+      case 'M': doType(mode,VK_SHIFT, VK_M); break;
+      case 'N': doType(mode,VK_SHIFT, VK_N); break;
+      case 'O': doType(mode,VK_SHIFT, VK_O); break;
+      case 'P': doType(mode,VK_SHIFT, VK_P); break;
+      case 'Q': doType(mode,VK_SHIFT, VK_Q); break;
+      case 'R': doType(mode,VK_SHIFT, VK_R); break;
+      case 'S': doType(mode,VK_SHIFT, VK_S); break;
+      case 'T': doType(mode,VK_SHIFT, VK_T); break;
+      case 'U': doType(mode,VK_SHIFT, VK_U); break;
+      case 'V': doType(mode,VK_SHIFT, VK_V); break;
+      case 'W': doType(mode,VK_SHIFT, VK_W); break;
+      case 'X': doType(mode,VK_SHIFT, VK_X); break;
+      case 'Y': doType(mode,VK_SHIFT, VK_Y); break;
+      case 'Z': doType(mode,VK_SHIFT, VK_Z); break;
+      case '`': doType(mode,VK_BACK_QUOTE); break;
+      case '0': doType(mode,VK_0); break;
+      case '1': doType(mode,VK_1); break;
+      case '2': doType(mode,VK_2); break;
+      case '3': doType(mode,VK_3); break;
+      case '4': doType(mode,VK_4); break;
+      case '5': doType(mode,VK_5); break;
+      case '6': doType(mode,VK_6); break;
+      case '7': doType(mode,VK_7); break;
+      case '8': doType(mode,VK_8); break;
+      case '9': doType(mode,VK_9); break;
+      case '-': doType(mode,VK_MINUS); break;
+      case '=': doType(mode,VK_EQUALS); break;
+      case '~': doType(mode,VK_SHIFT, VK_BACK_QUOTE); break;
+      case '!': doType(mode,VK_SHIFT, VK_1); break;
+      case '@': doType(mode,VK_SHIFT, VK_2); break;
+      case '#': doType(mode,VK_SHIFT, VK_3); break;
+      case '$': doType(mode,VK_SHIFT, VK_4); break;
+      case '%': doType(mode,VK_SHIFT, VK_5); break;
+      case '^': doType(mode,VK_SHIFT, VK_6); break;
+      case '&': doType(mode,VK_SHIFT, VK_7); break;
+      case '*': doType(mode,VK_SHIFT, VK_8); break;
+      case '(': doType(mode,VK_SHIFT, VK_9); break;
+      case ')': doType(mode,VK_SHIFT, VK_0); break;
+      case '_': doType(mode,VK_SHIFT, VK_MINUS); break;
+      case '+': doType(mode,VK_SHIFT, VK_EQUALS); break;
+      case '\b': doType(mode,VK_BACK_SPACE); break;
+      case '\t': doType(mode,VK_TAB); break;
+      case '\r': doType(mode,VK_ENTER); break;
+      case '\n': doType(mode,VK_ENTER); break;
+      case '[': doType(mode,VK_OPEN_BRACKET); break;
+      case ']': doType(mode,VK_CLOSE_BRACKET); break;
+      case '\\': doType(mode,VK_BACK_SLASH); break;
+      case '{': doType(mode,VK_SHIFT, VK_OPEN_BRACKET); break;
+      case '}': doType(mode,VK_SHIFT, VK_CLOSE_BRACKET); break;
+      case '|': doType(mode,VK_SHIFT, VK_BACK_SLASH); break;
+      case ';': doType(mode,VK_SEMICOLON); break;
+      case ':': doType(mode,VK_SHIFT, VK_SEMICOLON); break;
+      case '\'': doType(mode,VK_QUOTE); break;
+      case '"': doType(mode,VK_SHIFT, VK_QUOTE); break;
+      case ',': doType(mode,VK_COMMA); break;
+      case '<': doType(mode,VK_SHIFT, VK_COMMA); break;
+      case '.': doType(mode,VK_PERIOD); break;
+      case '>': doType(mode,VK_SHIFT, VK_PERIOD); break;
+      case '/': doType(mode,VK_SLASH); break;
+      case '?': doType(mode,VK_SHIFT, VK_SLASH); break;
+      case ' ': doType(mode,VK_SPACE); break;
+   }
+}
+
+void 
+Robot::type_key(int key, int mode){
+   switch (key) {
+      case ESC: doType(mode,VK_ESCAPE); break;
+      case UP: doType(mode,VK_UP); break;
+      case RIGHT: doType(mode,VK_RIGHT); break;
+      case DOWN: doType(mode,VK_DOWN); break;
+      case LEFT: doType(mode,VK_LEFT); break;
+      case PAGE_UP: doType(mode,VK_PAGE_UP); break;
+      case PAGE_DOWN: doType(mode,VK_PAGE_DOWN); break;
+      case DELETE: doType(mode,VK_DELETE); break;
+      case END: doType(mode,VK_END); break;
+      case HOME: doType(mode,VK_HOME); break;
+         //case INSERT: doType(mode,VK_INSERT); break;
+      case F1: doType(mode,VK_F1); break;
+      case F2: doType(mode,VK_F2); break;
+      case F3: doType(mode,VK_F3); break;
+      case F4: doType(mode,VK_F4); break;
+      case F5: doType(mode,VK_F5); break;
+      case F6: doType(mode,VK_F6); break;
+      case F7: doType(mode,VK_F7); break;
+      case F8: doType(mode,VK_F8); break;
+      case F9: doType(mode,VK_F9); break;
+      case F10: doType(mode,VK_F10); break;
+      case F11: doType(mode,VK_F11); break;
+      case F12: doType(mode,VK_F12); break;
+      case F13: doType(mode,VK_F13); break;
+      case F14: doType(mode,VK_F14); break;
+      case F15: doType(mode,VK_F15); break;
+   }
+}
+
+void 
+Robot::doType(int mode, int keycode){
+   if(mode==PRESS_ONLY){
+      keyPress(keycode);
+   }
+   else if(mode==RELEASE_ONLY){
+      keyRelease(keycode);
+   }
+   else{
+      keyPress(keycode);
+      keyRelease(keycode);
+   }
+}
+
+void 
+Robot::doType(int mode, int modifier, int keycode){
+   if(mode==PRESS_ONLY){
+      keyPress(modifier);
+      keyPress(keycode);      
+   }
+   else if(mode==RELEASE_ONLY){
+      keyRelease(keycode);      
+      keyRelease(modifier);      
+   }
+   else{
+      keyPress(modifier);
+      keyPress(keycode);      
+      keyRelease(keycode);
+      keyRelease(modifier);  
+   }
+}
+
+void 
+Robot::mouseDown(int button){
+   //_hold_buttons = buttons;
+   mousePress(button);
+   waitForIdle();
+}
+
+void 
+Robot::mouseUp(int button){
+   //if (buttons == 0)
+   mouseRelease(button);//_hold_buttons);
+   //else
+   //   mouseRelease(buttons);
+   waitForIdle();
+}
+
+void 
+Robot::keyDown(int key){
+//   
+//   if (keys.length() > 0){
+//      for (int i=0; i < keys.length(); ++i){
+//         char key = keys[i];
+//         // TODO: if this key has not already been pressed down
+//         //if (_hold_keys.indexOf(keys.charAt(i)) == -1)
+//         if (true){
+//            //  type_ch(key, PRESS_ONLY);
+//            _hold_keys += key;
+//         }
+//      }
+//      Robot::waitForIdle();
+//   }
+}
+
+
+// TODO: Re-implement using vector
+void 
+Robot::keyUp(int key){
+ //  string keys){
+ //  if (keys.empty())
+//      keys = _hold_keys;
+//   for (int i=0; i < keys.length(); ++i){
+//      char key = keys[i];
+//      int pos;
+//      pos = 1;
+//      // TODO:
+//      // pos=_hold_keys.indexOf(keys.charAt(i))
+//      if (pos != -1){
+//         //   type_ch(key, RELEASE_ONLY);
+//         // TODO: remove key from _hold_keys
+//         //         _hold_keys = _hold_keys.substring(0,pos) + 
+//         //         _hold_keys.substring(pos+1);
+//      }
+//   }
+//   Robot::waitForIdle();
+}
+
+
+//
+// OS-depdenet Implemntation
+//
 
 #include <time.h>
 void
@@ -308,7 +612,7 @@ Robot::waitForIdle(){
 }
 
 void 
-Robot::paste(const char* text){
+Robot::pasteText(const char* text){
    
    // Put the string data to the pasteboard
    OSStatus err;

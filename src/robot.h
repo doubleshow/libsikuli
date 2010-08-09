@@ -104,11 +104,18 @@ using namespace std;
 #define VK_ALT 58
 #define VK_META   55
 
+
+
+// TYPE MODE
+#define PRESS_RELEASE 0
+#define PRESS_ONLY 1
+#define RELEASE_ONLY 2
+
+
 class Robot{
    
-   // OS-dependent low-level IO functions
-   
-public:
+   // OS-dependent implementation   
+private:
    
    static void mouseMove(int x, int y);
    static void mousePress(int buttons);
@@ -120,10 +127,14 @@ public:
    static void doubleClick(int button);
    static void drag();
    static void drop();
-   static void paste(const char* text);
+   static void pasteText(const char* text);
    
-   static void openApp(const char* appname);
    static void waitForIdle();
+   
+public:
+
+   static void openApp(const char* appname);
+
    static void delay(int time);
    
    static cv::Mat capture(int displayId);   
@@ -131,17 +142,41 @@ public:
 
    static void getDisplayBounds(int displayId, int& x, int& y, int& w, int& h);
    
-   // Cross-platform IO functions
+   // Cross-platform implementation
 public:
    
-   static int click(int x, int y, int buttons, int modifers, bool dblClick);
-   static int click(int buttons, int modifers, bool dblClick);
+   static int click(int x, int y, int buttons, int modifiers, bool dblClick);
+   static int click(int buttons, int modifiers, bool dblClick);
    
+   static int dragDrop(int x1, int y1, int x2, int y2, int modifiers = 0);
+   static int drag(int x, int y);
+   static int dropAt(int x, int y, double delay = 0);
+   
+   static int hover(int x, int y);
+   
+   static int type(const char* text, int modifiers = 0);
+   static int type(int x, int y, const char* text, int modifiers = 0);
+   
+   static int paste(const char* text);
+   static int paste(int x, int y, const char* text);
+   
+      
+   static void mouseDown(int button);
+   static void mouseUp(int button);
+   
+   static void keyDown(int key);
+   static void keyUp(int key);
    
 private:
    
    static void pressModifiers(int modifiers);
    static void releaseModifiers(int modifiers);
+
+   static void doType(int mode, int keyCode);
+   static void doType(int mode, int keyCode1, int keycode2);
+   
+   static void type_ch(char character, int mode);  
+   static void type_key(int key, int mode);
    
    
 private:

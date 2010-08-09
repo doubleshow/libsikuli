@@ -96,14 +96,7 @@ Region::~Region(){
 void
 Region::init(){
    _pLastMatch = NULL;
-   _pLastMatches = NULL;
-   
-  // setScreen(0);
-   
-  // new vector<Match>();
-   //_pLastMatches->push_back(Match());
-   //_scr = initScreen();
-   //_robot = Screen.getRobot(0); // mouseMove only works on the primary robot
+   _pLastMatches = NULL;   
    //_evtMgr = new EventManager(this);   
 }
 
@@ -251,9 +244,7 @@ Region::rightClick(Match& target, int modifiers){
 
 int 
 Region::hover(Location target){
-   Robot::mouseMove(target.x, target.y);
-   Robot::delay(100);
-   return 1;
+   return Robot::hover(target.x, target.y);
 }
 
 int 
@@ -278,14 +269,7 @@ Region::hover(Match& target){
 
 int 
 Region::dragDrop(Location t1, Location t2, int modifiers){
-   int ret = 0;
-  // pressModifiers(modifiers);
-   if (drag(t1) != 0){
-      //Robot::delay((int) Settings::DelayAfterDrag*1000);
-      ret = dropAt(t2, Settings::DelayBeforeDrop);
-   }
-   //releaseModifiers(modifiers);
-   return ret;
+   return Robot::dragDrop(t1.x,t1.y,t2.x,t2.y,modifiers);
 }
 
 int 
@@ -319,11 +303,7 @@ Region::dragDrop(Match& t1, Match& t2, int modifiers){
 
 int
 Region::drag(Location target){
-   Robot::mouseMove(target.x, target.y);
-   Robot::delay(100);
-   Robot::drag();
-   Robot::delay(100);
-   return 1;  
+   return Robot::drag(target.x, target.y);
 }
 
 int 
@@ -348,10 +328,7 @@ Region::drag(Match& target){
 
 int
 Region::dropAt(Location target, double delay){
-   Robot::mouseMove(target.x, target.y);
-   //Robot::delay((int) delay*1000);
-   Robot::drop();
-   return 1;
+   return Robot::dropAt(target.x, target.y);
 }
 
 int 
@@ -376,19 +353,12 @@ Region::dropAt(Match& target, double delay){
 
 int
 Region::paste(const char* text){
-   if (strlen(text)==0){
-      return 0;
-   }else{
-      Robot::paste(text);  
-      return 1;
-   }
+   return Robot::paste(text);
 }
 
 int
 Region::paste(const Location& target, const char* text){
-   click(target, 0);
-   Robot::delay(50);
-   return paste(text);
+   return Robot::paste(target.x,target.y,text);
 }
 
 int
@@ -413,31 +383,17 @@ Region::paste(const Match& target, const char* text){
 
 int
 Region::press(int key, int modifiers){   
-  // pressModifiers(modifiers);  
-   type_key(key, PRESS_RELEASE);
-   //releaseModifiers(modifiers);
    return 1;   
 }
 
 int
 Region::type(const char* text, int modifiers){
-   if (strlen(text) < 0)
-      return 0;
- 
-   for (int i=0; i < strlen(text); i++){
-     // pressModifiers(modifiers);  
-      type_ch(text[i], PRESS_RELEASE);
-      //releaseModifiers(modifiers);
-      Robot::delay(20);
-   }   
-   //Robot::waitForIdle();
-   return 1;   
+   return Robot::type(text, modifiers);  
 }
 
 int
 Region::type(Location target, const char* text, int modifiers){
-   click(target, 0);
-   return type(text, modifiers);
+   return Robot::type(target.x, target.y, text, modifiers);
 }
 
 int
@@ -460,279 +416,26 @@ Region::type(Match& target, const char* text, int modifiers){
    return type(getLocationFromPSRML(target), text, modifiers);
 }
 
-void 
-Region::type_ch(char character, int mode){
-   switch (character) {
-      case 'a': doType(mode,VK_A); break;
-      case 'b': doType(mode,VK_B); break;
-      case 'c': doType(mode,VK_C); break;
-      case 'd': doType(mode,VK_D); break;
-      case 'e': doType(mode,VK_E); break;
-      case 'f': doType(mode,VK_F); break;
-      case 'g': doType(mode,VK_G); break;
-      case 'h': doType(mode,VK_H); break;
-      case 'i': doType(mode,VK_I); break;
-      case 'j': doType(mode,VK_J); break;
-      case 'k': doType(mode,VK_K); break;
-      case 'l': doType(mode,VK_L); break;
-      case 'm': doType(mode,VK_M); break;
-      case 'n': doType(mode,VK_N); break;
-      case 'o': doType(mode,VK_O); break;
-      case 'p': doType(mode,VK_P); break;
-      case 'q': doType(mode,VK_Q); break;
-      case 'r': doType(mode,VK_R); break;
-      case 's': doType(mode,VK_S); break;
-      case 't': doType(mode,VK_T); break;
-      case 'u': doType(mode,VK_U); break;
-      case 'v': doType(mode,VK_V); break;
-      case 'w': doType(mode,VK_W); break;
-      case 'x': doType(mode,VK_X); break;
-      case 'y': doType(mode,VK_Y); break;
-      case 'z': doType(mode,VK_Z); break;
-      case 'A': doType(mode,VK_SHIFT, VK_A); break;
-      case 'B': doType(mode,VK_SHIFT, VK_B); break;
-      case 'C': doType(mode,VK_SHIFT, VK_C); break;
-      case 'D': doType(mode,VK_SHIFT, VK_D); break;
-      case 'E': doType(mode,VK_SHIFT, VK_E); break;
-      case 'F': doType(mode,VK_SHIFT, VK_F); break;
-      case 'G': doType(mode,VK_SHIFT, VK_G); break;
-      case 'H': doType(mode,VK_SHIFT, VK_H); break;
-      case 'I': doType(mode,VK_SHIFT, VK_I); break;
-      case 'J': doType(mode,VK_SHIFT, VK_J); break;
-      case 'K': doType(mode,VK_SHIFT, VK_K); break;
-      case 'L': doType(mode,VK_SHIFT, VK_L); break;
-      case 'M': doType(mode,VK_SHIFT, VK_M); break;
-      case 'N': doType(mode,VK_SHIFT, VK_N); break;
-      case 'O': doType(mode,VK_SHIFT, VK_O); break;
-      case 'P': doType(mode,VK_SHIFT, VK_P); break;
-      case 'Q': doType(mode,VK_SHIFT, VK_Q); break;
-      case 'R': doType(mode,VK_SHIFT, VK_R); break;
-      case 'S': doType(mode,VK_SHIFT, VK_S); break;
-      case 'T': doType(mode,VK_SHIFT, VK_T); break;
-      case 'U': doType(mode,VK_SHIFT, VK_U); break;
-      case 'V': doType(mode,VK_SHIFT, VK_V); break;
-      case 'W': doType(mode,VK_SHIFT, VK_W); break;
-      case 'X': doType(mode,VK_SHIFT, VK_X); break;
-      case 'Y': doType(mode,VK_SHIFT, VK_Y); break;
-      case 'Z': doType(mode,VK_SHIFT, VK_Z); break;
-      case '`': doType(mode,VK_BACK_QUOTE); break;
-      case '0': doType(mode,VK_0); break;
-      case '1': doType(mode,VK_1); break;
-      case '2': doType(mode,VK_2); break;
-      case '3': doType(mode,VK_3); break;
-      case '4': doType(mode,VK_4); break;
-      case '5': doType(mode,VK_5); break;
-      case '6': doType(mode,VK_6); break;
-      case '7': doType(mode,VK_7); break;
-      case '8': doType(mode,VK_8); break;
-      case '9': doType(mode,VK_9); break;
-      case '-': doType(mode,VK_MINUS); break;
-      case '=': doType(mode,VK_EQUALS); break;
-      case '~': doType(mode,VK_SHIFT, VK_BACK_QUOTE); break;
-      case '!': doType(mode,VK_SHIFT, VK_1); break;
-      case '@': doType(mode,VK_SHIFT, VK_2); break;
-      case '#': doType(mode,VK_SHIFT, VK_3); break;
-      case '$': doType(mode,VK_SHIFT, VK_4); break;
-      case '%': doType(mode,VK_SHIFT, VK_5); break;
-      case '^': doType(mode,VK_SHIFT, VK_6); break;
-      case '&': doType(mode,VK_SHIFT, VK_7); break;
-      case '*': doType(mode,VK_SHIFT, VK_8); break;
-      case '(': doType(mode,VK_SHIFT, VK_9); break;
-      case ')': doType(mode,VK_SHIFT, VK_0); break;
-      case '_': doType(mode,VK_SHIFT, VK_MINUS); break;
-      case '+': doType(mode,VK_SHIFT, VK_EQUALS); break;
-      case '\b': doType(mode,VK_BACK_SPACE); break;
-      case '\t': doType(mode,VK_TAB); break;
-      case '\r': doType(mode,VK_ENTER); break;
-      case '\n': doType(mode,VK_ENTER); break;
-      case '[': doType(mode,VK_OPEN_BRACKET); break;
-      case ']': doType(mode,VK_CLOSE_BRACKET); break;
-      case '\\': doType(mode,VK_BACK_SLASH); break;
-      case '{': doType(mode,VK_SHIFT, VK_OPEN_BRACKET); break;
-      case '}': doType(mode,VK_SHIFT, VK_CLOSE_BRACKET); break;
-      case '|': doType(mode,VK_SHIFT, VK_BACK_SLASH); break;
-      case ';': doType(mode,VK_SEMICOLON); break;
-      case ':': doType(mode,VK_SHIFT, VK_SEMICOLON); break;
-      case '\'': doType(mode,VK_QUOTE); break;
-      case '"': doType(mode,VK_SHIFT, VK_QUOTE); break;
-      case ',': doType(mode,VK_COMMA); break;
-      case '<': doType(mode,VK_SHIFT, VK_COMMA); break;
-      case '.': doType(mode,VK_PERIOD); break;
-      case '>': doType(mode,VK_SHIFT, VK_PERIOD); break;
-      case '/': doType(mode,VK_SLASH); break;
-      case '?': doType(mode,VK_SHIFT, VK_SLASH); break;
-      case ' ': doType(mode,VK_SPACE); break;
- }
-}
 
 void 
-Region::type_key(int key, int mode){
-   switch (key) {
-       case ESC: doType(mode,VK_ESCAPE); break;
-       case UP: doType(mode,VK_UP); break;
-       case RIGHT: doType(mode,VK_RIGHT); break;
-       case DOWN: doType(mode,VK_DOWN); break;
-       case LEFT: doType(mode,VK_LEFT); break;
-       case PAGE_UP: doType(mode,VK_PAGE_UP); break;
-       case PAGE_DOWN: doType(mode,VK_PAGE_DOWN); break;
-       case DELETE: doType(mode,VK_DELETE); break;
-       case END: doType(mode,VK_END); break;
-       case HOME: doType(mode,VK_HOME); break;
-       //case INSERT: doType(mode,VK_INSERT); break;
-       case F1: doType(mode,VK_F1); break;
-       case F2: doType(mode,VK_F2); break;
-       case F3: doType(mode,VK_F3); break;
-       case F4: doType(mode,VK_F4); break;
-       case F5: doType(mode,VK_F5); break;
-       case F6: doType(mode,VK_F6); break;
-       case F7: doType(mode,VK_F7); break;
-       case F8: doType(mode,VK_F8); break;
-       case F9: doType(mode,VK_F9); break;
-       case F10: doType(mode,VK_F10); break;
-       case F11: doType(mode,VK_F11); break;
-       case F12: doType(mode,VK_F12); break;
-       case F13: doType(mode,VK_F13); break;
-       case F14: doType(mode,VK_F14); break;
-       case F15: doType(mode,VK_F15); break;
-   }
-}
-
-void 
-Region::doType(int mode, int keycode){
-   if(mode==PRESS_ONLY){
-      Robot::keyPress(keycode);
-   }
-   else if(mode==RELEASE_ONLY){
-      Robot::keyRelease(keycode);
-   }
-   else{
-    Robot::keyPress(keycode);
-    Robot::keyRelease(keycode);
-   }
-}
-
-void 
-Region::doType(int mode, int modifier, int keycode){
-   if(mode==PRESS_ONLY){
-      Robot::keyPress(modifier);
-      Robot::keyPress(keycode);      
-   }
-   else if(mode==RELEASE_ONLY){
-      Robot::keyRelease(keycode);      
-      Robot::keyRelease(modifier);      
-   }
-   else{
-      Robot::keyPress(modifier);
-      Robot::keyPress(keycode);      
-      Robot::keyRelease(keycode);
-      Robot::keyRelease(modifier);  
-   }
-}
-
-void 
-Region::mouseDown(int buttons){
-   _hold_buttons = buttons;
-   Robot::mousePress(buttons);
-   Robot::waitForIdle();
+Region::mouseDown(int button){
+   Robot::mouseDown(button);
 }
    
 void 
-Region::mouseUp(int buttons){
-   if (buttons == 0)
-      Robot::mouseRelease(_hold_buttons);
-   else
-      Robot::mouseRelease(buttons);
-   Robot::waitForIdle();
+Region::mouseUp(int button){
+   Robot::mouseUp(button);
 }
          
 void 
-Region::keyDown(string keys){
-   
-   if (keys.length() > 0){
-      for (int i=0; i < keys.length(); ++i){
-         char key = keys[i];
-         // TODO: if this key has not already been pressed down
-         //if (_hold_keys.indexOf(keys.charAt(i)) == -1)
-         if (true){
-            type_ch(key, PRESS_ONLY);
-            _hold_keys += key;
-         }
-      }
-      Robot::waitForIdle();
-   }
+Region::keyDown(int key){
+   Robot::keyDown(key);
 }
-//
-//void 
-//Region::pressModifiers(int modifiers){
-//   if(modifiers & SHIFT) Robot::keyPress(VK_SHIFT);
-//   if(modifiers & CTRL) Robot::keyPress(VK_CONTROL);
-//   if(modifiers & ALT) Robot::keyPress(VK_ALT);
-//   if(modifiers & CMD) Robot::keyPress(VK_META);
-//   if(modifiers & META) {
-// //     if( Env.getOS() == OS.WINDOWS )
-////         Robot::keyPress(KeyEvent.VK_WINDOWS);
-////      else
-//      Robot::keyPress(VK_META);
-//  }
-//}
-//
-//void 
-//Region::releaseModifiers(int modifiers){
-//   if(modifiers & SHIFT) Robot::keyRelease(VK_SHIFT);
-//   if(modifiers & CTRL) Robot::keyRelease(VK_CONTROL);
-//   if(modifiers & ALT) Robot::keyRelease(VK_ALT);//
-//   if(modifiers & CMD) Robot::keyRelease(VK_META);   
-//   if(modifiers & META){ 
-////      if( Env.getOS() == OS.WINDOWS )
-////         Robot::keyRelease(KeyEvent.VK_WINDOWS);
-////      else
-//         Robot::keyRelease(VK_META);
-//   }
-//}
 
-// TODO: Re-implement using vector
 void 
-Region::keyUp(string keys){
-   if (keys.empty())
-      keys = _hold_keys;
-   for (int i=0; i < keys.length(); ++i){
-      char key = keys[i];
-      int pos;
-      pos = 1;
-      // TODO:
-      // pos=_hold_keys.indexOf(keys.charAt(i))
-      if (pos != -1){
-         type_ch(key, RELEASE_ONLY);
-         // TODO: remove key from _hold_keys
-//         _hold_keys = _hold_keys.substring(0,pos) + 
-//         _hold_keys.substring(pos+1);
-      }
-   }
-   Robot::waitForIdle();
+Region::keyUp(int key){
+   Robot::keyUp(key);
 }
-
-//
-//int 
-//Region::_click(int buttons, int modifiers, bool dblClick){
-//   pressModifiers(modifiers);
-//   //_scr.showClick(loc);
-//   if( dblClick ){
-//      Robot::doubleClick(buttons);
-//   }else{
-//      Robot::singleClick(buttons);
-//   }
-//   releaseModifiers(modifiers);
-//   Robot::waitForIdle();
-//   return 1;
-//}
-//
-//int 
-//Region::_click(Location loc, int buttons, int modifiers, bool dblClick) {
-////   Debug.info( getClickMsg(loc, buttons, modifiers, dblClick) );
-//   Robot::mouseMove(loc.x, loc.y);
-//   Robot::delay(20);
-//   return _click(buttons, modifiers, dblClick);
-// }
 
 Match
 Region::getLastMatch(){

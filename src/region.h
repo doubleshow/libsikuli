@@ -245,8 +245,6 @@ public:
 //   int press(Region& target, int key, int modifiers = 0);
 //   int press(Match& target, int key, int modifiers = 0);
    
-   
-   //template<class PSRML> int paste(PSRML target, const char* text);
    int paste(const char* text);   
    int paste(const Location& target, const char* text);
    int paste(const Pattern& target, const char* text);
@@ -256,22 +254,10 @@ public:
    
    void mouseDown(int buttons);
    void mouseUp(int buttons);
-   void keyDown(string keys);
-   void keyUp(string keys);
+
+   void keyDown(int key);
+   void keyUp(int key);
    
-private:
-   
-//   int _click(Location loc, int buttons, int modifers, bool dblClick);
-//   int _click(int buttons, int modifers, bool dblClick);
-   
-//   void pressModifiers(int modifiers);
-//   void releaseModifiers(int modifiers);
-   
-   void doType(int mode, int keyCode);
-   void doType(int mode, int keyCode1, int keycode2);
-  
-   void type_ch(char character, int mode );  
-   void type_key(int key, int mode);
      
 //==================================================================
 // Spatial Operators
