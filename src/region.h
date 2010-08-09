@@ -23,17 +23,25 @@ using namespace std;
 
 namespace sikuli{
    
-struct Rectangle{
+class Rectangle{
+
+public:
    
-   Rectangle(){};
+   Rectangle(){
+      x = 0; y = 0; w = 0; h = 0;
+   };
    
-   Rectangle(int x_,int y_,int width_,int height_){
-      x = x_; y = y_; width = width_; height = height_;
+   Rectangle(const Rectangle& r){
+      x = r.x; y = r.y; w = r.w; h = r.h;
+   }
+   
+   Rectangle(int x_,int y_,int w_,int h_){
+      x = x_; y = y_; w = w_; h = h_;
    }
    
    Rectangle intersection(Rectangle r) { 
-      int x2 = min(x+width,r.x+r.width);
-      int y2 = min(y+height,r.y+r.height);
+      int x2 = min(x+w,r.x+r.w);
+      int y2 = min(y+h,r.y+r.h);
       int x1 = max(x,r.x);
       int y1 = max(y,r.y);
       return Rectangle(x1,y1,x2-x1,y2-y1);
@@ -41,8 +49,8 @@ struct Rectangle{
    
    int x;
    int y;
-   int width;
-   int height;
+   int w;
+   int h;
 };    
 
 class ScreenImage{
@@ -88,14 +96,14 @@ class Match;
 
 #define PADDING 50   
    
-class Region{
+class Region : public Rectangle {
 
 
 public:
    
    Region(int x_, int y_, int w_, int h_);
    Region(const Region& r);
-   Region(Rectangle r);
+   Region(const Rectangle& r);
    Region();
    ~Region();
    
@@ -253,11 +261,11 @@ public:
    
 private:
    
-   int _click(Location loc, int buttons, int modifers, bool dblClick);
-   int _click(int buttons, int modifers, bool dblClick);
+//   int _click(Location loc, int buttons, int modifers, bool dblClick);
+//   int _click(int buttons, int modifers, bool dblClick);
    
-   void pressModifiers(int modifiers);
-   void releaseModifiers(int modifiers);
+//   void pressModifiers(int modifiers);
+//   void releaseModifiers(int modifiers);
    
    void doType(int mode, int keyCode);
    void doType(int mode, int keyCode1, int keycode2);
@@ -293,15 +301,17 @@ public:
    
 protected:
    
-   void init(int x_, int y_, int w_, int h_);
+//   void init(int x_, int y_, int w_, int h_);
+   void init();
+
    
    Match* _pLastMatch;
    vector<Match>* _pLastMatches;
-   
-   int x;
-   int y;
-   int w;
-   int h; 
+//   
+//   int x;
+//   int y;
+//   int w;
+//   int h; 
 
 private:
       

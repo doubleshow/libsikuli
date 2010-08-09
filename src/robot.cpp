@@ -12,9 +12,65 @@
 #include <ApplicationServices/ApplicationServices.h>
 
 
+#include "keys.h"
 
 int Robot::_modifiers = 0;
 bool Robot::_dragged = false;
+
+
+
+int
+Robot::click(int x, int y, int buttons, int modifiers, bool dblClick){
+   mouseMove(x, y);
+   delay(20);
+   return click(buttons, modifiers, dblClick);
+}
+
+int
+Robot::click(int buttons, int modifiers, bool dblClick){
+   
+   pressModifiers(modifiers);
+   if( dblClick ){
+      doubleClick(buttons);
+   }else{
+      singleClick(buttons);
+   }
+   releaseModifiers(modifiers);
+   waitForIdle();
+   return 1;
+}
+
+void 
+Robot::pressModifiers(int modifiers){
+   if(modifiers & SHIFT) Robot::keyPress(VK_SHIFT);
+   if(modifiers & CTRL) Robot::keyPress(VK_CONTROL);
+   if(modifiers & ALT) Robot::keyPress(VK_ALT);
+   if(modifiers & CMD) Robot::keyPress(VK_META);
+   if(modifiers & META) {
+      //     if( Env.getOS() == OS.WINDOWS )
+      //         Robot::keyPress(KeyEvent.VK_WINDOWS);
+      //      else
+      Robot::keyPress(VK_META);
+   }
+}
+
+void 
+Robot::releaseModifiers(int modifiers){
+   if(modifiers & SHIFT) Robot::keyRelease(VK_SHIFT);
+   if(modifiers & CTRL) Robot::keyRelease(VK_CONTROL);
+   if(modifiers & ALT) Robot::keyRelease(VK_ALT);//
+   if(modifiers & CMD) Robot::keyRelease(VK_META);   
+   if(modifiers & META){ 
+      //      if( Env.getOS() == OS.WINDOWS )
+      //         Robot::keyRelease(KeyEvent.VK_WINDOWS);
+      //      else
+      Robot::keyRelease(VK_META);
+   }
+}
+
+
+
+
 
 #include <time.h>
 void

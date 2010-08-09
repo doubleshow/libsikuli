@@ -19,22 +19,22 @@ using namespace sikuli;
 /// Match Class
 ////////////////////////////////////////////////////////////////////
 
-Match::Match(){
-   init(-1,-1,-1,-1);
+Match::Match() : Region(-1,-1,-1,-1) {
+   init();
    score = -1;
 }
 
 Match::~Match(){
 }
 
-Match::Match(const Match& m){
-   init(m.x, m.y, m.w, m.h);
+Match::Match(const Match& m) :
+   Region(m)  {
    score = m.score;
    _target = Location(getCenter());   
 }
 
-Match::Match(int _x, int _y, int _w, int _h, double _score){
-   init(_x,_y,_w,_h);
+Match::Match(int _x, int _y, int _w, int _h, double _score) :
+   Region(_x,_y,_w,_h) {
    score = _score;
    _target = Location(getCenter());
 }
@@ -67,20 +67,23 @@ Match::setTargetOffset(Location offset){
 /// Region Class
 ////////////////////////////////////////////////////////////////////
 
-Region::Region(){
-   init(0,0,0,0);
+Region::Region() : Rectangle(0,0,0,0){
+   init();
 }
 
-Region::Region(int x_, int y_, int w_, int h_){
-   init(x_,y_,w_,h_);
+Region::Region(int x_, int y_, int w_, int h_) :
+   Rectangle(x_,y_,w_,h_) {
+   init();
 }
 
-Region::Region(Rectangle r) {
-   init(r.x, r.y, r.width, r.height);
+Region::Region(const Rectangle& r) :
+   Rectangle(r) {
+   init();
 }
 
-Region::Region(const Region& r) {
-   init(r.x, r.y, r.w, r.h);
+Region::Region(const Region& r) :
+   Rectangle(r) {
+   init();
 }
 
 Region::~Region(){
@@ -91,14 +94,8 @@ Region::~Region(){
 }
 
 void
-Region::init(int x_, int y_, int w_, int h_){
-   x = x_;
-   y = y_;
-   w = w_;
-   h = h_;
-//   _throwException = true;
-//   _autoWaitTimeout = 3.0;
-   _pLastMatch = NULL;//new Match();
+Region::init(){
+   _pLastMatch = NULL;
    _pLastMatches = NULL;
    
   // setScreen(0);
@@ -139,8 +136,8 @@ void
 Region::setROI(Rectangle roi){
    x = (int)roi.x;
    y = (int)roi.y;
-   w = (int)roi.width;
-   h = (int)roi.height;
+   w = (int)roi.w;
+   h = (int)roi.h;
 } 
 
 Location 
@@ -163,12 +160,12 @@ Region::toGlobalCoord(Match m){
 
 int 
 Region::click(int modifiers){
-   return _click(BUTTON1_MASK, modifiers, false);   
+   return Robot::click(BUTTON1_MASK, modifiers, false);   
 }
 
 int 
 Region::click(Location target, int modifiers){
-   return _click(target, BUTTON1_MASK, modifiers, false);
+   return Robot::click(target.x,target.y, BUTTON1_MASK, modifiers, false);
 }
 
 int 
@@ -194,12 +191,12 @@ Region::click(Match target, int modifiers){
 
 int 
 Region::doubleClick(int modifiers){
-   return _click(BUTTON1_MASK, modifiers, true);
+   return Robot::click(BUTTON1_MASK, modifiers, true);
 }
 
 int 
 Region::doubleClick(Location target, int modifiers){
-   return _click(target, BUTTON1_MASK, modifiers, true);   
+   return Robot::click(target.x,target.y, BUTTON1_MASK, modifiers, true);   
 }
 
 int 
@@ -224,12 +221,12 @@ Region::doubleClick(Match& target, int modifiers){
 
 int 
 Region::rightClick(int modifiers){
-   return _click(BUTTON3_MASK, modifiers, false);
+   return Robot::click(BUTTON3_MASK, modifiers, false);
 }
 
 int 
 Region::rightClick(Location target, int modifiers){
-   return _click(target, BUTTON3_MASK, modifiers, false);
+   return Robot::click(target.x, target.y, BUTTON3_MASK, modifiers, false);
 }
 
 int 
@@ -282,12 +279,12 @@ Region::hover(Match& target){
 int 
 Region::dragDrop(Location t1, Location t2, int modifiers){
    int ret = 0;
-   pressModifiers(modifiers);
+  // pressModifiers(modifiers);
    if (drag(t1) != 0){
       //Robot::delay((int) Settings::DelayAfterDrag*1000);
       ret = dropAt(t2, Settings::DelayBeforeDrop);
    }
-   releaseModifiers(modifiers);
+   //releaseModifiers(modifiers);
    return ret;
 }
 
@@ -416,9 +413,9 @@ Region::paste(const Match& target, const char* text){
 
 int
 Region::press(int key, int modifiers){   
-   pressModifiers(modifiers);  
+  // pressModifiers(modifiers);  
    type_key(key, PRESS_RELEASE);
-   releaseModifiers(modifiers);
+   //releaseModifiers(modifiers);
    return 1;   
 }
 
@@ -428,9 +425,9 @@ Region::type(const char* text, int modifiers){
       return 0;
  
    for (int i=0; i < strlen(text); i++){
-      pressModifiers(modifiers);  
+     // pressModifiers(modifiers);  
       type_ch(text[i], PRESS_RELEASE);
-      releaseModifiers(modifiers);
+      //releaseModifiers(modifiers);
       Robot::delay(20);
    }   
    //Robot::waitForIdle();
@@ -664,34 +661,34 @@ Region::keyDown(string keys){
       Robot::waitForIdle();
    }
 }
-
-void 
-Region::pressModifiers(int modifiers){
-   if(modifiers & SHIFT) Robot::keyPress(VK_SHIFT);
-   if(modifiers & CTRL) Robot::keyPress(VK_CONTROL);
-   if(modifiers & ALT) Robot::keyPress(VK_ALT);
-   if(modifiers & CMD) Robot::keyPress(VK_META);
-   if(modifiers & META) {
- //     if( Env.getOS() == OS.WINDOWS )
-//         Robot::keyPress(KeyEvent.VK_WINDOWS);
-//      else
-      Robot::keyPress(VK_META);
-  }
-}
-
-void 
-Region::releaseModifiers(int modifiers){
-   if(modifiers & SHIFT) Robot::keyRelease(VK_SHIFT);
-   if(modifiers & CTRL) Robot::keyRelease(VK_CONTROL);
-   if(modifiers & ALT) Robot::keyRelease(VK_ALT);//
-   if(modifiers & CMD) Robot::keyRelease(VK_META);   
-   if(modifiers & META){ 
-//      if( Env.getOS() == OS.WINDOWS )
-//         Robot::keyRelease(KeyEvent.VK_WINDOWS);
-//      else
-         Robot::keyRelease(VK_META);
-   }
-}
+//
+//void 
+//Region::pressModifiers(int modifiers){
+//   if(modifiers & SHIFT) Robot::keyPress(VK_SHIFT);
+//   if(modifiers & CTRL) Robot::keyPress(VK_CONTROL);
+//   if(modifiers & ALT) Robot::keyPress(VK_ALT);
+//   if(modifiers & CMD) Robot::keyPress(VK_META);
+//   if(modifiers & META) {
+// //     if( Env.getOS() == OS.WINDOWS )
+////         Robot::keyPress(KeyEvent.VK_WINDOWS);
+////      else
+//      Robot::keyPress(VK_META);
+//  }
+//}
+//
+//void 
+//Region::releaseModifiers(int modifiers){
+//   if(modifiers & SHIFT) Robot::keyRelease(VK_SHIFT);
+//   if(modifiers & CTRL) Robot::keyRelease(VK_CONTROL);
+//   if(modifiers & ALT) Robot::keyRelease(VK_ALT);//
+//   if(modifiers & CMD) Robot::keyRelease(VK_META);   
+//   if(modifiers & META){ 
+////      if( Env.getOS() == OS.WINDOWS )
+////         Robot::keyRelease(KeyEvent.VK_WINDOWS);
+////      else
+//         Robot::keyRelease(VK_META);
+//   }
+//}
 
 // TODO: Re-implement using vector
 void 
@@ -714,28 +711,28 @@ Region::keyUp(string keys){
    Robot::waitForIdle();
 }
 
-
-int 
-Region::_click(int buttons, int modifiers, bool dblClick){
-   pressModifiers(modifiers);
-   //_scr.showClick(loc);
-   if( dblClick ){
-      Robot::doubleClick(buttons);
-   }else{
-      Robot::singleClick(buttons);
-   }
-   releaseModifiers(modifiers);
-   Robot::waitForIdle();
-   return 1;
-}
-
-int 
-Region::_click(Location loc, int buttons, int modifiers, bool dblClick) {
-//   Debug.info( getClickMsg(loc, buttons, modifiers, dblClick) );
-   Robot::mouseMove(loc.x, loc.y);
-   Robot::delay(20);
-   return _click(buttons, modifiers, dblClick);
- }
+//
+//int 
+//Region::_click(int buttons, int modifiers, bool dblClick){
+//   pressModifiers(modifiers);
+//   //_scr.showClick(loc);
+//   if( dblClick ){
+//      Robot::doubleClick(buttons);
+//   }else{
+//      Robot::singleClick(buttons);
+//   }
+//   releaseModifiers(modifiers);
+//   Robot::waitForIdle();
+//   return 1;
+//}
+//
+//int 
+//Region::_click(Location loc, int buttons, int modifiers, bool dblClick) {
+////   Debug.info( getClickMsg(loc, buttons, modifiers, dblClick) );
+//   Robot::mouseMove(loc.x, loc.y);
+//   Robot::delay(20);
+//   return _click(buttons, modifiers, dblClick);
+// }
 
 Match
 Region::getLastMatch(){

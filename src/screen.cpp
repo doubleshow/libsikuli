@@ -15,18 +15,14 @@
 
 using namespace sikuli;
 
-Screen::Screen(){
+Screen::Screen() : Region() {
    _id = 0;
-   int x,y,w,h;
    Robot::getDisplayBounds(_id,x,y,w,h);
-   init(x,y,w,h);      
 }
 
-Screen::Screen(int id){   
+Screen::Screen(int id) : Region() {   
    _id = id;
-   int x,y,w,h;
    Robot::getDisplayBounds(_id,x,y,w,h);
-   init(x,y,w,h);      
 }
 
 Screen::~Screen(){

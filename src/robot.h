@@ -106,6 +106,8 @@ using namespace std;
 
 class Robot{
    
+   // OS-dependent low-level IO functions
+   
 public:
    
    static void mouseMove(int x, int y);
@@ -118,18 +120,29 @@ public:
    static void doubleClick(int button);
    static void drag();
    static void drop();
-   
-   static void getDisplayBounds(int displayId, int& x, int& y, int& w, int& h);
-   
    static void paste(const char* text);
    
+   static void openApp(const char* appname);
    static void waitForIdle();
    static void delay(int time);
    
-   static void openApp(const char* appname);
-
    static cv::Mat capture(int displayId);   
    static cv::Mat capture(int displayId, int x, int y, int w, int h);
+
+   static void getDisplayBounds(int displayId, int& x, int& y, int& w, int& h);
+   
+   // Cross-platform IO functions
+public:
+   
+   static int click(int x, int y, int buttons, int modifers, bool dblClick);
+   static int click(int buttons, int modifers, bool dblClick);
+   
+   
+private:
+   
+   static void pressModifiers(int modifiers);
+   static void releaseModifiers(int modifiers);
+   
    
 private:
    
