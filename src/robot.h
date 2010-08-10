@@ -21,6 +21,9 @@ using namespace std;
 #define BUTTON3_MASK 4   
 
 // VIRTUAL KEYS
+// Mac: keyboard map
+// http://boredzo.org/blog/wp-content/uploads/2007/05/imtx-virtual-keycodes.png
+
 #define VK_A   0
 #define VK_B   11
 #define VK_C   8
@@ -80,10 +83,10 @@ using namespace std;
 #define VK_LEFT  123
 #define VK_PAGE_UP   116
 #define VK_PAGE_DOWN 121
-#define VK_DELETE 51
+#define VK_DELETE 117
 #define VK_END 119
 #define VK_HOME   115
-#define VK_INSERT
+#define VK_INSERT 114
 #define VK_F1     122
 #define VK_F2  120
 #define VK_F3  99
@@ -99,6 +102,7 @@ using namespace std;
 #define VK_F13 105
 #define VK_F14 107
 #define VK_F15 113
+#define VK_CAPSLOCK 57
 #define VK_SHIFT  56
 #define VK_CONTROL   59
 #define VK_ALT 58
@@ -156,6 +160,8 @@ public:
    
    static int type(const char* text, int modifiers = 0);
    static int type(int x, int y, const char* text, int modifiers = 0);
+   
+   static int press(int key, int modifiers = 0);
    
    static int paste(const char* text);
    static int paste(int x, int y, const char* text);

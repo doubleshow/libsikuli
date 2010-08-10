@@ -13,8 +13,6 @@
 #include <string>
 
 #include "robot.h"
-
-//#include "sikuli.h"
 #include "pattern.h"
 #include "location.h"
 #include "exceptions.h"
@@ -87,12 +85,6 @@ class Match;
 
    
 #include "keys.h"
-
-// TYPE MODE
-#define PRESS_RELEASE 0
-#define PRESS_ONLY 1
-#define RELEASE_ONLY 2
-   
 
 #define PADDING 50   
    
@@ -286,31 +278,17 @@ public:
    Region inside();
    
 protected:
-   
-//   void init(int x_, int y_, int w_, int h_);
-   void init();
 
+   void init();
    
    Match* _pLastMatch;
    vector<Match>* _pLastMatches;
-//   
-//   int x;
-//   int y;
-//   int w;
-//   int h; 
 
 private:
       
    Location toRobotCoord(Location l);
    Match toGlobalCoord(Match m);
-  
-   int _hold_buttons;// = 0;
-   string _hold_keys;
    
-   //Robot _robot;
-   //Screen* _scr;
-   
- 
 };
    
 

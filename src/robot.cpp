@@ -124,6 +124,17 @@ Robot::paste(int x, int y, const char* text){
 }
 
 int
+Robot::press(int key, int modifiers){
+   pressModifiers(modifiers);  
+   type_key(key, PRESS_RELEASE);
+   releaseModifiers(modifiers);
+   waitForIdle();
+   return 1;
+}
+
+
+
+int
 Robot::type(const char* text, int modifiers){
    if (strlen(text) < 0)
       return 0;
@@ -255,6 +266,8 @@ void
 Robot::type_key(int key, int mode){
    switch (key) {
       case ESC: doType(mode,VK_ESCAPE); break;
+      case ENTER: doType(mode,VK_ENTER); break;
+      case TAB: doType(mode, VK_TAB); break;
       case UP: doType(mode,VK_UP); break;
       case RIGHT: doType(mode,VK_RIGHT); break;
       case DOWN: doType(mode,VK_DOWN); break;
@@ -262,9 +275,12 @@ Robot::type_key(int key, int mode){
       case PAGE_UP: doType(mode,VK_PAGE_UP); break;
       case PAGE_DOWN: doType(mode,VK_PAGE_DOWN); break;
       case DELETE: doType(mode,VK_DELETE); break;
+      case BACKSPACE: doType(mode,VK_BACK_SPACE); break;
       case END: doType(mode,VK_END); break;
       case HOME: doType(mode,VK_HOME); break;
-         //case INSERT: doType(mode,VK_INSERT); break;
+      case INSERT: doType(mode,VK_INSERT); break;
+      case CAPSLOCK: doType(mode,VK_CAPSLOCK); break;
+      case SPACE: doType(mode,VK_SPACE); break;
       case F1: doType(mode,VK_F1); break;
       case F2: doType(mode,VK_F2); break;
       case F3: doType(mode,VK_F3); break;

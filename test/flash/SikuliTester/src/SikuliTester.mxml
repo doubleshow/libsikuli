@@ -53,7 +53,8 @@
 					
 					private function checkTypeResult(event:Event):void{
 						
-						if (testTypeTextInput.text == "test TEST 1234567890 !@#$%^&*()")
+						if (testTypeTextInput.text 
+						== "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&*()_+ 1234567890-=`~;':,./<>?\"[]{}\\|")
 							result.text = "SUCCESS"
 					}
 				]]>
@@ -62,8 +63,68 @@
 			<mx:TextInput id="testTypeTextInput" x="52" y="50" width="374" height="19"
 				change="checkTypeResult(event)"/>
 			<mx:Label x="52" y="34" text="Type Here"/>
+
 		</mx:Canvas>
 		
+		
+		<mx:Canvas label="TestKeys" width="100%" height="100%"
+							show="initTestKeys(event)">
+			<mx:Script>
+				<![CDATA[
+					
+					private var testKeysHistory:String = ''
+					
+					private var keysPressed:Array = new Array()
+				
+					private function initTestKeys(event:Event):void{
+						keysPressed = []
+						testKeysInput.text = ''
+					}
+					
+					private function checkTestKeys(event:KeyboardEvent):void{
+						//var btn:Button = event.target as Button
+						//if (Key.isDown(Key.DOWN))
+						
+						var keyName:String;
+						
+						var keysWanted:Array = new Array(
+						Keyboard.DOWN,Keyboard.UP,Keyboard.LEFT,Keyboard.RIGHT,
+						Keyboard.F1,Keyboard.F2,Keyboard.F3,Keyboard.F4,Keyboard.F5,
+						Keyboard.F6,Keyboard.F7,Keyboard.F8,Keyboard.F9,Keyboard.F10,
+						Keyboard.F11,Keyboard.F12,
+						Keyboard.BACKSPACE,
+						Keyboard.DELETE,
+						Keyboard.END,
+						Keyboard.ENTER,
+						Keyboard.ESCAPE,
+//						Keyboard.NUMPAD_0,Keyboard.NUMPAD_1,Keyboard.NUMPAD_2,Keyboard.NUMPAD_3,Keyboard.NUMPAD_4,
+//						Keyboard.NUMPAD_5,
+//						Keyboard.NUMPAD_6,Keyboard.NUMPAD_7,Keyboard.NUMPAD_8,Keyboard.NUMPAD_9,
+//						Keyboard.NUMPAD_ADD,Keyboard.NUMPAD_DECIMAL,Keyboard.NUMPAD_DIVIDE,Keyboard.NUMPAD_ENTER,
+//						Keyboard.NUMPAD_MULTIPLY,Keyboard.NUMPAD_SUBTRACT,
+						Keyboard.PAGE_DOWN,
+						Keyboard.PAGE_UP,
+						Keyboard.SPACE,
+						Keyboard.CAPS_LOCK,
+						Keyboard.INSERT,
+						Keyboard.HOME,
+						//Keyboard.CONTROL
+						//Keyboard.SHIFT,						
+						Keyboard.TAB
+						);
+																	
+						keysPressed.push(event.keyCode)
+																
+						debug.text = keysPressed.toString() + "\n" + keysWanted.toString()
+						if (keysPressed.toString() == keysWanted.toString())
+							result.text = "SUCCESS"
+					}
+				]]>
+			</mx:Script>
+			<mx:TextInput id="testKeysInput" x="113" y="123" width="374" height="19"
+				 keyDown="checkTestKeys(event)"/>
+			<mx:Label x="113" y="106" text="Type Here"/>
+		</mx:Canvas>
 		<mx:Canvas label="TestDragDrop" width="100%" height="100%"
 			show="initTestDragDrop(event)">
 			<mx:Script>

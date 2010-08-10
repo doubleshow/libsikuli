@@ -383,7 +383,7 @@ Region::paste(const Match& target, const char* text){
 
 int
 Region::press(int key, int modifiers){   
-   return 1;   
+   return Robot::press(key, modifiers);   
 }
 
 int
