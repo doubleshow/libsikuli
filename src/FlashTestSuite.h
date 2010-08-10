@@ -65,30 +65,40 @@ public:
 //      TS_ASSERT(s.exists("success.png"));
 //   }
    
-   void testKeys(void)
-   {
-      switchToTest("TestKeys.png");
-      s.click("textinput.png");
-      s.press(DOWN);
-      s.press(UP);
-      s.press(LEFT);
-      s.press(RIGHT);
-      s.press(F1); s.press(F2); s.press(F3); s.press(F4); s.press(F5); s.press(F6);
-      s.press(F7); s.press(F8); s.press(F9); s.press(F10); s.press(F11); s.press(F12);
-      s.press(BACKSPACE);
-      s.press(DELETE);
-      s.press(END);
-      s.press(ENTER);
-      s.press(ESC);
-      s.press(PAGE_DOWN);
-      s.press(PAGE_UP);
-      s.press(SPACE);
-      s.press(CAPSLOCK);
-      s.press(INSERT);
-      s.press(HOME);
-      s.press(TAB);
-   }
+//   void testKeys(void)
+//   {
+//      switchToTest("TestKeys.png");
+//      s.click("textinput.png");
+//      s.press(DOWN);
+//      s.press(UP);
+//      s.press(LEFT);
+//      s.press(RIGHT);
+//      s.press(F1); s.press(F2); s.press(F3); s.press(F4); s.press(F5); s.press(F6);
+//      s.press(F7); s.press(F8); s.press(F9); s.press(F10); s.press(F11); s.press(F12);
+//      s.press(BACKSPACE);
+//      s.press(DELETE);
+//      s.press(END);
+//      s.press(ENTER);
+//      s.press(ESC);
+//      s.press(PAGE_DOWN);
+//      s.press(PAGE_UP);
+//      s.press(SPACE);
+//      s.press(CAPSLOCK);
+//      s.press(INSERT);
+//      s.press(HOME);
+//      s.press(TAB);
+//   }
    
+   void testOCR(void)
+   {
+      switchToTest("TestOCR.png");
+      initOCR("arial.png");
+      s.click("/System Preferences/");
+      s.click("/Configuration/");
+      s.click("/Keyboard/");
+      s.click("/My Favorites/");
+
+   }
    
    
 //   void testDragDrop(void)

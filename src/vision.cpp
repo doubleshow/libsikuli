@@ -3,7 +3,7 @@
  *  sikuli
  *
  *  Created by Tom Yeh on 8/1/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
+ *  Copyright 2010 sikuli.org. All rights reserved.
  *
  */
 
@@ -15,27 +15,52 @@
 using namespace sikuli;
 
 void
-Vision::initOCR(const char* ocrDataPath){
-   Mat im = imread(ocrDataPath,1);
+Vision::initOCR(const char* ocrDataPath) throw(FileNotFound) {
+   Pattern p(ocrDataPath);
+   Mat im = imread(p.getImageURL(),1);
    TextFinder::train(im);
 }
 
-
 vector<FindResult> 
-getFindResults(TemplateFinder& f, Mat image, bool all, double similarity) {
+getFindResults(Mat screenImage, Pattern ptn, bool all, double similarity) {
    
    vector<FindResult> results;
    
-   if (all){
-      f.find_all(image, similarity);
-      while (f.hasNext()){
-         results.push_back(f.next());
+   if (ptn.isText()){
+      
+      
+      TextFinder f(screenImage);      
+      f.find(ptn.getText(), similarity);
+      
+      if (all){
+         while (f.hasNext()){
+            results.push_back(f.next());
+         }
       }
-   }
-   else{
-      f.find(image, similarity);
-      if (f.hasNext())
-         results.push_back(f.next());
+      else{
+         if (f.hasNext())
+            results.push_back(f.next());
+      }
+      
+      
+      
+   }else{
+      
+      TemplateFinder f(screenImage);      
+      Mat image = imread(ptn.getImageURL());
+      
+      if (all){
+         f.find_all(image, similarity);
+         while (f.hasNext()){
+            results.push_back(f.next());
+         }
+      }
+      else{
+         f.find(image, similarity);
+         if (f.hasNext())
+            results.push_back(f.next());
+         
+      }
    }
    return results;
 }
@@ -57,16 +82,18 @@ bool sort_by_x_dsc(const FindResult& r1, const FindResult& r2){
 vector<Match> 
 Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
    
-   TemplateFinder f(simg.getMat());   
+   //TemplateFinder f(simg.getMat());   
    
-   Mat image = imread(ptn.getImageURL());
-   if (image.data == NULL)
-      throw FindFailed(ptn);
+   Mat screenImage = simg.getMat();
+   
+//   Mat image = imread(ptn.getImageURL());
+//   if (image.data == NULL)
+//      throw FindFailed(ptn);
    
    vector<FindResult> results;
    if (ptn.bAll()){
       
-      results = getFindResults(f, image, true, ptn.getSimilarity());
+      results = getFindResults(screenImage, ptn, true, ptn.getSimilarity());
       
       
       if (ptn.getOrdering() == TOPDOWN){
@@ -84,7 +111,7 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
       
       if (ptn.where() != ANYWHERE){
       
-         results = getFindResults(f, image, true, ptn.getSimilarity());      
+         results = getFindResults(screenImage, ptn, true, ptn.getSimilarity());      
             
          
          cout << "found " << results.size() << " matches." << endl;
@@ -107,7 +134,7 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
       }
       else {
 
-         results = getFindResults(f, image, false, ptn.getSimilarity());
+         results = getFindResults(screenImage, ptn, false, ptn.getSimilarity());
             
       }
       

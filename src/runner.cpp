@@ -21,10 +21,10 @@ static FlashTestSuite suite_FlashTestSuite;
 static CxxTest::List Tests_FlashTestSuite = { 0, 0 };
 CxxTest::StaticSuiteDescription suiteDescription_FlashTestSuite( "FlashTestSuite.h", 15, "FlashTestSuite", suite_FlashTestSuite, Tests_FlashTestSuite );
 
-static class TestDescription_FlashTestSuite_testKeys : public CxxTest::RealTestDescription {
+static class TestDescription_FlashTestSuite_testOCR : public CxxTest::RealTestDescription {
 public:
- TestDescription_FlashTestSuite_testKeys() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 68, "testKeys" ) {}
- void runTest() { suite_FlashTestSuite.testKeys(); }
-} testDescription_FlashTestSuite_testKeys;
+ TestDescription_FlashTestSuite_testOCR() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 92, "testOCR" ) {}
+ void runTest() { suite_FlashTestSuite.testOCR(); }
+} testDescription_FlashTestSuite_testOCR;
 
 #include <cxxtest/Root.cpp>

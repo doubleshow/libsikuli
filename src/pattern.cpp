@@ -121,6 +121,7 @@ Pattern::Pattern(){
    similarity = 0.8f;
    dx = 0;
    dy = 0;
+   bText = false;
    _bAll = false;
    _ordering = SCORE;
    _position = ANYWHERE;
@@ -152,10 +153,10 @@ Pattern::Pattern(const char* str_){
    bText = str.length()>3 && str[0] == '/' && str[str.length()-1] == '/';
    if (bText)
       str = str.substr(1, str.length()-2);
-   
-   _imageURL = str;
-   _resolved_imageURL = findImageFromPaths(str);
-   
+   else{
+      _imageURL = str;
+      _resolved_imageURL = findImageFromPaths(str);
+   }
    
    similarity = 0.8f;
    dx = 0;

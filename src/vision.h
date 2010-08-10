@@ -23,7 +23,7 @@ public:
 
    
    
-   static void initOCR(const char* ocrDataPath);
+   static void initOCR(const char* ocrDataPath) throw(FileNotFound);
    
 };
 
