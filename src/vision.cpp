@@ -79,6 +79,43 @@ bool sort_by_x_dsc(const FindResult& r1, const FindResult& r2){
    return r1.x > r2.x;
 }
 
+#define PIXEL_DIFF_THRESHOLD 20
+#define IMAGE_DIFF_THRESHOLD 20
+
+double
+Vision::compare(Mat im1, Mat im2){
+   
+   Mat gray1;
+   Mat gray2;
+   
+   // convert image from RGB to grayscale
+   cvtColor(im1, gray1, CV_RGB2GRAY);
+   cvtColor(im2, gray2, CV_RGB2GRAY);
+   
+   Mat diff1;
+   absdiff(gray1,gray2,diff1);
+   
+   typedef float T;
+   
+   Size size = diff1.size();
+   
+   int diff_cnt = 0;
+   for( int i = 0; i < size.height; i++ )
+   {
+      const T* ptr1 = diff1.ptr<T>(i);
+      for( int j = 0; j < size.width; j += 4 )
+      {         
+         if (ptr1[j] > PIXEL_DIFF_THRESHOLD)
+            diff_cnt++;
+      }
+   }
+   
+   
+   // ratio of pixels that are different
+   double score = 1.0 * diff_cnt / (im1.rows * im1.cols);
+   return score;
+}
+
 vector<Match> 
 Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
    

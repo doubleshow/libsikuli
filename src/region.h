@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 
 #include "robot.h"
 #include "pattern.h"
@@ -45,10 +46,20 @@ public:
       return Rectangle(x1,y1,x2-x1,y2-y1);
    };
    
+   const char* toString(){
+      stringstream ss;
+      ss << x << "," << y << "," << w << "," << h;
+      repr = ss.str();
+      return repr.c_str();
+   }
+   
    int x;
    int y;
    int w;
    int h;
+   
+   private:
+      string repr;
 };    
 
 class ScreenImage{
@@ -79,11 +90,13 @@ private:
 };
   
 
-   
+   //
 class Match;
+class SikuliEventManager;
+struct Event;
+typedef void (*SikuliEventCallback)(Event);
 
-
-   
+//#include "event-manager.h"
 #include "keys.h"
 
 #define PADDING 50   
@@ -126,6 +139,8 @@ public:
    
    Match getLastMatch();
    vector<Match> getLastMatches();
+   
+   bool operator==(const Region& r);
   
 
 //==================================================================
@@ -155,7 +170,6 @@ public:
    bool waitVanish(const char* target); 
    bool waitVanish(const char* target, double timeout);
 
-private:
    
    Match findNow(Pattern ptn) throw(FindFailed);
    Match findNow(const char* imgURL) throw(FindFailed);
@@ -165,6 +179,8 @@ private:
       
    vector<Match> waitAll(Pattern target, double timeout) throw(FindFailed);
    vector<Match> waitAll(const char* target, double timeout) throw(FindFailed);
+
+private:
    
    Location getLocationFromPSRML(Pattern target);
    Location getLocationFromPSRML(const char* target);
@@ -250,7 +266,9 @@ public:
    void keyDown(int key);
    void keyUp(int key);
    
-     
+   
+   ScreenImage capture();
+   
 //==================================================================
 // Spatial Operators
 //==================================================================
@@ -277,6 +295,30 @@ public:
    
    Region inside();
    
+//==================================================================
+// Events
+//==================================================================
+public:
+   
+   void onAppear(Pattern ptn, int handler_id);
+   void onVanish(Pattern ptn, int handler_id);
+   void onChange(int handler_id);
+   
+   void onAppear(Pattern ptn, SikuliEventCallback func);
+   void onVanish(Pattern ptn, SikuliEventCallback func);
+   void onChange(SikuliEventCallback func);   
+   
+   //void observe(int seconds = -1, bool background = false);
+   
+   // observe once and return a vector of observed events
+   //vector<Event> observe();
+   //void stopObserver();
+   
+private:
+   
+   void onEvent(int event_type, Pattern ptn, int handler_id);
+   void onEvent(int event_type, Pattern ptn, SikuliEventCallback func);
+      
 protected:
 
    void init();

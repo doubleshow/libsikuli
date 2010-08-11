@@ -16,11 +16,11 @@ public:
 	
 	int get_screen_height() const { return source.rows;};
 	int get_screen_width()  const {return source.cols;};
-
+   
 	
    void find();
    
-   virtual void find(const char* str, double min_similarity) = 0;   
+ //  virtual void find(const char* str, double min_similarity) = 0;   
    
    virtual bool hasNext() = 0;
    virtual FindResult next() = 0;
@@ -102,10 +102,10 @@ public:
 	Finder(IplImage* source);
    Finder(const char* source);
 	~Finder();
-
+   
 	void find(IplImage* target, double min_similarity);
 	void find(const char *target, double min_similarity);
-
+   
 	void find_all(IplImage*  target, double min_similarity);
 	void find_all(const char *target, double min_similarity);  
 	
@@ -119,54 +119,53 @@ private:
 };
 
 class FaceFinder : public BaseFinder {
-
+   
 public:
-
-  FaceFinder(const char* screen_image_filename);
-  ~FaceFinder();
-
-  void find();
-  bool hasNext();
-  FindResult next();
-
+   
+   FaceFinder(const char* screen_image_filename);
+   ~FaceFinder();
+   
+   void find();
+   bool hasNext();
+   FindResult next();
+   
 private:
-
-  CvMemStorage* storage;
-  
-  static CvHaarClassifierCascade* cascade;
-  
-  CvSeq* faces;
-  int face_i;
-
+   
+   CvMemStorage* storage;
+   
+   static CvHaarClassifierCascade* cascade;
+   
+   CvSeq* faces;
+   int face_i;
+   
 };
 
 
 class ChangeFinder : public BaseFinder {
-
+   
 public:
-
-  ChangeFinder(const IplImage* screen_image);
-  ChangeFinder(const Mat screen_image);
-	
-  ChangeFinder(const char* screen_image_filename);
-  ~ChangeFinder();
-
-  void find(IplImage* new_img);
-  void find(Mat new_img);
-	
-  void find(const char* new_screen_image_filename);
-  
-  bool hasNext();
-  FindResult next(); 
-
+   
+   ChangeFinder(const IplImage* screen_image);
+   ChangeFinder(const Mat screen_image);
+   ChangeFinder(const char* screen_image_filename);
+   
+   ~ChangeFinder();
+   
+   void find(IplImage* new_img);
+   void find(Mat new_img);
+   void find(const char* new_screen_image_filename);
+   
+   bool hasNext();
+   FindResult next(); 
+   
 private:
-  
-  bool is_identical;
-
-  IplImage *prev_img;
-  CvSeq* c;
-  CvMemStorage* storage;
-
+   
+   bool is_identical;
+   
+   IplImage *prev_img;
+   CvSeq* c;
+   CvMemStorage* storage;
+   
 };
 
 

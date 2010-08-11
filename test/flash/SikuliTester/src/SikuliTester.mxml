@@ -19,7 +19,7 @@
 		        }
   		  </mx:Style>
   		  
-	<mx:Panel x="136" y="10">
+	<mx:Panel title="Sikuli Tester" x="136" y="10">
 		
 	<mx:ViewStack id="myViewStack" x="124" y="10" width="600" height="291"
 		change="tabChangeHandler(event)">
@@ -328,6 +328,62 @@
 		
 		
 		
+		</mx:Canvas>
+		
+		<mx:Canvas label="TestEvent" width="100%" height="100%"		
+				show="initTestEvent(event)"
+				hide="hideTestEvent(event)"
+				click="checkTestEvent(event)">
+				<mx:Script>
+					<![CDATA[
+						
+					private var intervalId:uint;
+					private var step:uint;
+					
+					private function initTestEvent(event:Event):void{
+						step = 1;
+						computer.visible = false
+						intervalId = setInterval(myAnimationFunction, 2000);
+					}
+					
+					private function hideTestEvent(event:Event):void{
+						clearInterval(intervalId)
+					}
+
+					private function myAnimationFunction():void{
+						switch (step){
+							case 1:
+							computer.visible = true;
+							break
+							
+							case 2:
+							computer.visible = false;
+							flower.visible = false;							
+							break
+							
+							case 3:
+							computer.visible = true;
+							break				
+							
+							case 4:
+							flower.visible = true;	
+							
+							case 5:
+							bug.visible = true;		
+							
+						}
+						step = step + 1;
+					}
+					
+					private function checkTestEvent(event:Event):void{
+					}	
+						
+					]]>
+				</mx:Script>
+			
+			<mx:Image id="computer"  visible="false" source="@Embed('computer.png')" x="88" y="55"/>			
+			<mx:Image id="flower"  visible="true" source="@Embed('flower.png')" x="10" y="156"/>		
+			<mx:Image id="bug"  visible="false" source="@Embed('bug.png')" x="138" y="156"/>
 		</mx:Canvas>
 
 	</mx:ViewStack>

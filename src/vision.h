@@ -11,6 +11,7 @@
 #define _VISION_H_
 
 #include "region.h"
+#include "opencv2/opencv.hpp"
 
 namespace sikuli {
 
@@ -21,8 +22,8 @@ public:
    //static vector<Match> findAll(ScreenImage simg, Pattern ptn) throw(FindFailed);
    static vector<Match> find(ScreenImage simg, Pattern ptn) throw(FindFailed);
 
-   
-   
+   static double compare(cv::Mat m1, cv::Mat m2);
+
    static void initOCR(const char* ocrDataPath) throw(FileNotFound);
    
 };

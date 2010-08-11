@@ -9,9 +9,14 @@
 
 #include <iostream>
 #include <sstream>
+
 #include "region.h"
 #include "vision.h"
 #include "settings.h"
+#include "event-manager.h"
+
+
+#define dout if (0) cout
 
 using namespace sikuli;
 
@@ -97,7 +102,11 @@ void
 Region::init(){
    _pLastMatch = NULL;
    _pLastMatches = NULL;   
-   //_evtMgr = new EventManager(this);   
+}
+
+bool
+Region::operator==(const Region& r){
+   return true;
 }
 
 Region
@@ -149,6 +158,12 @@ Region::toGlobalCoord(Match m){
    m.x += x;
    m.y += y;
    return m;
+}
+
+
+ScreenImage
+Region::capture(){
+   return Robot::capture(0, x, y, w, h);
 }
 
 int 
@@ -495,7 +510,7 @@ Region::findAll(const char* imgURL) throw(FindFailed) {
 
 Match 
 Region::findNow(Pattern ptn) throw(FindFailed){
-   cout << "[Region::findNow] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;
+   dout << "[Region::findNow] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;
    ScreenImage simg = Robot::capture(0, x, y, w, h);
    Match m = Vision::find(simg, ptn)[0];
    
@@ -504,7 +519,7 @@ Region::findNow(Pattern ptn) throw(FindFailed){
    
    m.setTargetOffset(ptn.getTargetOffset());
  
-   cout << "[Region::findNow] Found at (" << m.x << "," << m.y << ") score = " << m.getScore()  << endl;
+   dout << "[Region::findNow] Found at (" << m.x << "," << m.y << ") score = " << m.getScore()  << endl;
    
    if (m.getScore() <= 0)
       throw FindFailed(ptn);
@@ -795,5 +810,73 @@ Region::getLocationFromPSRML(Location target){
    return target;
 }
 
+void 
+Region::onEvent(int event_type, Pattern ptn, int handler_id){
+   Observer ob(event_type, ptn, handler_id);
+   EventManager::addObserver(*this, ob);
+}
 
+
+void 
+Region::onEvent(int event_type, Pattern ptn,  SikuliEventCallback func){
+   Observer ob(event_type, ptn, func);
+   EventManager::addObserver(*this, ob);
+}
+
+void 
+Region::onAppear(Pattern ptn, int handler_id){
+   onEvent(APPEAR, ptn, handler_id);
+}
+
+void 
+Region::onVanish(Pattern ptn, int handler_id){
+   onEvent(VANISH, ptn, handler_id);
+}
+
+void 
+Region::onChange(int handler_id){
+   onEvent(CHANGE, Pattern(), handler_id);
+}
+
+void 
+Region::onAppear(Pattern ptn, SikuliEventCallback func){
+   onEvent(APPEAR, ptn, func);
+}
+
+void 
+Region::onVanish(Pattern ptn, SikuliEventCallback func){
+   onEvent(VANISH, ptn, func);
+}
+
+void 
+Region::onChange(SikuliEventCallback func){   
+   onEvent(CHANGE, Pattern(), func);
+}
+
+//void
+//Region::observe(int seconds, bool background){
+//   if (_eventManager == NULL)
+//      _eventManager = new SikuliEventManager(this);  
+//   
+//   _bObserverRunning = true;
+//
+//   long clocks_limit = clock() + seconds * CLOCKS_PER_SEC;   
+//   while (clock() < clocks_limit && _bObserverRunning){      
+//      _eventManager->update(); 
+//      Robot::delay(100);
+//   }     
+//}
+
+//vector<Event>
+//Region::observe(){
+//   if (_eventManager == NULL)
+//      _eventManager = new SikuliEventManager(this);   
+//
+//   return _eventManager->update(); 
+//}
+//
+//void
+//Region::stopObserver(){
+//   _bObserverRunning = false;
+//}
 
