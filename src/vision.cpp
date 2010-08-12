@@ -116,7 +116,7 @@ Vision::compare(Mat im1, Mat im2){
    return score;
 }
 
-vector<Match> 
+vector<FindResult> 
 Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){ 
    
    //TemplateFinder f(simg.getMat());   
@@ -177,18 +177,14 @@ Vision::find(ScreenImage simg, Pattern ptn) throw(FindFailed){
       
    }
    
-   
-   if (results.empty())
-      throw FindFailed(ptn);
-   
-   
-   // Convert FindResults to Matches
-   vector<Match> matches;
+   vector<FindResult> final_results;
    int n = min((int)results.size(), (int)ptn.getLimit());
    for (int i=0; i< n; ++i){
-      FindResult& r = results[i];
-      matches.push_back(Match(r.x,r.y,r.w,r.h,r.score));
+      final_results.push_back(results[i]);
    }
    
-   return matches;
+   if (final_results.empty())
+      throw FindFailed(ptn);
+   
+   return final_results;
 }

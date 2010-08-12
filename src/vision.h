@@ -12,6 +12,7 @@
 
 #include "region.h"
 #include "opencv2/opencv.hpp"
+#include "finder.h"
 
 namespace sikuli {
 
@@ -20,7 +21,7 @@ public:
    
    //static Match find(ScreenImage simg, Pattern ptn) throw(FindFailed);   
    //static vector<Match> findAll(ScreenImage simg, Pattern ptn) throw(FindFailed);
-   static vector<Match> find(ScreenImage simg, Pattern ptn) throw(FindFailed);
+   static vector<FindResult> find(ScreenImage simg, Pattern ptn) throw(FindFailed);
 
    static double compare(cv::Mat m1, cv::Mat m2);
 

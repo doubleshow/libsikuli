@@ -77,19 +77,19 @@ public:
 
 static class TestDescription_FlashTestSuite_testOrdering : public CxxTest::RealTestDescription {
 public:
- TestDescription_FlashTestSuite_testOrdering() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 164, "testOrdering" ) {}
+ TestDescription_FlashTestSuite_testOrdering() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 165, "testOrdering" ) {}
  void runTest() { suite_FlashTestSuite.testOrdering(); }
 } testDescription_FlashTestSuite_testOrdering;
 
 static class TestDescription_FlashTestSuite_testPaste : public CxxTest::RealTestDescription {
 public:
- TestDescription_FlashTestSuite_testPaste() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 192, "testPaste" ) {}
+ TestDescription_FlashTestSuite_testPaste() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 193, "testPaste" ) {}
  void runTest() { suite_FlashTestSuite.testPaste(); }
 } testDescription_FlashTestSuite_testPaste;
 
 static class TestDescription_FlashTestSuite_testEvent : public CxxTest::RealTestDescription {
 public:
- TestDescription_FlashTestSuite_testEvent() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 199, "testEvent" ) {}
+ TestDescription_FlashTestSuite_testEvent() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 200, "testEvent" ) {}
  void runTest() { suite_FlashTestSuite.testEvent(); }
 } testDescription_FlashTestSuite_testEvent;
 

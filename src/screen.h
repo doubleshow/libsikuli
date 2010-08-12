@@ -22,15 +22,12 @@ public:
    Screen(int id);
    ~Screen();
    
-   ScreenImage capture(int x, int y, int w, int h);
+//   ScreenImage capture(int x, int y, int w, int h);
    
    Rectangle getBounds();
 
    static int getNumberScreens();
    
-private:
-   
-   int _id;
 };
 
 

@@ -16,9 +16,10 @@ class Location {
    
 public: 
    
-   Location() : x(-1), y(-1){};
+   Location() : x(-1), y(-1), screen(0) {};
    Location(int _x, int _y) : x(_x), y(_y){};
-   Location(const Location& loc) : x(loc.x), y(loc.y){};
+   Location(int _x, int _y, int _screen) : x(_x), y(_y), screen(_screen) {}
+   Location(const Location& loc) : x(loc.x), y(loc.y), screen(loc.screen){};
    
    Location offset(int dx, int dy);
    Location left(int dx);
@@ -28,6 +29,7 @@ public:
    
    int x;
    int y;
+   int screen;
    
    //      public String toString(){
    //         return "(" + x + "," + y + ")";

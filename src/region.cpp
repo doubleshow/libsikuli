@@ -16,7 +16,7 @@
 #include "event-manager.h"
 
 
-#define dout if (0) cout
+#define dout if (1) cout
 
 using namespace sikuli;
 
@@ -37,6 +37,17 @@ Match::Match(const Match& m) :
    score = m.score;
    _target = Location(getCenter());   
 }
+
+Match::Match(const Region& r, double _score) :
+Region(r), score(_score){
+   _target = Location(getCenter());
+}
+
+Match::Match(int _screen_id, int _x, int _y, int _w, int _h, double _score) :
+   Region(_x,_y,_w,_h) {
+   score = _score;
+}
+
 
 Match::Match(int _x, int _y, int _w, int _h, double _score) :
    Region(_x,_y,_w,_h) {
@@ -81,14 +92,29 @@ Region::Region(int x_, int y_, int w_, int h_) :
    init();
 }
 
-Region::Region(const Rectangle& r) :
-   Rectangle(r) {
+Region::Region(int screen_id_, int x_, int y_, int w_, int h_) :
+Rectangle(x_,y_,w_,h_) {
+   init();
+   _screen_id = screen_id_;
+}
+
+
+Region::Region(const Rectangle& r) : Rectangle(r) {
    init();
 }
 
-Region::Region(const Region& r) :
-   Rectangle(r) {
+Region::Region(int screen_id, const Rectangle& r) : Rectangle(r) {
    init();
+   _screen_id = screen_id;
+   xo = 0;
+   yo = 0;
+}
+
+Region::Region(const Region& r) : Rectangle(r) {
+   init();
+   _screen_id = r._screen_id;
+   xo = r.xo;
+   yo = r.yo;
 }
 
 Region::~Region(){
@@ -98,23 +124,37 @@ Region::~Region(){
       delete _pLastMatches;
 }
 
+
+Region 
+Region::crop(int x_, int y_, int w_, int h_){
+   Region r(x_,y_,w_,h_);
+   
+   // copy the screen id
+   r._screen_id = _screen_id;
+   
+   // calculate the screen coordinate origin
+   r.xo = xo + x;
+   r.yo = yo + y;
+   return r;
+}
+
 void
 Region::init(){
+   _screen_id = 0;
    _pLastMatch = NULL;
    _pLastMatches = NULL;   
+}
+
+void
+Region::setScreenCoordinateOrigin(int x0, int y0){
+   xo = x;
+   yo = y;
 }
 
 bool
 Region::operator==(const Region& r){
    return true;
 }
-
-Region
-Region::getFullScreen(int screenId){
-   int x,y,w,h;
-   Robot::getDisplayBounds(screenId,x,y,w,h);
-   return Region(x,y,w,h);
-}   
 
 Rectangle 
 Region::getROI(){ 
@@ -163,7 +203,8 @@ Region::toGlobalCoord(Match m){
 
 ScreenImage
 Region::capture(){
-   return Robot::capture(0, x, y, w, h);
+   // when capturing, we need to use the screen coordinate system
+   return Robot::capture(_screen_id, xo+x, yo+y, w, h);
 }
 
 int 
@@ -173,7 +214,7 @@ Region::click(int modifiers){
 
 int 
 Region::click(Location target, int modifiers){
-   return Robot::click(target.x,target.y, BUTTON1_MASK, modifiers, false);
+   return Robot::click(_screen_id, xo+x+target.x, yo+y+target.y, BUTTON1_MASK, modifiers, false);
 }
 
 int 
@@ -204,7 +245,7 @@ Region::doubleClick(int modifiers){
 
 int 
 Region::doubleClick(Location target, int modifiers){
-   return Robot::click(target.x,target.y, BUTTON1_MASK, modifiers, true);   
+   return Robot::click(_screen_id, target.x,target.y, BUTTON1_MASK, modifiers, true);   
 }
 
 int 
@@ -234,7 +275,7 @@ Region::rightClick(int modifiers){
 
 int 
 Region::rightClick(Location target, int modifiers){
-   return Robot::click(target.x, target.y, BUTTON3_MASK, modifiers, false);
+   return Robot::click(_screen_id, target.x, target.y, BUTTON3_MASK, modifiers, false);
 }
 
 int 
@@ -259,7 +300,7 @@ Region::rightClick(Match& target, int modifiers){
 
 int 
 Region::hover(Location target){
-   return Robot::hover(target.x, target.y);
+   return Robot::hover(_screen_id, target.x, target.y);
 }
 
 int 
@@ -284,7 +325,8 @@ Region::hover(Match& target){
 
 int 
 Region::dragDrop(Location t1, Location t2, int modifiers){
-   return Robot::dragDrop(t1.x,t1.y,t2.x,t2.y,modifiers);
+   // TODO: support cross-monitor drag-drop
+   return Robot::dragDrop(_screen_id, t1.x,t1.y,_screen_id, t2.x,t2.y,modifiers);
 }
 
 int 
@@ -318,7 +360,7 @@ Region::dragDrop(Match& t1, Match& t2, int modifiers){
 
 int
 Region::drag(Location target){
-   return Robot::drag(target.x, target.y);
+   return Robot::drag(_screen_id, target.x, target.y);
 }
 
 int 
@@ -343,7 +385,7 @@ Region::drag(Match& target){
 
 int
 Region::dropAt(Location target, double delay){
-   return Robot::dropAt(target.x, target.y);
+   return Robot::dropAt(_screen_id, target.x, target.y);
 }
 
 int 
@@ -373,7 +415,7 @@ Region::paste(const char* text){
 
 int
 Region::paste(const Location& target, const char* text){
-   return Robot::paste(target.x,target.y,text);
+   return Robot::paste(_screen_id, target.x,target.y,text);
 }
 
 int
@@ -408,7 +450,7 @@ Region::type(const char* text, int modifiers){
 
 int
 Region::type(Location target, const char* text, int modifiers){
-   return Robot::type(target.x, target.y, text, modifiers);
+   return Robot::type(_screen_id, target.x, target.y, text, modifiers);
 }
 
 int
@@ -510,20 +552,21 @@ Region::findAll(const char* imgURL) throw(FindFailed) {
 
 Match 
 Region::findNow(Pattern ptn) throw(FindFailed){
-   dout << "[Region::findNow] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;
-   ScreenImage simg = Robot::capture(0, x, y, w, h);
-   Match m = Vision::find(simg, ptn)[0];
+   dout << "[Region::findNow] Searching in (" << xo+x << "," << yo+y << ")-(" << xo+x+w << "," << yo+y+h << ")" << endl;
+   ScreenImage simg = capture();//Robot::capture(0, x, y, w, h);
    
-   m.x += x;
-   m.y += y;
+   FindResult r = Vision::find(simg, ptn)[0];
+   Match match(crop(r.x,r.y,r.w,r.h),r.score); 
+
    
-   m.setTargetOffset(ptn.getTargetOffset());
+   // TODO: setTargetOffset 
+   //match.setTargetOffset(ptn.getTargetOffset());
  
-   dout << "[Region::findNow] Found at (" << m.x << "," << m.y << ") score = " << m.getScore()  << endl;
+   dout << "[Region::findNow] Found at (" << match.x << "," << match.y << "), score = " << match.getScore()  << endl;
    
-   if (m.getScore() <= 0)
+   if (match.getScore() <= 0)
       throw FindFailed(ptn);
-   return m;
+   return match;
 }
 
 Match 
@@ -535,16 +578,25 @@ vector<Match>
 Region::findAllNow(Pattern ptn) throw(FindFailed){
    // ToDo: adjust capturing region for multi-monitor
    cout << "[Region::findAll] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;   
-   ScreenImage simg = Robot::capture(0, x, y, w, h);
+   ScreenImage simg = capture();
    
-   vector<Match> ms = Vision::find(simg, ptn.all());
+   vector<FindResult> results = Vision::find(simg, ptn.all());
+   vector<Match> matches;
+   int n = min((int)results.size(), (int)ptn.getLimit());
+   for (int i=0; i< n; ++i){
+      FindResult& r = results[i];
+      Match match(crop(r.x,r.y,r.w,r.h),r.score); 
+      matches.push_back(match);
+   }
    
-   for (int i=0;i<ms.size();++i)
-      ms[i].setTargetOffset(ptn.getTargetOffset());
-   cout << "[Region::findAll] Found " << ms.size() << " matches" << endl;
-   if (ms.empty())
+   
+   for (int i=0;i<matches.size();++i)
+      matches[i].setTargetOffset(ptn.getTargetOffset());
+ 
+   cout << "[Region::findAll] Found " << matches.size() << " matches" << endl;
+   if (matches.empty())
       throw FindFailed(ptn);
-   return ms;
+   return matches;
 }
 
 vector<Match> 
@@ -717,10 +769,18 @@ Region::right(){
 
 Region 
 Region::right(int range){
-   Rectangle bounds = Screen(0).getBounds();
-   Rectangle rect = Rectangle(x+w,y,range,h);
-   rect = rect.intersection(bounds);
-   return Region(rect).taller(10);      
+//   Rectangle bounds = Screen(0).getBounds();
+//   Rectangle rect = Rectangle(x+w,y,range,h);
+//   rect = rect.intersection(bounds);
+//   return Region(rect).taller(10);  
+//   
+   int sh,sw;
+   Robot::getScreenSize(_screen_id, sw, sh);
+   Rectangle bounds(0,0,sw,sh);
+   Rectangle rect(xo+x+w, yo+y, range, h);
+   rect = rect.intersection(bounds);   
+   Region region = Screen(_screen_id).crop(rect.x,rect.y,rect.w,rect.h);
+   return region;
 }
 
 Region 
@@ -730,10 +790,13 @@ Region::left(){
 
 Region 
 Region::left(int range){//
-   Rectangle bounds = Screen(0).getBounds();
-   Rectangle rect = Rectangle(x-range,y,range,h);
-   rect = rect.intersection(bounds);
-   return Region(rect).taller(10);   
+   int sh,sw;
+   Robot::getScreenSize(_screen_id, sw, sh);
+   Rectangle bounds(0,0,sw,sh);
+   Rectangle rect(xo+x-range, yo+y, range, h);
+   rect = rect.intersection(bounds);   
+   Region region = Screen(_screen_id).crop(rect.x,rect.y,rect.w,rect.h);
+   return region;
 }
 
 Region 
@@ -743,10 +806,19 @@ Region::above(){
 
 Region
 Region::above(int range){
-   Rectangle bounds = Screen(0).getBounds();
-   Rectangle rect = Rectangle(x,y-range,w,range);
-   rect = rect.intersection(bounds);
-   return Region(rect).wider(10);
+//   Rectangle bounds = Screen(0).getBounds();
+//   Rectangle rect = Rectangle(x,y-range,w,range);
+//   rect = rect.intersection(bounds);
+//   return Region(rect).wider(10);
+   
+   int sh,sw;
+   Robot::getScreenSize(_screen_id, sw, sh);
+   Rectangle bounds(0,0,sw,sh);
+   Rectangle rect(xo+x, yo+y-range, w, range);
+   rect = rect.intersection(bounds);   
+   Region region = Screen(_screen_id).crop(rect.x,rect.y,rect.w,rect.h);
+   return region;
+   
 }
 
 Region 
@@ -756,10 +828,19 @@ Region::below(){
 
 Region 
 Region::below(int range){
-   Rectangle bounds = Screen(0).getBounds();
-   Rectangle rect = Rectangle(x,y+h/2,w,range);
-   rect = rect.intersection(bounds);
-   return Region(rect).wider(10);
+//   Rectangle bounds = Screen(0).getBounds();
+//   Rectangle rect = Rectangle(x,y+h/2,w,range);
+//   rect = rect.intersection(bounds);
+//   return Region(rect).wider(10);
+   
+   int sh,sw;
+   Robot::getScreenSize(_screen_id, sw, sh);
+   Rectangle bounds(0,0,sw,sh);
+   Rectangle rect(xo+x, yo+y+h/2, w, range);
+   rect = rect.intersection(bounds);   
+   Region region = Screen(_screen_id).crop(rect.x,rect.y,rect.w,rect.h);
+   return region;
+   
 }
 
 Region

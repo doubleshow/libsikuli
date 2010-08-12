@@ -121,7 +121,10 @@ class Robot{
    // OS-dependent implementation   
 private:
    
+   static void mouseMove(int screen, int x, int y);
    static void mouseMove(int x, int y);
+   
+   
    static void mousePress(int buttons);
    static void mouseRelease(int buttons);
    static void keyPress(int key);
@@ -138,33 +141,42 @@ private:
 public:
 
    static void openApp(const char* appname);
-
-   static void delay(int time);
+   static void delay(int seconds);
    
-   static cv::Mat capture(int displayId);   
-   static cv::Mat capture(int displayId, int x, int y, int w, int h);
-
-   static void getDisplayBounds(int displayId, int& x, int& y, int& w, int& h);
+   static cv::Mat capture(int screen);   
+   static cv::Mat capture(int screen, int x, int y, int w, int h);
+   
+   static void getScreenBounds(int screen, int& x, int& y, int& w, int& h);
+   static void getScreenSize(int screen, int& w, int& h);
    
    // Cross-platform implementation
 public:
    
-   static int click(int x, int y, int buttons, int modifiers, bool dblClick);
    static int click(int buttons, int modifiers, bool dblClick);
+   static int click(int x, int y, int buttons, int modifiers, bool dblClick);
+   static int click(int screen, int x, int y, int buttons, int modifiers, bool dblClick);
    
    static int dragDrop(int x1, int y1, int x2, int y2, int modifiers = 0);
+   static int dragDrop(int screen1, int x1, int y1, int screen2, int x2, int y2, int modifiers = 0);
+   
    static int drag(int x, int y);
+   static int drag(int screen, int x, int y);
+
    static int dropAt(int x, int y, double delay = 0);
+   static int dropAt(int screen, int x, int y, double delay = 0);
    
    static int hover(int x, int y);
+   static int hover(int screen, int x, int y);
    
    static int type(const char* text, int modifiers = 0);
    static int type(int x, int y, const char* text, int modifiers = 0);
+   static int type(int screen, int x, int y, const char* text, int modifiers = 0);
    
    static int press(int key, int modifiers = 0);
    
    static int paste(const char* text);
    static int paste(int x, int y, const char* text);
+   static int paste(int screen, int x, int y, const char* text);
    
       
    static void mouseDown(int button);
@@ -187,9 +199,13 @@ private:
    
 private:
    
+   // not sure whether these two can be cross-platform
    static void mouseMoveTo(int x, int y, bool dragged);
    static void mouseMoveFromTo(int x0, int y0, int x1, int y1, bool dragged);
 
+   
+private:
+   
    static int _modifiers;
    static bool _dragged;
    

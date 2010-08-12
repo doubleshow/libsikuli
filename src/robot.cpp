@@ -20,11 +20,17 @@ bool Robot::_dragged = false;
 
 
 int
-Robot::click(int x, int y, int buttons, int modifiers, bool dblClick){
-   mouseMove(x, y);
+Robot::click(int screen, int x, int y, int buttons, int modifiers, bool dblClick){
+   mouseMove(screen, x, y);
    delay(20);
    return click(buttons, modifiers, dblClick);
 }
+
+int
+Robot::click(int x, int y, int buttons, int modifiers, bool dblClick){
+   return click(0,x,y,buttons,modifiers,dblClick);
+}
+
 
 int
 Robot::click(int buttons, int modifiers, bool dblClick){
@@ -71,26 +77,42 @@ Robot::releaseModifiers(int modifiers){
 
 int 
 Robot::hover(int x, int y){
-   mouseMove(x,y);
+   return hover(0,x,y);
+}
+
+int 
+Robot::hover(int screen, int x, int y){
+   mouseMove(screen,x,y);
    delay(100);
    return 1;
 }
 
+
 int
-Robot::dragDrop(int x1, int y1, int x2, int y2, int modifiers){
+Robot::dragDrop(int screen1, int x1, int y1, int screen2, int x2, int y2, int modifiers){
    int ret = 0;
    pressModifiers(modifiers);
-   if (drag(x1,y1) != 0){
+   if (drag(screen1,x1,y1) != 0){
       //delay((int) Settings::DelayAfterDrag*1000);
-      ret = dropAt(x2,y2);
+      ret = dropAt(screen2,x2,y2);
    }
    releaseModifiers(modifiers);
-   return ret;
+   return ret;   
+}
+
+int
+Robot::dragDrop(int x1, int y1, int x2, int y2, int modifiers){
+   return dragDrop(0,x1,y1,0,x2,y2,modifiers);
 }
 
 int
 Robot::drag(int x, int y){
-   mouseMove(x,y);
+   return drag(0,x,y);
+}
+
+int
+Robot::drag(int screen, int x, int y){
+   mouseMove(screen,x,y);
    delay(100);
    drag();
    delay(100);
@@ -98,9 +120,14 @@ Robot::drag(int x, int y){
 }
 
 int
-Robot::dropAt(int x, int y, double delay){
-   mouseMove(x, y);
-   //delay((int) delay*1000);
+Robot::dropAt(int x, int y, double seconds){
+   return dropAt(0,x,y,seconds);
+}
+
+int
+Robot::dropAt(int screen, int x, int y, double seconds){
+   mouseMove(screen,x, y);
+   delay((int) seconds*1000);
    drop();
    return 1;
 }
@@ -118,7 +145,12 @@ Robot::paste(const char* text){
 
 int 
 Robot::paste(int x, int y, const char* text){
-   click(x,y,BUTTON1_MASK,0,false); 
+   return paste(0,x,y,text);
+}
+
+int 
+Robot::paste(int screen, int x, int y, const char* text){
+   click(screen,x,y,BUTTON1_MASK,0,false); 
    delay(100);
    return paste(text);
 }
@@ -151,7 +183,12 @@ Robot::type(const char* text, int modifiers){
 
 int
 Robot::type(int x, int y, const char* text, int modifiers){
-   click(x,y,BUTTON1_MASK,0,false);
+   return type(0,x,y,text,modifiers);
+}
+
+int
+Robot::type(int screen, int x, int y, const char* text, int modifiers){
+   click(screen,x,y,BUTTON1_MASK,0,false);
    delay(50);
    return type(text, modifiers);
 }
@@ -447,11 +484,15 @@ Robot::mouseMoveFromTo(int x0, int y0, int x1, int y1, bool dragged){
    Robot::delay(50);
 }
 
+
 void 
-Robot::mouseMove(int x, int y)
-{
-   
-   
+Robot::mouseMove(int x, int y){
+   mouseMove(0,x,y);
+}
+
+void 
+Robot::mouseMove(int screen, int x, int y){
+      
    CGPoint curloc;
    CGEventRef eventRef;
    
@@ -459,6 +500,11 @@ Robot::mouseMove(int x, int y)
    curloc = CGEventGetLocation(eventRef);
    CFRelease(eventRef);
    
+   int x0,y0,w0,h0;
+   getScreenBounds(screen, x0, y0, w0, h0);
+   
+   x += x0;
+   y += y0;
    
    mouseMoveFromTo(curloc.x,curloc.y,x,y,_dragged);
 }
@@ -675,9 +721,26 @@ Robot::pasteText(const char* text){
 
 }
 
+
+int convert_user_screen_id_to_mac_display_id(int screen){
+   CGDisplayErr err;
+   CGDirectDisplayID ids[10];
+   CGDisplayCount dspyCnt;
+   err = CGGetActiveDisplayList(10,ids,&dspyCnt); 
+   
+   if (screen < dspyCnt)
+      return ids[screen];
+   else
+      return 0;
+}
+
+
 void
-Robot::getDisplayBounds(int displayId, int& x, int& y, int& w, int& h){
-   CGRect r = CGDisplayBounds(displayId);
+Robot::getScreenBounds(int screen, int& x, int& y, int& w, int& h){
+   CGDirectDisplayID dspyID;
+   dspyID = convert_user_screen_id_to_mac_display_id(screen); 
+   
+   CGRect r = CGDisplayBounds(dspyID);
    CGPoint p = r.origin;
    CGSize s = r.size;
    x = p.x;
@@ -686,25 +749,47 @@ Robot::getDisplayBounds(int displayId, int& x, int& y, int& w, int& h){
    h = s.height;
 }
 
+void
+Robot::getScreenSize(int screen, int& w, int& h){
+   CGDirectDisplayID dspyID;
+   dspyID = convert_user_screen_id_to_mac_display_id(screen); 
+   
+   CGRect r = CGDisplayBounds(dspyID);
+   CGSize s = r.size;
+   w = s.width;
+   h = s.height;
+}
+
 using namespace cv;
 
 #include "glgrab.h"
+
+
+ 
+
 Mat
-Robot::capture(int displayId){
-   CGRect rect = CGDisplayBounds(displayId);
-   return capture(displayId,(int)rect.origin.x,(int)rect.origin.y,
+Robot::capture(int screen){
+   CGDirectDisplayID dspyID;
+   dspyID = convert_user_screen_id_to_mac_display_id(screen); 
+   
+   CGRect rect = CGDisplayBounds(dspyID);
+   return capture(screen,(int)rect.origin.x,(int)rect.origin.y,
                   (int)rect.size.width,(int)rect.size.height);
 }
 
 Mat
-Robot::capture(int displayId, int x, int y, int w, int h){
+Robot::capture(int screen, int x, int y, int w, int h){
    
-   CGRect bounds = CGDisplayBounds(displayId);   
+   CGDirectDisplayID dspyID;
+   dspyID = convert_user_screen_id_to_mac_display_id(screen);
+   
+   CGRect bounds = CGDisplayBounds(dspyID);   
    
    // flip y coordinate vertically
    int y0 = bounds.size.height - y - h;
+   
    CGRect rect = CGRectMake(x,y0,w,h);
-   CGImageRef imgRef = grabViaOpenGL(displayId, rect);
+   CGImageRef imgRef = grabViaOpenGL(dspyID, rect);
 
    const int imgh = CGImageGetHeight(imgRef);
    const int imgw = CGImageGetWidth(imgRef);
@@ -732,10 +817,9 @@ Robot::capture(int displayId, int x, int y, int w, int h){
    delete buffer;
    cvReleaseImageHeader(&img);
    
-   return bgr;//bgr.clone();//(bgr,true);//bgr.clone();
+   return bgr;
 }
-//#include <Carbon/Carbon.h>
-//#include "LSInfo.h"
+
 void
 Robot::openApp(const char* appname){
    OSStatus err;

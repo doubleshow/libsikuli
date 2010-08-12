@@ -153,15 +153,15 @@ public:
       Match computer = s.find("computer.png");
       s.hover(computer);
       
-      s.click(computer.left().find("clickButton.png"));
-      s.click(computer.below().find("clickButton.png"));
-      s.click(computer.right().find("clickButton.png"));
-      s.click(computer.above().find("clickButton.png"));
+      computer.left().find("clickButton.png").click(Location(10,10));
+      computer.below().find("clickButton.png").click(Location(10,10));
+      computer.right().find("clickButton.png").click(Location(10,10));
+      computer.above().find("clickButton.png").click(Location(10,10));
       
       TS_ASSERT(s.exists("success.png"));
    }
 
-   void testOrdering(void)
+  void testOrdering(void)
    {
       switchToTest("TestOrdering.png");
 

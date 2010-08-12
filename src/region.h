@@ -107,10 +107,22 @@ class Region : public Rectangle {
 public:
    
    Region(int x_, int y_, int w_, int h_);
+   Region(int screen_id_, int x_, int y_, int w_, int h_);
    Region(const Region& r);
    Region(const Rectangle& r);
+   Region(int screen_id_, const Rectangle& r);
+
    Region();
    ~Region();
+   
+   // Obtain a region within this region. The coordinate system
+   // of the new region will be relative to the current region,
+   // with its origin (0,0) set to the upper-left corner of the
+   // current region. Internally, we also compute the location 
+   // in the screen coordinate system this origin point corresponds
+   // to as (xo, yo). The new region will be on the same screen
+   // as the current region.
+   Region crop(int x, int y, int w, int h);
    
 //==================================================================
 // Setting/Getting Attributes
@@ -133,7 +145,6 @@ public:
    void setROI(Region roi);
    void setROI(Rectangle roi);
    
-   static Region getFullScreen(int screenId = 0);
    
    Location getCenter() const;
    
@@ -308,12 +319,6 @@ public:
    void onVanish(Pattern ptn, SikuliEventCallback func);
    void onChange(SikuliEventCallback func);   
    
-   //void observe(int seconds = -1, bool background = false);
-   
-   // observe once and return a vector of observed events
-   //vector<Event> observe();
-   //void stopObserver();
-   
 private:
    
    void onEvent(int event_type, Pattern ptn, int handler_id);
@@ -322,14 +327,22 @@ private:
 protected:
 
    void init();
+   void setScreenCoordinateOrigin(int x, int y);
+   
+   // top-left origin in the screen coordinate
+   int xo;
+   int yo;
    
    Match* _pLastMatch;
    vector<Match>* _pLastMatches;
+
+   int _screen_id;
 
 private:
       
    Location toRobotCoord(Location l);
    Match toGlobalCoord(Match m);
+   
    
 };
    
@@ -340,7 +353,9 @@ public:
    
    Match();
    ~Match();
+   Match(const Region& r, double _score);
    Match(int _x, int _y, int _w, int _h, double _score);
+   Match(int _screen_id, int _x, int _y, int _w, int _h, double _score);
    Match(const Match& m);
    
    int compareTo(const Match& m);
