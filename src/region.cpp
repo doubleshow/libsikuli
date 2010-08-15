@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "screen.h"
 #include "region.h"
 #include "vision.h"
 #include "settings.h"
@@ -126,7 +127,7 @@ Region::~Region(){
 
 
 Region 
-Region::crop(int x_, int y_, int w_, int h_){
+Region::inner(int x_, int y_, int w_, int h_){
    Region r(x_,y_,w_,h_);
    
    // copy the screen id
@@ -508,6 +509,21 @@ Region::getLastMatches(){
    return *_pLastMatches;
 }
 
+void
+Region::setLastMatch(Match match){
+   if (_pLastMatch == NULL)
+      _pLastMatch = new Match();
+   *_pLastMatch = match;
+}
+
+void
+Region::setLastMatches(vector<Match> matches){
+   if (_pLastMatches == NULL)
+      _pLastMatches = new vector<Match>();
+   *_pLastMatches = matches;
+}
+
+
 Match
 Region::find(Pattern ptn) throw(FindFailed) {
    Match m;
@@ -556,7 +572,7 @@ Region::findNow(Pattern ptn) throw(FindFailed){
    ScreenImage simg = capture();//Robot::capture(0, x, y, w, h);
    
    FindResult r = Vision::find(simg, ptn)[0];
-   Match match(crop(r.x,r.y,r.w,r.h),r.score); 
+   Match match(inner(r.x,r.y,r.w,r.h),r.score); 
 
    
    // TODO: setTargetOffset 
@@ -585,7 +601,7 @@ Region::findAllNow(Pattern ptn) throw(FindFailed){
    int n = min((int)results.size(), (int)ptn.getLimit());
    for (int i=0; i< n; ++i){
       FindResult& r = results[i];
-      Match match(crop(r.x,r.y,r.w,r.h),r.score); 
+      Match match(inner(r.x,r.y,r.w,r.h),r.score); 
       matches.push_back(match);
    }
    
@@ -606,41 +622,65 @@ Region::findAllNow(const char* imgURL) throw(FindFailed){
    
 
 #include <time.h>
-#define CLOCKS_PER_MSEC (CLOCKS_PER_SEC/1000)
+#define CLOCKS_PER_MSEC ((long)CLOCKS_PER_SEC/(long)1000)
 
 Match
 Region::wait(Pattern target) throw(FindFailed){
-   return wait(target, Settings::AutoWaitTimeout );
+   return wait(target, Settings::AutoWaitTimeout);
 } 
 
-Match
-Region::wait(Pattern target, double timeout) throw(FindFailed){
-   Match m;
 
-   long max_clocks_per_scan = CLOCKS_PER_MSEC * Settings::WaitScanRate;
-   long clocks_limit = clock() + timeout * CLOCKS_PER_SEC;   
-   while (clock() < clocks_limit){
+vector<Match> 
+Region::try_for_n_seconds(callback func, Pattern target, int seconds){
+   vector<Match> ms;
+   
+   
+   //cout << CLOCKS_PER_MSEC << endl;
+   long max_clocks_per_scan = CLOCKS_PER_SEC / Settings::WaitScanRate;
+   //long start = clock();
+   long clocks_limit = clock() + seconds * CLOCKS_PER_SEC;   
+   time_t time_limit = time(NULL) + seconds;
+   time_t start_time;
+   start_time = time(NULL);
+   while (time(NULL) < time_limit){
+      //while (clock() < clocks_limit){
       long before_find = clock();
       
-      // [begin] findNow
-      try {
-         m = findNow(target);
-         if (_pLastMatch == NULL)
-            _pLastMatch = new Match();
-         *_pLastMatch = m;
-         return m;
-      }catch (FindFailed e){
-      }
-      // [end]
+      ms = (this->*func)(target);
+      if (!ms.empty())
+         return ms;
       
       long actual_clocks_per_scan = clock() - before_find;
       long mseconds_to_delay = (max_clocks_per_scan - actual_clocks_per_scan)/CLOCKS_PER_MSEC;
       Robot::delay(max((long)10, mseconds_to_delay));
-   }  
+      //cout << 1.0*(clock() - start)/ CLOCKS_PER_SEC << " seconds" << endl;
+      cout << (time(NULL) - start_time) << " seconds" << endl;
+   }        
+   return ms;
+}
 
-   if(Settings::ThrowException)
+vector<Match>
+Region::wait_callback(Pattern target) {
+   vector<Match> ms;
+   try{
+      Match m = findNow(target);
+      ms.push_back(m);
+   }catch(FindFailed ff){
+   }
+   return ms;
+}
+      
+Match
+Region::wait(Pattern target, int seconds) throw(FindFailed){
+   vector<Match> ms = try_for_n_seconds(&Region::wait_callback, target, seconds);   
+   if (!ms.empty()){
+      setLastMatch(ms[0]);
+      return getLastMatch();
+   }else {
+   
+  // if(Settings::ThrowException)
       throw FindFailed(target);
-   return m;
+   }
 }
 
 Match
@@ -649,54 +689,54 @@ Region::wait(const char* target) throw(FindFailed){
 }
 
 Match
-Region::wait(const char* target, double timeout) throw(FindFailed){
-   return wait(Pattern(target), timeout);
+Region::wait(const char* target, int seconds) throw(FindFailed){
+   return wait(Pattern(target), seconds);
 }
 
 vector<Match>
-Region::waitAll(Pattern target, double timeout) throw(FindFailed){
+Region::waitAll_callback(Pattern target) {
    vector<Match> ms;
-   
-   long max_clocks_per_scan = CLOCKS_PER_MSEC * Settings::WaitScanRate;
-   long clocks_limit = clock() + timeout * CLOCKS_PER_SEC;   
-   while (clock() < clocks_limit){
-      long before_find = clock();
-      
-      // [begin] findAllNow
-      try{
-         ms = findAllNow(target);
-         return ms;
-      }catch (FindFailed ff){
-      }
-      // [end]
-      
-      long actual_clocks_per_scan = clock() - before_find;
-      long mseconds_to_delay = (max_clocks_per_scan - actual_clocks_per_scan)/CLOCKS_PER_MSEC;
-      Robot::delay(max((long)10, mseconds_to_delay));
-   }  
-   
-   if(Settings::ThrowException)
-      throw FindFailed(target);
+   try{
+      ms = findAllNow(target);
+   }catch(FindFailed ff){
+   }
    return ms;
 }
 
+
 vector<Match>
-Region::waitAll(const char* target, double timeout) throw(FindFailed){
-   return waitAll(Pattern(target), timeout);
+Region::waitAll(Pattern target, int seconds) throw(FindFailed){
+   vector<Match> ms = try_for_n_seconds(&Region::waitAll_callback, target, seconds);
+   
+   if (!ms.empty()){
+      return ms;
+   }else{
+      setLastMatches(ms);
+      return getLastMatches();
+   
+   //if(Settings::ThrowException)
+      throw FindFailed(target);
+   }
+}   
+
+
+vector<Match>
+Region::waitAll(const char* target, int seconds) throw(FindFailed){
+   return waitAll(Pattern(target), seconds);
 }
 
 bool
-Region::exists(Pattern target, double timeout){
+Region::exists(Pattern target, int seconds){
    try{
-      wait(target, timeout);
+      wait(target, seconds);
       return true;
    }catch (FindFailed ff){
       return false;
    }
 }
 bool
-Region::exists(const char* target, double timeout){
-   return exists(Pattern(target), timeout);
+Region::exists(const char* target, int seconds){
+   return exists(Pattern(target), seconds);
 }
 
 bool
@@ -708,37 +748,41 @@ Region::exists(const char* target){
    return exists(Pattern(target));
 }
 
-bool
-Region::waitVanish(Pattern target, double timeout){
-   
-   long max_clocks_per_scan = CLOCKS_PER_MSEC * Settings::WaitScanRate;
-   long clocks_limit = clock() + timeout * CLOCKS_PER_SEC;   
-   while (clock() < clocks_limit){
-      long before_find = clock();
+
+vector<Match>
+Region::waitVanish_callback(Pattern target) {
+   vector<Match> ms;
+   try{
+      Match m = findNow(target);
       
-      // [begin] findNow
-      try {
-         Match m = findNow(target);
-      }catch (FindFailed e){
-         return true;
-      }      
-      // [end]
-      
-      long actual_clocks_per_scan = clock() - before_find;
-      long mseconds_to_delay = (max_clocks_per_scan - actual_clocks_per_scan)/CLOCKS_PER_MSEC;
-      Robot::delay(max((long)10, mseconds_to_delay));
-   }  
-   
-   return false;
+      // purposely return an empty vector to
+      // indicate the target is still there
+      return ms; 
+   }catch(FindFailed ff){
+      // purposely return a non-empty vector
+      // to indicate the target has vanished
+      ms.push_back(Match()); 
+      return ms;
+   }
 }
 
+bool
+Region::waitVanish(Pattern target, int seconds){
+   vector<Match> ms = try_for_n_seconds(&Region::waitVanish_callback, target, seconds);   
+   if (!ms.empty()){
+      return true;
+   }else {
+      return false;
+   }   
+}
+   
 bool
 Region::waitVanish(Pattern target){
    return waitVanish(target, Settings::AutoWaitTimeout);
 }
 
 bool
-Region::waitVanish(const char* target, double timeout){
+Region::waitVanish(const char* target, int seconds){
    return waitVanish(Pattern(target));
 }
 
@@ -747,8 +791,6 @@ Region::waitVanish(const char* target){
    return waitVanish(target, Settings::AutoWaitTimeout);
 }
 
-#include "screen.h"
-
 Region 
 Region::nearby(){
    return nearby(PADDING);
@@ -756,10 +798,7 @@ Region::nearby(){
 
 Region 
 Region::nearby(int range){
-   Rectangle bounds = Screen(0).getBounds();
-   Rectangle rect = Rectangle(x-range,y-range,w+range*2,h+range*2);
-   rect = rect.intersection(bounds);
-   return Region(rect);
+   return spatialOpHelper(Rectangle(xo+x-range,yo+y-range,w+range*2,h+range*2));
 }
 
 Region 
@@ -769,18 +808,7 @@ Region::right(){
 
 Region 
 Region::right(int range){
-//   Rectangle bounds = Screen(0).getBounds();
-//   Rectangle rect = Rectangle(x+w,y,range,h);
-//   rect = rect.intersection(bounds);
-//   return Region(rect).taller(10);  
-//   
-   int sh,sw;
-   Robot::getScreenSize(_screen_id, sw, sh);
-   Rectangle bounds(0,0,sw,sh);
-   Rectangle rect(xo+x+w, yo+y, range, h);
-   rect = rect.intersection(bounds);   
-   Region region = Screen(_screen_id).crop(rect.x,rect.y,rect.w,rect.h);
-   return region;
+   return spatialOpHelper(Rectangle(xo+x+w, yo+y, range, h));
 }
 
 Region 
@@ -789,14 +817,8 @@ Region::left(){
 }
 
 Region 
-Region::left(int range){//
-   int sh,sw;
-   Robot::getScreenSize(_screen_id, sw, sh);
-   Rectangle bounds(0,0,sw,sh);
-   Rectangle rect(xo+x-range, yo+y, range, h);
-   rect = rect.intersection(bounds);   
-   Region region = Screen(_screen_id).crop(rect.x,rect.y,rect.w,rect.h);
-   return region;
+Region::left(int range){
+   return spatialOpHelper(Rectangle(xo+x-range, yo+y, range, h));
 }
 
 Region 
@@ -806,19 +828,7 @@ Region::above(){
 
 Region
 Region::above(int range){
-//   Rectangle bounds = Screen(0).getBounds();
-//   Rectangle rect = Rectangle(x,y-range,w,range);
-//   rect = rect.intersection(bounds);
-//   return Region(rect).wider(10);
-   
-   int sh,sw;
-   Robot::getScreenSize(_screen_id, sw, sh);
-   Rectangle bounds(0,0,sw,sh);
-   Rectangle rect(xo+x, yo+y-range, w, range);
-   rect = rect.intersection(bounds);   
-   Region region = Screen(_screen_id).crop(rect.x,rect.y,rect.w,rect.h);
-   return region;
-   
+   return spatialOpHelper(Rectangle(xo+x, yo+y-range, w, range));
 }
 
 Region 
@@ -828,35 +838,29 @@ Region::below(){
 
 Region 
 Region::below(int range){
-//   Rectangle bounds = Screen(0).getBounds();
-//   Rectangle rect = Rectangle(x,y+h/2,w,range);
-//   rect = rect.intersection(bounds);
-//   return Region(rect).wider(10);
-   
-   int sh,sw;
-   Robot::getScreenSize(_screen_id, sw, sh);
-   Rectangle bounds(0,0,sw,sh);
-   Rectangle rect(xo+x, yo+y+h/2, w, range);
-   rect = rect.intersection(bounds);   
-   Region region = Screen(_screen_id).crop(rect.x,rect.y,rect.w,rect.h);
-   return region;
-   
+   return spatialOpHelper(Rectangle(xo+x, yo+y+h/2, w, range));
 }
 
 Region
 Region::wider(int range){
-   Rectangle bounds = Screen(0).getBounds();
-   Rectangle rect = Rectangle(x-range,y,w+2*range,h);
-   rect = rect.intersection(bounds);
-   return Region(rect);   
+   return spatialOpHelper(Rectangle(xo+x-range,yo+y,w+2*range,h));
 }
 
 Region
 Region::taller(int range){
-   Rectangle bounds = Screen(0).getBounds();
-   Rectangle rect = Rectangle(x,y-range,w,h+2*range);
-   rect = rect.intersection(bounds);
-   return Region(rect);   
+   return spatialOpHelper(Rectangle(xo+x,yo+y-range,w,h+2*range));
+}
+
+Region
+Region::spatialOpHelper(Rectangle rect){
+   int sh,sw;
+   Robot::getScreenSize(_screen_id, sw, sh);
+   Rectangle bounds(0,0,sw,sh);
+   rect = rect.intersection(bounds);   
+   Region region = Screen(_screen_id).inner(rect.x,rect.y,rect.w,rect.h);
+   region.xo -= xo;
+   region.yo -= yo;
+   return region;
 }
 
 Region 
@@ -934,30 +938,4 @@ Region::onChange(SikuliEventCallback func){
    onEvent(CHANGE, Pattern(), func);
 }
 
-//void
-//Region::observe(int seconds, bool background){
-//   if (_eventManager == NULL)
-//      _eventManager = new SikuliEventManager(this);  
-//   
-//   _bObserverRunning = true;
-//
-//   long clocks_limit = clock() + seconds * CLOCKS_PER_SEC;   
-//   while (clock() < clocks_limit && _bObserverRunning){      
-//      _eventManager->update(); 
-//      Robot::delay(100);
-//   }     
-//}
-
-//vector<Event>
-//Region::observe(){
-//   if (_eventManager == NULL)
-//      _eventManager = new SikuliEventManager(this);   
-//
-//   return _eventManager->update(); 
-//}
-//
-//void
-//Region::stopObserver(){
-//   _bObserverRunning = false;
-//}
 

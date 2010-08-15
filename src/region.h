@@ -101,6 +101,8 @@ typedef void (*SikuliEventCallback)(Event);
 
 #define PADDING 50   
    
+   
+
 class Region : public Rectangle {
 
 
@@ -114,15 +116,6 @@ public:
 
    Region();
    ~Region();
-   
-   // Obtain a region within this region. The coordinate system
-   // of the new region will be relative to the current region,
-   // with its origin (0,0) set to the upper-left corner of the
-   // current region. Internally, we also compute the location 
-   // in the screen coordinate system this origin point corresponds
-   // to as (xo, yo). The new region will be on the same screen
-   // as the current region.
-   Region crop(int x, int y, int w, int h);
    
 //==================================================================
 // Setting/Getting Attributes
@@ -140,20 +133,38 @@ public:
    void setH(int h_){ h = h_; }   
    
    
+   
+   // Deprecated
    Rectangle getROI();
    void setROI(int X, int Y, int W, int H);
    void setROI(Region roi);
    void setROI(Rectangle roi);
+   
+  
+   // Compare whether two regions are spatially equivalent. Two
+   // regions are considered spatially equivalent if they have the
+   // same upper-left corner in the screen coordinate, same width,
+   // same height, and on the same screen. Note that since regions
+   // can have different local coordinate systems, having the same
+   // (x,y,w,h) does not necessarily mean they refer to the same
+   // region on the screen. On the other hand, two regions with 
+   // different (x,y,w,h)'s may refer to the same screen region after
+   // being converted to the screen coordinate.
+   bool operator==(const Region& r);
    
    
    Location getCenter() const;
    
    Match getLastMatch();
    vector<Match> getLastMatches();
-   
-   bool operator==(const Region& r);
-  
+   void setLastMatch(Match match);
+   void setLastMatches(vector<Match> matches);
 
+protected:
+   
+   Match* _pLastMatch;
+   vector<Match>* _pLastMatches;
+   
 //==================================================================
 // Pattern Matching Functions
 //==================================================================
@@ -167,19 +178,20 @@ public:
    vector<Match> findAll(const char* imgURL) throw(FindFailed);
       
    Match wait(Pattern target) throw(FindFailed);
-   Match wait(Pattern target, double timeout) throw(FindFailed);
+   Match wait(Pattern target, int seconds) throw(FindFailed);
    Match wait(const char* target) throw(FindFailed);
-   Match wait(const char* target, double timeout) throw(FindFailed); 
+   Match wait(const char* target, int seconds) throw(FindFailed); 
+   
    
    bool exists(Pattern target);
-   bool exists(Pattern target, double timeout);
+   bool exists(Pattern target, int seconds);
    bool exists(const char* target);
-   bool exists(const char* target, double timeout);
+   bool exists(const char* target, int seconds);
 
    bool waitVanish(Pattern target); 
-   bool waitVanish(Pattern target, double timeout);
+   bool waitVanish(Pattern target, int seconds);
    bool waitVanish(const char* target); 
-   bool waitVanish(const char* target, double timeout);
+   bool waitVanish(const char* target, int seconds);
 
    
    Match findNow(Pattern ptn) throw(FindFailed);
@@ -188,10 +200,18 @@ public:
    vector<Match> findAllNow(Pattern ptn) throw(FindFailed);
    vector<Match> findAllNow(const char* imgURL) throw(FindFailed);
       
-   vector<Match> waitAll(Pattern target, double timeout) throw(FindFailed);
-   vector<Match> waitAll(const char* target, double timeout) throw(FindFailed);
+   vector<Match> waitAll(Pattern target,  int seconds) throw(FindFailed);
+   vector<Match> waitAll(const char* target,  int seconds) throw(FindFailed);
 
 private:
+   
+   vector<Match> wait_callback(Pattern target);
+   vector<Match> waitAll_callback(Pattern target);
+   vector<Match> waitVanish_callback(Pattern target);
+   
+   typedef vector<Match> (Region::*callback)(Pattern target); 
+   vector<Match> try_for_n_seconds(callback func, Pattern target, int seconds);   
+   
    
    Location getLocationFromPSRML(Pattern target);
    Location getLocationFromPSRML(const char* target);
@@ -286,6 +306,23 @@ public:
    
 public:
    
+   
+   // All derivative regions using spatial operators will use
+   // the local coordinate system defined by the source region.
+   // The origin (0,0) corresponds to the upper-left corner
+   // of the source region. A derivative region often goes beyond
+   // the boundary of the source region. For example, all the
+   // "neighborhood" operators (i.e., left, right, below, above)
+   // return regions outside but adjacent to the source region.
+   // An inner region obtained by the "inner" operator will be
+   // strictly inside and no larger than the source region. 
+   
+   // (xo,yo) stores the screen location of the origin of the
+   // coordinate system used by the region. Internally, it is
+   // used to convert a local coordinate to the corresponding
+   // screen coordinate where mouse/key events can be delivered
+   // to. 
+   
    Region nearby();
    Region nearby(int range);
    
@@ -306,6 +343,16 @@ public:
    
    Region inside();
    
+   // Obtain an inner region
+   Region inner(int x, int y, int w, int h);   
+   
+private:
+   
+   // Take a Rectangle in the screen coordinate system and return
+   // a valid Region w.r.t. the screen of this region
+   Region spatialOpHelper(Rectangle rect);
+
+
 //==================================================================
 // Events
 //==================================================================
@@ -333,8 +380,7 @@ protected:
    int xo;
    int yo;
    
-   Match* _pLastMatch;
-   vector<Match>* _pLastMatches;
+   
 
    int _screen_id;
 
@@ -346,6 +392,7 @@ private:
    
 };
    
+
 
 class Match : public Region {
    

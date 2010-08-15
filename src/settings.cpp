@@ -14,7 +14,7 @@ using namespace sikuli;
 
 int Settings::DelayBeforeDrop = 10;
 int Settings::DelayAfterDrag = 10;
-int Settings::WaitScanRate = 3;
+int Settings::WaitScanRate = 1;
 bool Settings::ThrowException = true;
 double Settings::AutoWaitTimeout = 3.0;
 vector<string> Settings::_image_paths = vector<string>();

@@ -7,6 +7,8 @@
  *
  */
 
+#define dout if (0) cout
+
 #include "pattern.h"
 #include "settings.h"
 
@@ -77,7 +79,7 @@ string downloadImageFromURL(string url){
 
 string findImageHelper(string image_url) throw(FileNotFound){
    
-   cout << "[Pattern] Resolving image url:  " << image_url << endl;
+   dout << "[Pattern] Resolving image url:  " << image_url << endl;
    
    string found_image_path;
    if (strncmp(image_url.c_str(), "http", 4) == 0)

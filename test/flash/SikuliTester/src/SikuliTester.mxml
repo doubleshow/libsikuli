@@ -230,6 +230,7 @@
 			<mx:Button x="192" y="100" label="click" id="rightBtn" click="checkTestSpatialOpResult(event)"/>
 			<mx:Button x="102.5" y="23" label="click" id="aboveBtn" click="checkTestSpatialOpResult(event)"/>
 			<mx:Button x="104.5" y="191" styleName="ft" label="click" id="belowBtn" click="checkTestSpatialOpResult(event)"/>
+			<mx:Text x="262" y="25" text="Click on left, below, right, above buttons in sequence." width="217" height="75"/>
 		</mx:Canvas>
 
 		<mx:Canvas label="TestOCR" width="100%" height="100%"
@@ -330,6 +331,30 @@
 		
 		</mx:Canvas>
 		
+		<mx:Canvas label="TestVanish" width="100%" height="100%"		
+				show="initTestVanish(event)">
+				<mx:Script>
+					<![CDATA[
+						private var vanishIntervalId:uint
+						
+						private function initTestVanish(event:Event):void{
+							vanishFlower.visible = true
+							vanishIntervalId = setTimeout(vanishFunction, 2000)
+						}
+						
+						private function vanishFunction():void{
+							vanishFlower.visible = false
+						}
+						
+					]]>
+				</mx:Script>
+				
+				
+			<mx:Image id="vanishFlower"  visible="true" source="@Embed('flower.png')" x="10" y="156"/>		
+				
+				
+		</mx:Canvas>
+		
 		<mx:Canvas label="TestEvent" width="100%" height="100%"		
 				show="initTestEvent(event)"
 				hide="hideTestEvent(event)"
@@ -343,6 +368,7 @@
 					private function initTestEvent(event:Event):void{
 						step = 1;
 						computer.visible = false
+						bug.visible = false
 						intervalId = setInterval(myAnimationFunction, 2000);
 					}
 					
