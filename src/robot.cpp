@@ -682,13 +682,18 @@ Robot::pasteText(const char* text){
    err = PasteboardCreate(kPasteboardClipboard,
                           &pbRef);
    PasteboardClear(pbRef);
+   
+   // Convert c char array into CFString. We use kCFStringEncodingUTF8 
+   // to tell the program to interpret the content of the char array
+   // as in UTF8 encoding
    CFStringRef strRef;
-   strRef = CFStringCreateWithCString(kCFAllocatorDefault,
-                                   text,
-                                   kCFStringEncodingMacRoman);
+   strRef = CFStringCreateWithCString(kCFAllocatorDefault, text,
+                                      kCFStringEncodingUTF8);
+   
    CFDataRef dataRef;
    dataRef = CFStringCreateExternalRepresentation(NULL, strRef,                                                 
-                                                 kCFStringEncodingUTF8, '?');
+                                                  kCFStringEncodingUTF8, '?');
+   
    
    PasteboardPutItemFlavor(pbRef, (PasteboardItemID)1, 
                            kUTTypeUTF8PlainText, dataRef, 

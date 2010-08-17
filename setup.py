@@ -11,6 +11,7 @@ from distutils.core import setup, Extension
 sources = [
    'sikuli-python_wrap.cxx', 
    'sikuli.cpp','region.cpp','screen.cpp','location.cpp','pattern.cpp','settings.cpp',
+   'event-manager.cpp',
    'robot.cpp','glgrab.c',
    'vision.cpp','finder.cpp','ocr.cpp',
    'cv-util.cpp','pyramid-template-matcher.cpp']

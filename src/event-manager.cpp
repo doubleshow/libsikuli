@@ -110,7 +110,6 @@ RegionObserver::observe(){
             //cout << score << endl;
             
             e.type = ob.event_type;
-            e.handler_id = ob.handler_id;
             e.region = region;
             triggered = true;
             
@@ -125,7 +124,6 @@ RegionObserver::observe(){
                if (!ob.active){
                   
                   e.type = ob.event_type;
-                  e.handler_id = ob.handler_id;
                   e.match = top_match;
                   e.pattern = ob.pattern;
                   e.region = region;
@@ -151,7 +149,6 @@ RegionObserver::observe(){
                if (!ob.active){
                   
                   e.type = ob.event_type;
-                  e.handler_id = ob.handler_id;
                   e.pattern = ob.pattern;
                   e.region = region;
                   triggered = true;
@@ -169,6 +166,8 @@ RegionObserver::observe(){
          if (ob.callback)
             (*ob.callback)(e);
          
+         if (ob.event_handler)
+            ob.event_handler->handle(e);
       }
       
    }   
@@ -180,18 +179,18 @@ RegionObserver::observe(){
 Observer::Observer(int event_type_, Pattern ptn, SikuliEventCallback func_){
    
    event_type = event_type_;
-   handler_id = -1;
    callback = func_;
+   event_handler = NULL;
    active = false;  
    pattern = ptn;
 }
 
 
-Observer::Observer(int event_type_, Pattern ptn, int handler_id_){
+Observer::Observer(int event_type_, Pattern ptn, SikuliEventHandler* handler){
    
    event_type = event_type_;
-   handler_id = handler_id_;
    callback = 0;
+   event_handler = handler;
    active = false;
    pattern = ptn;
 }

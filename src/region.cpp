@@ -26,7 +26,7 @@ using namespace sikuli;
 ////////////////////////////////////////////////////////////////////
 
 Match::Match() : Region(-1,-1,-1,-1) {
-   init();
+   init(0);
    score = -1;
 }
 
@@ -34,25 +34,12 @@ Match::~Match(){
 }
 
 Match::Match(const Match& m) :
-   Region(m)  {
-   score = m.score;
+   Region(m), score(m.score)  {
    _target = Location(getCenter());   
 }
 
 Match::Match(const Region& r, double _score) :
-Region(r), score(_score){
-   _target = Location(getCenter());
-}
-
-Match::Match(int _screen_id, int _x, int _y, int _w, int _h, double _score) :
-   Region(_x,_y,_w,_h) {
-   score = _score;
-}
-
-
-Match::Match(int _x, int _y, int _w, int _h, double _score) :
-   Region(_x,_y,_w,_h) {
-   score = _score;
+   Region(r), score(_score){
    _target = Location(getCenter());
 }
 
@@ -85,35 +72,20 @@ Match::setTargetOffset(Location offset){
 ////////////////////////////////////////////////////////////////////
 
 Region::Region() : Rectangle(0,0,0,0){
-   init();
+   init(0);
 }
 
-Region::Region(int x_, int y_, int w_, int h_) :
+Region::Region(int x_, int y_, int w_, int h_, int screen_id_) :
    Rectangle(x_,y_,w_,h_) {
-   init();
+   init(screen_id_);
 }
 
-Region::Region(int screen_id_, int x_, int y_, int w_, int h_) :
-Rectangle(x_,y_,w_,h_) {
-   init();
-   _screen_id = screen_id_;
-}
-
-
-Region::Region(const Rectangle& r) : Rectangle(r) {
-   init();
-}
-
-Region::Region(int screen_id, const Rectangle& r) : Rectangle(r) {
-   init();
-   _screen_id = screen_id;
-   xo = 0;
-   yo = 0;
+Region::Region(const Rectangle& r, int screen_id) : Rectangle(r) {
+   init(screen_id);
 }
 
 Region::Region(const Region& r) : Rectangle(r) {
-   init();
-   _screen_id = r._screen_id;
+   init(r._screen_id);
    xo = r.xo;
    yo = r.yo;
 }
@@ -124,7 +96,6 @@ Region::~Region(){
    if (_pLastMatches != NULL)
       delete _pLastMatches;
 }
-
 
 Region 
 Region::inner(int x_, int y_, int w_, int h_){
@@ -140,10 +111,12 @@ Region::inner(int x_, int y_, int w_, int h_){
 }
 
 void
-Region::init(){
-   _screen_id = 0;
+Region::init(int screen_id){
+   _screen_id = screen_id;
    _pLastMatch = NULL;
    _pLastMatches = NULL;   
+   xo = 0;
+   yo = 0;
 }
 
 void
@@ -157,31 +130,31 @@ Region::operator==(const Region& r){
    return true;
 }
 
-Rectangle 
-Region::getROI(){ 
-   return Rectangle(x,y,w,h); 
-}
-   
-void 
-Region::setROI(int X, int Y, int W, int H){
-   x = X;   y = Y;   w = W;   h = H;
-}
-
-void 
-Region::setROI(Region roi){
-   x = roi.x;
-   y = roi.y;
-   w = roi.w;
-   h = roi.h;
-}
-
-void 
-Region::setROI(Rectangle roi){
-   x = (int)roi.x;
-   y = (int)roi.y;
-   w = (int)roi.w;
-   h = (int)roi.h;
-} 
+//Rectangle 
+//Region::getROI(){ 
+//   return Rectangle(x,y,w,h); 
+//}
+//   
+//void 
+//Region::setROI(int X, int Y, int W, int H){
+//   x = X;   y = Y;   w = W;   h = H;
+//}
+//
+//void 
+//Region::setROI(Region roi){
+//   x = roi.x;
+//   y = roi.y;
+//   w = roi.w;
+//   h = roi.h;
+//}
+//
+//void 
+//Region::setROI(Rectangle roi){
+//   x = (int)roi.x;
+//   y = (int)roi.y;
+//   w = (int)roi.w;
+//   h = (int)roi.h;
+//} 
 
 Location 
 Region::getCenter() const{ 
@@ -189,17 +162,17 @@ Region::getCenter() const{
 }
 
 
-Location 
-Region::toRobotCoord(Location l){
-   return Location(l.x - x, l.y - y);
-}
-
-Match 
-Region::toGlobalCoord(Match m){
-   m.x += x;
-   m.y += y;
-   return m;
-}
+//Location 
+//Region::toRobotCoord(Location l){
+//   return Location(l.x - x, l.y - y);
+//}
+//
+//Match 
+//Region::toGlobalCoord(Match m){
+//   m.x += x;
+//   m.y += y;
+//   return m;
+//}
 
 
 ScreenImage
@@ -622,7 +595,7 @@ Region::findAllNow(const char* imgURL) throw(FindFailed){
    
 
 #include <time.h>
-#define CLOCKS_PER_MSEC ((long)CLOCKS_PER_SEC/(long)1000)
+//#define CLOCKS_PER_MSEC ((long)CLOCKS_PER_SEC/(long)1000)
 
 Match
 Region::wait(Pattern target) throw(FindFailed){
@@ -651,10 +624,10 @@ Region::try_for_n_seconds(callback func, Pattern target, int seconds){
          return ms;
       
       long actual_clocks_per_scan = clock() - before_find;
-      long mseconds_to_delay = (max_clocks_per_scan - actual_clocks_per_scan)/CLOCKS_PER_MSEC;
+      long mseconds_to_delay = 1000*(max_clocks_per_scan - actual_clocks_per_scan)/CLOCKS_PER_SEC;
       Robot::delay(max((long)10, mseconds_to_delay));
       //cout << 1.0*(clock() - start)/ CLOCKS_PER_SEC << " seconds" << endl;
-      cout << (time(NULL) - start_time) << " seconds" << endl;
+      //cout << (time(NULL) - start_time) << " seconds" << endl;
    }        
    return ms;
 }
@@ -677,8 +650,6 @@ Region::wait(Pattern target, int seconds) throw(FindFailed){
       setLastMatch(ms[0]);
       return getLastMatch();
    }else {
-   
-  // if(Settings::ThrowException)
       throw FindFailed(target);
    }
 }
@@ -706,15 +677,11 @@ Region::waitAll_callback(Pattern target) {
 
 vector<Match>
 Region::waitAll(Pattern target, int seconds) throw(FindFailed){
-   vector<Match> ms = try_for_n_seconds(&Region::waitAll_callback, target, seconds);
-   
+   vector<Match> ms = try_for_n_seconds(&Region::waitAll_callback, target, seconds);   
    if (!ms.empty()){
-      return ms;
-   }else{
       setLastMatches(ms);
       return getLastMatches();
-   
-   //if(Settings::ThrowException)
+   }else{
       throw FindFailed(target);
    }
 }   
@@ -896,8 +863,8 @@ Region::getLocationFromPSRML(Location target){
 }
 
 void 
-Region::onEvent(int event_type, Pattern ptn, int handler_id){
-   Observer ob(event_type, ptn, handler_id);
+Region::onEvent(int event_type, Pattern ptn, SikuliEventHandler* handler){
+   Observer ob(event_type, ptn, handler);
    EventManager::addObserver(*this, ob);
 }
 
@@ -909,18 +876,18 @@ Region::onEvent(int event_type, Pattern ptn,  SikuliEventCallback func){
 }
 
 void 
-Region::onAppear(Pattern ptn, int handler_id){
-   onEvent(APPEAR, ptn, handler_id);
+Region::onAppear(Pattern ptn, SikuliEventHandler* handler){
+   onEvent(APPEAR, ptn, handler);
 }
 
 void 
-Region::onVanish(Pattern ptn, int handler_id){
-   onEvent(VANISH, ptn, handler_id);
+Region::onVanish(Pattern ptn, SikuliEventHandler* handler){
+   onEvent(VANISH, ptn, handler);
 }
 
 void 
-Region::onChange(int handler_id){
-   onEvent(CHANGE, Pattern(), handler_id);
+Region::onChange(SikuliEventHandler* handler){
+   onEvent(CHANGE, Pattern(), handler);
 }
 
 void 

@@ -32,6 +32,15 @@ void appear_and_stop_callback(Event event){
    cout << "stopping event manager.." << endl;
 }
 
+class VanishEventHandler : public SikuliEventHandler{
+  
+public:
+   virtual void handle(Event event){
+      cout << event.pattern.getImageURL() << " vanished from " << event.region.toString() << endl;
+  
+   }
+};
+
 class FlashTestSuite : public CxxTest::TestSuite 
 {
 public:
@@ -146,14 +155,14 @@ public:
 //
 //      TS_ASSERT(s.exists("success.png"));      
 //   }
-   
-   void testVanish(void)
-   {
-      switchToTest("TestVanish.png");
-      s.waitVanish("flower.png");
-      TS_ASSERT(!s.exists("flower.png",0)); 
-   }
-   
+//   
+//   void testVanish(void)
+//   {
+//      switchToTest("TestVanish.png");
+//      s.waitVanish("flower.png");
+//      TS_ASSERT(!s.exists("flower.png",0)); 
+//   }
+//   
 //   void testSpatialOp(void)
 //   {
 //      switchToTest("TestSpatialOp.png");
@@ -199,12 +208,12 @@ public:
 //      
 //   }
 //   
-//   void testPaste(void)
-//   {
-//      switchToTest("TestPaste.png");
-//      s.paste("paste_target.png", "paSte tHis text here!!!");
-//      TS_ASSERT(s.exists("success.png"));
-//   }
+   void testPaste(void)
+   {
+      switchToTest("TestPaste.png");
+      s.paste("paste_target.png", "paSte tHis text here!!!");
+      TS_ASSERT(s.exists("success.png"));
+   }
 //   
 //   void testEvent(void)
 //   {
@@ -215,7 +224,9 @@ public:
 //      Region r = s.inner(m.x,m.y,230,250);
 //      
 //      EventManager::addObserver(r, Observer(APPEAR, Pattern("computer.png"), &appear_callback));
-//      EventManager::addObserver(r, Observer(VANISH, Pattern("computer.png"), &vanish_callback));
+//      
+//      VanishEventHandler ve;
+//      EventManager::addObserver(r, Observer(VANISH, Pattern("computer.png"), &ve));
 //      
 //      r.onAppear(Pattern("flower.png"), &appear_callback);
 //      r.onVanish(Pattern("flower.png"), &vanish_callback);
@@ -225,6 +236,14 @@ public:
 //      EventManager::observe(10);
 // 
 //  
+//   }
+   
+   
+//   void testUnicode(void)
+//   {
+//      switchToTest("TestPaste.png");
+//      s.click("paste_target.png");
+//      s.paste("paSte tHis text here!!!");
 //   }
    
 };

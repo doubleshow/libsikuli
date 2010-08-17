@@ -173,11 +173,9 @@ public:
    static int type(int screen, int x, int y, const char* text, int modifiers = 0);
    
    static int press(int key, int modifiers = 0);
-   
    static int paste(const char* text);
    static int paste(int x, int y, const char* text);
    static int paste(int screen, int x, int y, const char* text);
-   
       
    static void mouseDown(int button);
    static void mouseUp(int button);

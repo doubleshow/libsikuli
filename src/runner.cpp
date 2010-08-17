@@ -19,12 +19,12 @@ int main() {
 static FlashTestSuite suite_FlashTestSuite;
 
 static CxxTest::List Tests_FlashTestSuite = { 0, 0 };
-CxxTest::StaticSuiteDescription suiteDescription_FlashTestSuite( "FlashTestSuite.h", 35, "FlashTestSuite", suite_FlashTestSuite, Tests_FlashTestSuite );
+CxxTest::StaticSuiteDescription suiteDescription_FlashTestSuite( "FlashTestSuite.h", 44, "FlashTestSuite", suite_FlashTestSuite, Tests_FlashTestSuite );
 
-static class TestDescription_FlashTestSuite_testVanish : public CxxTest::RealTestDescription {
+static class TestDescription_FlashTestSuite_testPaste : public CxxTest::RealTestDescription {
 public:
- TestDescription_FlashTestSuite_testVanish() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 150, "testVanish" ) {}
- void runTest() { suite_FlashTestSuite.testVanish(); }
-} testDescription_FlashTestSuite_testVanish;
+ TestDescription_FlashTestSuite_testPaste() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 211, "testPaste" ) {}
+ void runTest() { suite_FlashTestSuite.testPaste(); }
+} testDescription_FlashTestSuite_testPaste;
 
 #include <cxxtest/Root.cpp>

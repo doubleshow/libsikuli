@@ -79,7 +79,7 @@ public:
       return _filename;
    }
    
-   cv::Mat getMat() { return _image;};
+   cv::Mat getMat() { return _image;}
    
 private:
    
@@ -93,6 +93,7 @@ private:
    //
 class Match;
 class SikuliEventManager;
+class SikuliEventHandler;
 struct Event;
 typedef void (*SikuliEventCallback)(Event);
 
@@ -108,19 +109,30 @@ class Region : public Rectangle {
 
 public:
    
-   Region(int x_, int y_, int w_, int h_);
-   Region(int screen_id_, int x_, int y_, int w_, int h_);
+   Region(int x_, int y_, int w_, int h_, int screen_id_ = 0);
    Region(const Region& r);
-   Region(const Rectangle& r);
-   Region(int screen_id_, const Rectangle& r);
+   Region(const Rectangle& r, int screen_id_ = 0);
 
    Region();
-   ~Region();
+   ~Region();   
+   
+protected:
+   
+   void init(int screen_id);
+   void setScreenCoordinateOrigin(int x, int y);
+   
+   // top-left origin in the screen coordinate
+   int xo;
+   int yo;
+   
+   int _screen_id;
+   
    
 //==================================================================
 // Setting/Getting Attributes
 //==================================================================
-   
+
+public:
    
    int getX(){ return x; }
    int getY(){ return y; }
@@ -135,10 +147,10 @@ public:
    
    
    // Deprecated
-   Rectangle getROI();
-   void setROI(int X, int Y, int W, int H);
-   void setROI(Region roi);
-   void setROI(Rectangle roi);
+//   Rectangle getROI();
+//   void setROI(int X, int Y, int W, int H);
+//   void setROI(Region roi);
+//   void setROI(Rectangle roi);
    
   
    // Compare whether two regions are spatially equivalent. Two
@@ -358,9 +370,9 @@ private:
 //==================================================================
 public:
    
-   void onAppear(Pattern ptn, int handler_id);
-   void onVanish(Pattern ptn, int handler_id);
-   void onChange(int handler_id);
+   void onAppear(Pattern ptn, SikuliEventHandler* handler);
+   void onVanish(Pattern ptn, SikuliEventHandler* handler);
+   void onChange(SikuliEventHandler* handler);
    
    void onAppear(Pattern ptn, SikuliEventCallback func);
    void onVanish(Pattern ptn, SikuliEventCallback func);
@@ -368,28 +380,9 @@ public:
    
 private:
    
-   void onEvent(int event_type, Pattern ptn, int handler_id);
+   void onEvent(int event_type, Pattern ptn, SikuliEventHandler* handler);
    void onEvent(int event_type, Pattern ptn, SikuliEventCallback func);
-      
-protected:
-
-   void init();
-   void setScreenCoordinateOrigin(int x, int y);
-   
-   // top-left origin in the screen coordinate
-   int xo;
-   int yo;
-   
-   
-
-   int _screen_id;
-
-private:
-      
-   Location toRobotCoord(Location l);
-   Match toGlobalCoord(Match m);
-   
-   
+         
 };
    
 
@@ -400,9 +393,8 @@ public:
    
    Match();
    ~Match();
+   
    Match(const Region& r, double _score);
-   Match(int _x, int _y, int _w, int _h, double _score);
-   Match(int _screen_id, int _x, int _y, int _w, int _h, double _score);
    Match(const Match& m);
    
    int compareTo(const Match& m);

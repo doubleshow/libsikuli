@@ -1,4 +1,4 @@
-%module sikuli
+%module(directors="1") sikuli
 %{
 #define SWIG_FILE_WITH_INI
 #include "sikuli.h"
@@ -27,6 +27,8 @@ def _swig_setattr_nondynamic(self,class_type,name,value,static=1):
 %include "std_vector.i"
 %template(Matches) std::vector<sikuli::Match>;
 
+%feature("director") sikuli::SikuliEventHandler;   
+   
 %include "sikuli.h"
 %include "keys.h"
 %include "pattern.h"
@@ -34,6 +36,8 @@ def _swig_setattr_nondynamic(self,class_type,name,value,static=1):
 %include "region.h"
 %include "screen.h"
 %include "settings.h"
+%include "exceptions.h"
+%include "event-manager.h"
 
    
 %pythoncode

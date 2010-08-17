@@ -11,6 +11,7 @@
 #include "keys.h"
 #include "screen.h"
 #include "settings.h"
+#include "event-manager.h"
 
 namespace sikuli{
 

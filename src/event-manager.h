@@ -13,13 +13,11 @@
 #include "region.h"
 
 using namespace std;
-using namespace cv;
 
 namespace sikuli{
 
 struct Event{
    int type;
-   int handler_id;
    Pattern pattern;
    Match match; 
    Region region;
@@ -30,9 +28,17 @@ enum SikuliEventType{
    VANISH,
    CHANGE
 };
-
-
+   
+   
 typedef void  (*SikuliEventCallback)(Event event);
+
+   
+class SikuliEventHandler {
+public:
+   SikuliEventHandler(){};
+   virtual ~SikuliEventHandler(){};
+   virtual void handle(Event event) {};
+};
    
 class Observer{
    
@@ -40,18 +46,16 @@ public:
    
    // handler_id allows higher-level scripting language wrapper
    // to implement its own callback mechanism
-   Observer(int event_type, Pattern ptn, int handler_id);
-   
+   Observer(int event_type, Pattern ptn, SikuliEventHandler* handler);
    Observer(int event_type, Pattern ptn, SikuliEventCallback func);
 
    ~Observer();
    
-   int event_type;
-   int handler_id;
-   
+   int event_type;   
    Pattern pattern;
-   Mat param_image;
+
    SikuliEventCallback callback;
+   SikuliEventHandler* event_handler;
    
    bool active;
 };
@@ -76,7 +80,7 @@ private:
    // The screen image captured of the region in the previous
    // time step. It is compared to the current frame to detect
    // changes.
-   Mat prev_screen_image;
+   cv::Mat prev_screen_image;
    vector<Observer> observers;
 };
 
