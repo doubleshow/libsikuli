@@ -48,6 +48,7 @@ public:
    // to implement its own callback mechanism
    Observer(int event_type, Pattern ptn, SikuliEventHandler* handler);
    Observer(int event_type, Pattern ptn, SikuliEventCallback func);
+   Observer(const Observer& ob);
 
    ~Observer();
    

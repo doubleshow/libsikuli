@@ -17,7 +17,7 @@
 #include "event-manager.h"
 
 
-#define dout if (1) cout
+#define dout if (0) cout
 
 using namespace sikuli;
 
@@ -566,7 +566,7 @@ Region::findNow(const char* imgURL) throw(FindFailed){
 vector<Match> 
 Region::findAllNow(Pattern ptn) throw(FindFailed){
    // ToDo: adjust capturing region for multi-monitor
-   cout << "[Region::findAll] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;   
+   dout << "[Region::findAll] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;   
    ScreenImage simg = capture();
    
    vector<FindResult> results = Vision::find(simg, ptn.all());
@@ -582,7 +582,7 @@ Region::findAllNow(Pattern ptn) throw(FindFailed){
    for (int i=0;i<matches.size();++i)
       matches[i].setTargetOffset(ptn.getTargetOffset());
  
-   cout << "[Region::findAll] Found " << matches.size() << " matches" << endl;
+   dout << "[Region::findAll] Found " << matches.size() << " matches" << endl;
    if (matches.empty())
       throw FindFailed(ptn);
    return matches;

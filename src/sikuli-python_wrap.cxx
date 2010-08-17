@@ -18873,7 +18873,6 @@ SWIGINTERN PyObject *_wrap_SikuliEventHandler_handle(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj1 = 0 ;
   Swig::Director *director = 0;
   bool upcall = false;
-  
   if (!PyArg_ParseTuple(args,(char *)"OO:SikuliEventHandler_handle",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__SikuliEventHandler, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
@@ -19038,6 +19037,31 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_new_Observer__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::Observer *arg1 = 0 ;
+  sikuli::Observer *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:new_Observer",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_sikuli__Observer,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_Observer" "', argument " "1"" of type '" "sikuli::Observer const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_Observer" "', argument " "1"" of type '" "sikuli::Observer const &""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::Observer * >(argp1);
+  result = (sikuli::Observer *)new sikuli::Observer((sikuli::Observer const &)*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sikuli__Observer, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_new_Observer(PyObject *self, PyObject *args) {
   int argc;
   PyObject *argv[4];
@@ -19048,23 +19072,12 @@ SWIGINTERN PyObject *_wrap_new_Observer(PyObject *self, PyObject *args) {
   for (ii = 0; (ii < argc) && (ii < 3); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
   }
-  if (argc == 3) {
+  if (argc == 1) {
     int _v;
-    {
-      int res = SWIG_AsVal_int(argv[0], NULL);
-      _v = SWIG_CheckState(res);
-    }
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_sikuli__Observer, 0);
+    _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_sikuli__Pattern, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        void *vptr = 0;
-        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_sikuli__SikuliEventHandler, 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          return _wrap_new_Observer__SWIG_0(self, args);
-        }
-      }
+      return _wrap_new_Observer__SWIG_2(self, args);
     }
   }
   if (argc == 3) {
@@ -19086,9 +19099,28 @@ SWIGINTERN PyObject *_wrap_new_Observer(PyObject *self, PyObject *args) {
       }
     }
   }
+  if (argc == 3) {
+    int _v;
+    {
+      int res = SWIG_AsVal_int(argv[0], NULL);
+      _v = SWIG_CheckState(res);
+    }
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_sikuli__Pattern, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_sikuli__SikuliEventHandler, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_new_Observer__SWIG_0(self, args);
+        }
+      }
+    }
+  }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_Observer'.\n  Possible C/C++ prototypes are:\n    sikuli::Observer(int,sikuli::Pattern,sikuli::SikuliEventHandler *)\n    sikuli::Observer(int,sikuli::Pattern,sikuli::SikuliEventCallback)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_Observer'.\n  Possible C/C++ prototypes are:\n    sikuli::Observer(int,sikuli::Pattern,sikuli::SikuliEventHandler *)\n    sikuli::Observer(int,sikuli::Pattern,sikuli::SikuliEventCallback)\n    sikuli::Observer(sikuli::Observer const &)\n");
   return NULL;
 }
 

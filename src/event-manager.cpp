@@ -37,8 +37,8 @@ EventManager::addObserver(Region r, Observer observer){
 void
 EventManager::observe(int seconds, bool background){
    bObserving = true;
-   long clocks_limit = clock() + seconds * CLOCKS_PER_SEC;   
-   while (clock() < clocks_limit && bObserving){
+   time_t time_limit = time(NULL) + seconds;
+   while (time(NULL) < time_limit && bObserving){
       EventManager::update(); 
       Robot::delay(100);
    }
@@ -51,7 +51,6 @@ EventManager::stop(){
 
 vector<Event> 
 EventManager::update(){
-   
    vector<Event> all_events;
    
    for (vector<RegionObserver>::iterator rob = region_observers.begin(); 
@@ -85,7 +84,7 @@ RegionObserver::~RegionObserver(){
 
 vector<Event> 
 RegionObserver::observe(){
-   
+
    Match top_match;
    
    vector<Event> events;
@@ -107,8 +106,6 @@ RegionObserver::observe(){
          prev_screen_image = current_screen_image;
          
          if (score > CHANGE_THRESHOLD){
-            //cout << score << endl;
-            
             e.type = ob.event_type;
             e.region = region;
             triggered = true;
@@ -118,7 +115,6 @@ RegionObserver::observe(){
       else if (ob.event_type == APPEAR){
             
             try{
-               
                top_match = region.findNow(ob.pattern);
                
                if (!ob.active){
@@ -159,15 +155,15 @@ RegionObserver::observe(){
             }
       }
 
-            
       if (triggered){
-         events.push_back(e);
          
+         events.push_back(e);
          if (ob.callback)
             (*ob.callback)(e);
          
-         if (ob.event_handler)
+         if (ob.event_handler){
             ob.event_handler->handle(e);
+         }
       }
       
    }   
@@ -193,6 +189,14 @@ Observer::Observer(int event_type_, Pattern ptn, SikuliEventHandler* handler){
    event_handler = handler;
    active = false;
    pattern = ptn;
+}
+
+Observer::Observer(const Observer& ob){
+   event_type = ob.event_type;
+   callback = ob.callback;
+   event_handler = ob.event_handler;
+   active = ob.active;
+   pattern = ob.pattern;   
 }
 
 Observer::~Observer(){

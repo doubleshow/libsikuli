@@ -6,10 +6,66 @@ Settings.addImagePath("images")
 click("SikuliTester.png")
 time.sleep(1)
 
+sikuli_event_handler_global_array = []
+
+class SikuliCallbackEventHandler(SikuliEventHandler):
+
+    def __init__(self, handler):
+        SikuliEventHandler.__init__(self)
+        self.handler = handler
+
+    def handle(self, event):
+        self.handler(event)
+
+Region_onAppear_old = Region.onAppear
+def Region_onAppear(self, target, handler):
+    ae = SikuliCallbackEventHandler(handler)
+
+    # Keep a reference to the handler in a 
+    # global array. This is a trick to 
+    # to keep handler objects in memory 
+    # so that they don't get garbage collected 
+    # after the call is returned
+    sikuli_event_handler_global_array.append(ae)
+
+    return Region_onAppear_old(self, target, ae)
+Region.onAppear = Region_onAppear
+
+Region_onVanish_old = Region.onVanish
+def Region_onVanish(self, target, handler):
+    ae = SikuliCallbackEventHandler(handler)
+    sikuli_event_handler_global_array.append(ae)
+    return Region_onVanish_old(self, target, ae)
+Region.onVanish = Region_onVanish
+
+Region_onChange_old = Region.onChange
+def Region_onChange(self, handler):
+    ae = SikuliCallbackEventHandler(handler)
+    sikuli_event_handler_global_array.append(ae)
+    return Region_onChange_old(self, ae)
+Region.onChange = Region_onChange
+
+
+
+
+
 def switchToTest(x):
     click(x)
     time.sleep(1)
 
+def appear_callback(event):
+    print event.pattern.getImageURL() + " appeared!"
+
+def vanish_callback(event):
+    print event.pattern.getImageURL() + " vanished!"
+
+def appear_and_stop_callback(event):
+    print event.pattern.getImageURL() + " appeared!"
+    EventManager.stop()
+    print "stopping event manager.."
+
+def change_callback(event):
+    print "change is detected"
 
 class TestFlash(unittest.TestCase):
     def setUp(self):
@@ -148,7 +204,22 @@ class TestFlash(unittest.TestCase):
         paste("paste_target.png", "paSte tHis text here!!!")
         self.assertTrue(exists("success.png"))
   
-  
+    def test_event(self):
+        switchToTest("TestEvent.png")
+        m = find("SikuliTester.png")
+        r = inner(m.x,m.y,230,250)
+
+        r.onChange(change_callback)
+    
+        r.onAppear(Pattern("computer.png"), appear_callback)
+        r.onVanish(Pattern("computer.png"), vanish_callback)
+
+        r.onAppear(Pattern("flower.png"), appear_callback)
+        r.onVanish(Pattern("flower.png"), vanish_callback)
+
+        r.onAppear(Pattern("bug.png"), appear_and_stop_callback)
+
+        EventManager.observe(20)
   
 if __name__ == '__main__':
     unittest.main()

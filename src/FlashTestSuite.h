@@ -208,35 +208,35 @@ public:
 //      
 //   }
 //   
-   void testPaste(void)
-   {
-      switchToTest("TestPaste.png");
-      s.paste("paste_target.png", "paSte tHis text here!!!");
-      TS_ASSERT(s.exists("success.png"));
-   }
-//   
-//   void testEvent(void)
+//   void testPaste(void)
 //   {
-//      switchToTest("TestEvent.png");
-//      
-//      Match m = s.find("SikuliTester.png");
-//      
-//      Region r = s.inner(m.x,m.y,230,250);
-//      
+//      switchToTest("TestPaste.png");
+//      s.paste("paste_target.png", "paSte tHis text here!!!");
+//      TS_ASSERT(s.exists("success.png"));
+//   }
+//   
+   void testEvent(void)
+   {
+      switchToTest("TestEvent.png");
+      
+      Match m = s.find("SikuliTester.png");
+      
+      Region r = s.inner(m.x,m.y,230,250);
+      
 //      EventManager::addObserver(r, Observer(APPEAR, Pattern("computer.png"), &appear_callback));
-//      
-//      VanishEventHandler ve;
+      
+      VanishEventHandler ve;
 //      EventManager::addObserver(r, Observer(VANISH, Pattern("computer.png"), &ve));
 //      
 //      r.onAppear(Pattern("flower.png"), &appear_callback);
-//      r.onVanish(Pattern("flower.png"), &vanish_callback);
-//      
+      r.onVanish(Pattern("flower.png"), &ve);
+      
 //      r.onAppear(Pattern("bug.png"), &appear_and_stop_callback);
-//      
-//      EventManager::observe(10);
-// 
-//  
-//   }
+      
+      EventManager::observe(2);
+ 
+  
+   }
    
    
 //   void testUnicode(void)
