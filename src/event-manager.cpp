@@ -40,7 +40,7 @@ EventManager::observe(int seconds, bool background){
    time_t time_limit = time(NULL) + seconds;
    while (time(NULL) < time_limit && bObserving){
       EventManager::update(); 
-      Robot::delay(100);
+      //Robot::delay(100);
    }
 }
 

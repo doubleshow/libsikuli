@@ -22,7 +22,7 @@ bool Robot::_dragged = false;
 int
 Robot::click(int screen, int x, int y, int buttons, int modifiers, bool dblClick){
    mouseMove(screen, x, y);
-   delay(20);
+   delay(10);
    return click(buttons, modifiers, dblClick);
 }
 
@@ -478,10 +478,10 @@ Robot::mouseMoveFromTo(int x0, int y0, int x1, int y1, bool dragged){
       int xi = x0 + i * xstep;
       int yi = y0 + i * ystep;
       mouseMoveTo(xi,yi,dragged);
-      Robot::delay(50);
+      //Robot::delay(50);
    }
    mouseMoveTo(x1,y1,dragged);
-   Robot::delay(50);
+   //Robot::delay(50);
 }
 
 
@@ -769,9 +769,6 @@ using namespace cv;
 
 #include "glgrab.h"
 
-
- 
-
 Mat
 Robot::capture(int screen){
    CGDirectDisplayID dspyID;
@@ -791,11 +788,15 @@ Robot::capture(int screen, int x, int y, int w, int h){
    CGRect bounds = CGDisplayBounds(dspyID);   
    
    // flip y coordinate vertically
-   int y0 = bounds.size.height - y - h;
+   //int y0 = bounds.size.height - y - h;
    
-   CGRect rect = CGRectMake(x,y0,w,h);
-   CGImageRef imgRef = grabViaOpenGL(dspyID, rect);
+   CGRect rect = CGRectMake(x+bounds.origin.x,y+bounds.origin.y,w,h);
 
+   CGImageRef imgRef;
+   imgRef = CGWindowListCreateImage(rect, 
+                                    kCGWindowListOptionOnScreenOnly, 
+                                    kCGNullWindowID, kCGWindowImageDefault);
+   
    const int imgh = CGImageGetHeight(imgRef);
    const int imgw = CGImageGetWidth(imgRef);
    
@@ -805,24 +806,42 @@ Robot::capture(int screen, int x, int y, int w, int h){
    CFDataRef imageData = CGDataProviderCopyData(CGImageGetDataProvider(imgRef)); 
    UInt8* buffer = new UInt8[CFDataGetLength(imageData)];
    CFDataGetBytes(imageData, CFRangeMake(0,CFDataGetLength(imageData)), buffer);
-   
    CGImageRelease(imgRef);
+   CFRelease(imageData);
    
-   IplImage* img = cvCreateImageHeader(cvSize(imgw,imgh),8,bpp/8); //create the "shell"   
-   cvSetData(img, buffer, bpr);    //set the buffer
    
-   Mat argb(img);
-   Mat bgr( argb.rows, argb.cols, CV_8UC3 );
-   Mat alpha( argb.rows, argb.cols, CV_8UC1 );
    
-   Mat out[] = { bgr, alpha };
-   int from_to[] = { 1,2,  2,1,  3,0,  0,3 };
-   mixChannels( &argb, 1, out, 2, from_to, 4 ); 
- 
+   Mat bgra(cv::Size(imgw,imgh), CV_8UC4, buffer, bpr);
+   Mat bgr( bgra.rows, bgra.cols, CV_8UC3 );
+   cvtColor(bgra,bgr,CV_RGBA2RGB);
+   // 
    delete buffer;
-   cvReleaseImageHeader(&img);
-   
+   //namedWindow("test");
+//   imshow("test",bgr);
+//   waitKey(0);
+//   
    return bgr;
+   //
+//   //
+////   IplImage* img = cvCreateImageHeader(cvSize(imgw,imgh),8,bpp/8); //create the "shell"   
+////   cvSetData(img, buffer, bpr);    //set the buffer
+//   
+//   //Mat argb(img);
+//   Mat bgr( argb.rows, argb.cols, CV_8UC3 );
+//   Mat alpha( argb.rows, argb.cols, CV_8UC1 );
+//   
+//   Mat out[] = { bgr, alpha };
+//   int from_to[] = { 1,2,  2,1,  3,0,  0,3 };
+//   mixChannels( &argb, 1, out, 2, from_to, 4 ); 
+//   
+//   namedWindow("test");
+//   imshow("test",argb);
+//   waitKey(0);
+//// 
+//   delete buffer;
+//   //cvReleaseImageHeader(&img);
+//   
+//   return bgr;
 }
 
 void

@@ -219,7 +219,7 @@ Region::doubleClick(int modifiers){
 
 int 
 Region::doubleClick(Location target, int modifiers){
-   return Robot::click(_screen_id, target.x,target.y, BUTTON1_MASK, modifiers, true);   
+   return Robot::click(_screen_id, xo+x+target.x,  yo+y+target.y, BUTTON1_MASK, modifiers, true);   
 }
 
 int 
@@ -249,7 +249,7 @@ Region::rightClick(int modifiers){
 
 int 
 Region::rightClick(Location target, int modifiers){
-   return Robot::click(_screen_id, target.x, target.y, BUTTON3_MASK, modifiers, false);
+   return Robot::click(_screen_id, xo+x+target.x,  yo+y+target.y, BUTTON3_MASK, modifiers, false);
 }
 
 int 
@@ -274,11 +274,11 @@ Region::rightClick(Match& target, int modifiers){
 
 int 
 Region::hover(Location target){
-   return Robot::hover(_screen_id, target.x, target.y);
+   return Robot::hover(_screen_id,  xo+x+target.x, yo+y+target.y);
 }
 
 int 
-Region::hover(Pattern& target){
+Region::hover(Pattern target){
    return hover(getLocationFromPSRML(target));
 }
 
@@ -288,19 +288,20 @@ Region::hover(const char* target){
 }
 
 int 
-Region::hover(Region& target){
+Region::hover(Region target){
    return hover(getLocationFromPSRML(target));
 }
 
 int 
-Region::hover(Match& target){
+Region::hover(Match target){
    return hover(getLocationFromPSRML(target));
 }
 
 int 
 Region::dragDrop(Location t1, Location t2, int modifiers){
    // TODO: support cross-monitor drag-drop
-   return Robot::dragDrop(_screen_id, t1.x,t1.y,_screen_id, t2.x,t2.y,modifiers);
+   return Robot::dragDrop(_screen_id, xo+x+t1.x,yo+y+t1.y,_screen_id, 
+                          xo+x+t2.x,yo+y+t2.y,modifiers);
 }
 
 int 
@@ -334,7 +335,7 @@ Region::dragDrop(Match& t1, Match& t2, int modifiers){
 
 int
 Region::drag(Location target){
-   return Robot::drag(_screen_id, target.x, target.y);
+   return Robot::drag(_screen_id, xo+x+target.x,  yo+y+target.y);
 }
 
 int 
@@ -359,7 +360,7 @@ Region::drag(Match& target){
 
 int
 Region::dropAt(Location target, double delay){
-   return Robot::dropAt(_screen_id, target.x, target.y);
+   return Robot::dropAt(_screen_id, xo+x+target.x,  yo+y+target.y);
 }
 
 int 
@@ -389,7 +390,7 @@ Region::paste(const char* text){
 
 int
 Region::paste(const Location& target, const char* text){
-   return Robot::paste(_screen_id, target.x,target.y,text);
+   return Robot::paste(_screen_id, xo+x+target.x, yo+y+target.y,text);
 }
 
 int
@@ -424,7 +425,7 @@ Region::type(const char* text, int modifiers){
 
 int
 Region::type(Location target, const char* text, int modifiers){
-   return Robot::type(_screen_id, target.x, target.y, text, modifiers);
+   return Robot::type(_screen_id, xo+x+target.x, yo+y+target.y, text, modifiers);
 }
 
 int
@@ -615,7 +616,7 @@ Region::try_for_n_seconds(callback func, Pattern target, int seconds){
    time_t time_limit = time(NULL) + seconds;
    time_t start_time;
    start_time = time(NULL);
-   while (time(NULL) < time_limit){
+   do {
       //while (clock() < clocks_limit){
       long before_find = clock();
       
@@ -625,10 +626,12 @@ Region::try_for_n_seconds(callback func, Pattern target, int seconds){
       
       long actual_clocks_per_scan = clock() - before_find;
       long mseconds_to_delay = 1000*(max_clocks_per_scan - actual_clocks_per_scan)/CLOCKS_PER_SEC;
-      Robot::delay(max((long)10, mseconds_to_delay));
+      
+      //if (seconds > 0)
+         Robot::delay(max((long)10, mseconds_to_delay));
       //cout << 1.0*(clock() - start)/ CLOCKS_PER_SEC << " seconds" << endl;
       //cout << (time(NULL) - start_time) << " seconds" << endl;
-   }        
+   } while (time(NULL) < time_limit);
    return ms;
 }
 
@@ -695,7 +698,11 @@ Region::waitAll(const char* target, int seconds) throw(FindFailed){
 bool
 Region::exists(Pattern target, int seconds){
    try{
-      wait(target, seconds);
+      if (seconds == 0)
+         findNow(target);
+      else
+         wait(target, seconds);
+      
       return true;
    }catch (FindFailed ff){
       return false;

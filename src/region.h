@@ -259,10 +259,10 @@ public:
    int rightClick(Match& target, int modifiers = 0);
    
    int hover(Location target);
-   int hover(Pattern& target);
+   int hover(Pattern target);
    int hover(const char* target);
-   int hover(Region& target);
-   int hover(Match& target);
+   int hover(Region target);
+   int hover(Match target);
 
    int dragDrop(Location t1, Location t2, int modifiers = 0);
    int dragDrop(Pattern& t1, Pattern& t2, int modifiers = 0);

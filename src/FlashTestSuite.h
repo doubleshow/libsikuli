@@ -15,6 +15,7 @@ using namespace sikuli;
 
 void appear_callback(Event event){
    cout << event.pattern.getImageURL() << " appeared in " << event.region.toString() << endl;
+   event.region.hover(event.match);
 }
 
 void vanish_callback(Event event){
@@ -36,10 +37,15 @@ class VanishEventHandler : public SikuliEventHandler{
   
 public:
    virtual void handle(Event event){
-      cout << event.pattern.getImageURL() << " vanished from " << event.region.toString() << endl;
-  
+      cout << event.pattern.getImageURL() << " vanished from " << event.region.toString() << endl;  
    }
 };
+
+void wack(Event event){
+   cout << event.pattern.getImageURL() << " appeared in " << event.region.toString() << endl;
+   event.region.click(event.match);
+}
+
 
 class FlashTestSuite : public CxxTest::TestSuite 
 {
@@ -215,27 +221,53 @@ public:
 //      TS_ASSERT(s.exists("success.png"));
 //   }
 //   
-   void testEvent(void)
-   {
-      switchToTest("TestEvent.png");
-      
-      Match m = s.find("SikuliTester.png");
-      
-      Region r = s.inner(m.x,m.y,230,250);
-      
+//   void testEvent(void)
+//   {
+//      switchToTest("TestEvent.png");
+//      
+//      Match m = s.find("SikuliTester.png");
+//      
+//      Region r = s.inner(m.x,m.y,230,250);
+//      
 //      EventManager::addObserver(r, Observer(APPEAR, Pattern("computer.png"), &appear_callback));
-      
-      VanishEventHandler ve;
+//      
+//      VanishEventHandler ve;
 //      EventManager::addObserver(r, Observer(VANISH, Pattern("computer.png"), &ve));
 //      
 //      r.onAppear(Pattern("flower.png"), &appear_callback);
-      r.onVanish(Pattern("flower.png"), &ve);
-      
-//      r.onAppear(Pattern("bug.png"), &appear_and_stop_callback);
-      
-      EventManager::observe(2);
+//      r.onVanish(Pattern("flower.png"), &ve);
+//      
+//      r.onAppear(Pattern("bug.png"), &appear_and_stop_callback);      
+//      EventManager::observe(20);
+// 
+//  
+//   }
+   
+   void testWakAMole(void)
+   {
+      Match g = s.find("startpage.png");
+      g.click("play.png");
  
-  
+      while (!g.exists("enter.png",0)){
+         try{
+            
+            vector<Match> ms = g.findAllNow(Pattern("mole.png"));
+            cout << ms.size() << ": ------" << endl;
+            for (int j=0;j<ms.size();++j){
+               g.click(ms[j]);
+               cout << ms[j].toString() << endl; 
+            }
+            
+            if (ms.size()>0)
+               Robot::delay(200);
+            
+         }catch (FindFailed ff){
+            
+         }
+         
+         
+      }
+      
    }
    
    

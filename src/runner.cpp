@@ -19,12 +19,12 @@ int main() {
 static FlashTestSuite suite_FlashTestSuite;
 
 static CxxTest::List Tests_FlashTestSuite = { 0, 0 };
-CxxTest::StaticSuiteDescription suiteDescription_FlashTestSuite( "FlashTestSuite.h", 44, "FlashTestSuite", suite_FlashTestSuite, Tests_FlashTestSuite );
+CxxTest::StaticSuiteDescription suiteDescription_FlashTestSuite( "FlashTestSuite.h", 45, "FlashTestSuite", suite_FlashTestSuite, Tests_FlashTestSuite );
 
-static class TestDescription_FlashTestSuite_testEvent : public CxxTest::RealTestDescription {
+static class TestDescription_FlashTestSuite_testWakAMole : public CxxTest::RealTestDescription {
 public:
- TestDescription_FlashTestSuite_testEvent() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 218, "testEvent" ) {}
- void runTest() { suite_FlashTestSuite.testEvent(); }
-} testDescription_FlashTestSuite_testEvent;
+ TestDescription_FlashTestSuite_testWakAMole() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 241, "testWakAMole" ) {}
+ void runTest() { suite_FlashTestSuite.testWakAMole(); }
+} testDescription_FlashTestSuite_testWakAMole;
 
 #include <cxxtest/Root.cpp>
