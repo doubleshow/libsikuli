@@ -5,6 +5,7 @@
 #endif
 
 #define _CXXTEST_HAVE_STD
+#define _CXXTEST_HAVE_EH
 #include <cxxtest/TestListener.h>
 #include <cxxtest/TestTracker.h>
 #include <cxxtest/TestRunner.h>
@@ -19,12 +20,12 @@ int main() {
 static FlashTestSuite suite_FlashTestSuite;
 
 static CxxTest::List Tests_FlashTestSuite = { 0, 0 };
-CxxTest::StaticSuiteDescription suiteDescription_FlashTestSuite( "FlashTestSuite.h", 45, "FlashTestSuite", suite_FlashTestSuite, Tests_FlashTestSuite );
+CxxTest::StaticSuiteDescription suiteDescription_FlashTestSuite( "FlashTestSuite.h", 50, "FlashTestSuite", suite_FlashTestSuite, Tests_FlashTestSuite );
 
-static class TestDescription_FlashTestSuite_testWakAMole : public CxxTest::RealTestDescription {
+static class TestDescription_FlashTestSuite_testBejeweled : public CxxTest::RealTestDescription {
 public:
- TestDescription_FlashTestSuite_testWakAMole() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 241, "testWakAMole" ) {}
- void runTest() { suite_FlashTestSuite.testWakAMole(); }
-} testDescription_FlashTestSuite_testWakAMole;
+ TestDescription_FlashTestSuite_testBejeweled() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 273, "testBejeweled" ) {}
+ void runTest() { suite_FlashTestSuite.testBejeweled(); }
+} testDescription_FlashTestSuite_testBejeweled;
 
 #include <cxxtest/Root.cpp>

@@ -21,7 +21,7 @@ public:
    
    //static Match find(ScreenImage simg, Pattern ptn) throw(FindFailed);   
    //static vector<Match> findAll(ScreenImage simg, Pattern ptn) throw(FindFailed);
-   static vector<FindResult> find(ScreenImage simg, Pattern ptn) throw(FindFailed);
+   static vector<FindResult> find(ScreenImage simg, Pattern ptn);
 
    static double compare(cv::Mat m1, cv::Mat m2);
 

@@ -186,8 +186,8 @@ public:
    Match find(Pattern ptn) throw(FindFailed);
    Match find(const char* target) throw(FindFailed);
    
-   vector<Match> findAll(Pattern ptn) throw(FindFailed);
-   vector<Match> findAll(const char* imgURL) throw(FindFailed);
+   vector<Match> findAll(Pattern ptn);
+   vector<Match> findAll(const char* imgURL);
       
    Match wait(Pattern target) throw(FindFailed);
    Match wait(Pattern target, int seconds) throw(FindFailed);
@@ -209,11 +209,11 @@ public:
    Match findNow(Pattern ptn) throw(FindFailed);
    Match findNow(const char* imgURL) throw(FindFailed);
 
-   vector<Match> findAllNow(Pattern ptn) throw(FindFailed);
-   vector<Match> findAllNow(const char* imgURL) throw(FindFailed);
+   vector<Match> findAllNow(Pattern ptn);
+   vector<Match> findAllNow(const char* imgURL);
       
-   vector<Match> waitAll(Pattern target,  int seconds) throw(FindFailed);
-   vector<Match> waitAll(const char* target,  int seconds) throw(FindFailed);
+   vector<Match> waitAll(Pattern target,  int seconds);
+   vector<Match> waitAll(const char* target,  int seconds);
 
 private:
    

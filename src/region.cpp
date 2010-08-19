@@ -17,7 +17,7 @@
 #include "event-manager.h"
 
 
-#define dout if (0) cout
+#define dout if (1) cout
 
 using namespace sikuli;
 
@@ -503,9 +503,9 @@ Region::find(Pattern ptn) throw(FindFailed) {
    Match m;
    if (Settings::AutoWaitTimeout > 0)
       m = wait(ptn, Settings::AutoWaitTimeout);
-   else {
+   else
       m = findNow(ptn);
-   }
+   
    if (_pLastMatch == NULL)
       _pLastMatch = new Match();
    
@@ -519,14 +519,12 @@ Region::find(const char* imgURL) throw(FindFailed){
 }
 
 vector<Match> 
-Region::findAll(Pattern ptn) throw(FindFailed) {
+Region::findAll(Pattern ptn) {
    vector<Match> ms;
    if (Settings::AutoWaitTimeout > 0){
       ms = waitAll(ptn, Settings::AutoWaitTimeout);
    }else{
       ms  = findAllNow(ptn);
-      if (Settings::AutoWaitTimeout && ms.empty())
-         throw FindFailed(ptn);
    }
    if (_pLastMatches == NULL)
       _pLastMatches = new vector<Match>();
@@ -535,7 +533,7 @@ Region::findAll(Pattern ptn) throw(FindFailed) {
 }
 
 vector<Match> 
-Region::findAll(const char* imgURL) throw(FindFailed) {
+Region::findAll(const char* imgURL){
    return findAll(Pattern(imgURL));
 }
 
@@ -543,9 +541,14 @@ Region::findAll(const char* imgURL) throw(FindFailed) {
 Match 
 Region::findNow(Pattern ptn) throw(FindFailed){
    dout << "[Region::findNow] Searching in (" << xo+x << "," << yo+y << ")-(" << xo+x+w << "," << yo+y+h << ")" << endl;
-   ScreenImage simg = capture();//Robot::capture(0, x, y, w, h);
+   ScreenImage simg = capture();
    
-   FindResult r = Vision::find(simg, ptn)[0];
+   vector<FindResult> rs = Vision::find(simg, ptn);
+   
+   if (rs.empty())
+      throw FindFailed(ptn);
+   
+   FindResult r = rs[0];
    Match match(inner(r.x,r.y,r.w,r.h),r.score); 
 
    
@@ -553,9 +556,7 @@ Region::findNow(Pattern ptn) throw(FindFailed){
    //match.setTargetOffset(ptn.getTargetOffset());
  
    dout << "[Region::findNow] Found at (" << match.x << "," << match.y << "), score = " << match.getScore()  << endl;
-   
-   if (match.getScore() <= 0)
-      throw FindFailed(ptn);
+
    return match;
 }
 
@@ -565,7 +566,7 @@ Region::findNow(const char* imgURL) throw(FindFailed){
 }
 
 vector<Match> 
-Region::findAllNow(Pattern ptn) throw(FindFailed){
+Region::findAllNow(Pattern ptn){
    // ToDo: adjust capturing region for multi-monitor
    dout << "[Region::findAll] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;   
    ScreenImage simg = capture();
@@ -579,18 +580,15 @@ Region::findAllNow(Pattern ptn) throw(FindFailed){
       matches.push_back(match);
    }
    
-   
    for (int i=0;i<matches.size();++i)
       matches[i].setTargetOffset(ptn.getTargetOffset());
  
    dout << "[Region::findAll] Found " << matches.size() << " matches" << endl;
-   if (matches.empty())
-      throw FindFailed(ptn);
    return matches;
 }
 
 vector<Match> 
-Region::findAllNow(const char* imgURL) throw(FindFailed){
+Region::findAllNow(const char* imgURL){
    return findAllNow(Pattern(imgURL));
 }
    
@@ -630,7 +628,7 @@ Region::try_for_n_seconds(callback func, Pattern target, int seconds){
       //if (seconds > 0)
          Robot::delay(max((long)10, mseconds_to_delay));
       //cout << 1.0*(clock() - start)/ CLOCKS_PER_SEC << " seconds" << endl;
-      //cout << (time(NULL) - start_time) << " seconds" << endl;
+      cout << (time(NULL) - start_time) << " seconds" << endl;
    } while (time(NULL) < time_limit);
    return ms;
 }
@@ -679,7 +677,7 @@ Region::waitAll_callback(Pattern target) {
 
 
 vector<Match>
-Region::waitAll(Pattern target, int seconds) throw(FindFailed){
+Region::waitAll(Pattern target, int seconds){
    vector<Match> ms = try_for_n_seconds(&Region::waitAll_callback, target, seconds);   
    if (!ms.empty()){
       setLastMatches(ms);
@@ -691,7 +689,7 @@ Region::waitAll(Pattern target, int seconds) throw(FindFailed){
 
 
 vector<Match>
-Region::waitAll(const char* target, int seconds) throw(FindFailed){
+Region::waitAll(const char* target, int seconds){
    return waitAll(Pattern(target), seconds);
 }
 
