@@ -478,10 +478,10 @@ Robot::mouseMoveFromTo(int x0, int y0, int x1, int y1, bool dragged){
       int xi = x0 + i * xstep;
       int yi = y0 + i * ystep;
       mouseMoveTo(xi,yi,dragged);
-      //Robot::delay(50);
+      Robot::delay(10);
    }
    mouseMoveTo(x1,y1,dragged);
-   //Robot::delay(50);
+   Robot::delay(10);
 }
 
 

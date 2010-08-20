@@ -21,18 +21,20 @@ public:
    Screen s;
    
    void setUp() {
-      Robot::openApp("Google Chrome.app");
+     // Robot::openApp("Google Chrome.app");
       Settings::addImagePath("flash/images");
    }   
    
    void testFindInterfaces(void)
    {
       char str[] = "SikuliTester.png";
-      find(Pattern(str));
-      find(str);
+      try{
+      s.find(Pattern(str));
+      s.find(str);
       
-      findAll(Pattern(str));
-      findAll(str);
+      s.findAll(Pattern(str));
+      s.findAll(str);
+      }catch(...){}
    }
    
 };

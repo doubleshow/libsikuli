@@ -230,6 +230,9 @@ private:
    Location getLocationFromPSRML(Region target);
    Location getLocationFromPSRML(Match target);
    Location getLocationFromPSRML(Location target);   
+   
+   
+   bool findInteractive(Pattern target, Match& match) throw(FindFailed);
  
 //==================================================================
 // Automation Functions
@@ -238,37 +241,37 @@ private:
 public:
    
    int click(int modifiers = 0);
+   int click(Pattern target, int modifiers = 0) throw(FindFailed);
+   int click(const char* target, int modifiers = 0) throw(FindFailed);
    int click(Location target, int modifiers = 0);
-   int click(Pattern target, int modifiers = 0);
-   int click(const char* target, int modifiers = 0);
    int click(Region target, int modifiers = 0);
    int click(Match target, int modifiers = 0);
    
    int doubleClick(int modifiers = 0);
+   int doubleClick(Pattern target, int modifiers = 0) throw(FindFailed);
+   int doubleClick(const char* target, int modifiers = 0) throw(FindFailed);   
    int doubleClick(Location target, int modifiers = 0);
-   int doubleClick(Pattern& target, int modifiers = 0);
-   int doubleClick(const char* target, int modifiers = 0);
-   int doubleClick(Region& target, int modifiers = 0);
-   int doubleClick(Match& target, int modifiers = 0);
+   int doubleClick(Region target, int modifiers = 0);
+   int doubleClick(Match target, int modifiers = 0);
       
    int rightClick(int modifiers = 0);
+   int rightClick(Pattern target, int modifiers = 0) throw(FindFailed);
+   int rightClick(const char* target, int modifiers = 0) throw(FindFailed);
    int rightClick(Location target, int modifiers = 0);   
-   int rightClick(Pattern& target, int modifiers = 0);
-   int rightClick(const char* target, int modifiers = 0);
-   int rightClick(Region& target, int modifiers = 0);
-   int rightClick(Match& target, int modifiers = 0);
+   int rightClick(Region target, int modifiers = 0);
+   int rightClick(Match target, int modifiers = 0);
    
+   int hover(Pattern target) throw(FindFailed);
+   int hover(const char* target) throw(FindFailed);
    int hover(Location target);
-   int hover(Pattern target);
-   int hover(const char* target);
    int hover(Region target);
    int hover(Match target);
 
+   int dragDrop(Pattern t1, Pattern t2, int modifiers = 0) throw(FindFailed);
+   int dragDrop(const char* t1, const char* t2, int modifiers = 0) throw(FindFailed);
    int dragDrop(Location t1, Location t2, int modifiers = 0);
-   int dragDrop(Pattern& t1, Pattern& t2, int modifiers = 0);
-   int dragDrop(const char* t1, const char* t2, int modifiers = 0);
-   int dragDrop(Region& t1, Region& t2, int modifiers = 0);
-   int dragDrop(Match& t1, Match& t2, int modifiers = 0);
+   int dragDrop(Region t1, Region t2, int modifiers = 0);
+   int dragDrop(Match t1, Match t2, int modifiers = 0);
    
    int drag(Location target);
    int drag(Pattern& target);
@@ -284,10 +287,10 @@ public:
    
    int type(const char* text, int modifiers = 0);   
    int type(Location target, const char* text, int modifiers = 0);
-   int type(Pattern& target, const char* text, int modifiers = 0);
-   int type(const char* target, const char* text, int modifiers = 0);
-   int type(Region& target, const char* text, int modifiers = 0);
-   int type(Match& target, const char* text, int modifiers = 0);
+   int type(Pattern target, const char* text, int modifiers = 0) throw(FindFailed);
+   int type(const char* target, const char* text, int modifiers = 0) throw(FindFailed);
+   int type(Region target, const char* text, int modifiers = 0);
+   int type(Match target, const char* text, int modifiers = 0);
 
    int press(int key, int modifiers = 0);   
 //   int press(Location target, int key, int modifiers = 0);
@@ -297,11 +300,11 @@ public:
 //   int press(Match& target, int key, int modifiers = 0);
    
    int paste(const char* text);   
-   int paste(const Location& target, const char* text);
-   int paste(const Pattern& target, const char* text);
-   int paste(const char* target, const char* text);
-   int paste(const Region& target, const char* text);
-   int paste(const Match& target, const char* text);
+   int paste(const Location target, const char* text);
+   int paste(const Pattern target, const char* text) throw(FindFailed);
+   int paste(const char* target, const char* text) throw(FindFailed);
+   int paste(const Region target, const char* text);
+   int paste(const Match target, const char* text);
    
    void mouseDown(int buttons);
    void mouseUp(int buttons);

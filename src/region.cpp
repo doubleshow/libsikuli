@@ -17,7 +17,13 @@
 #include "event-manager.h"
 
 
-#define dout if (1) cout
+enum{
+   IGNORE,
+   RETRY,
+   ABORT
+};
+
+#define dout if (0) cout
 
 using namespace sikuli;
 
@@ -130,50 +136,10 @@ Region::operator==(const Region& r){
    return true;
 }
 
-//Rectangle 
-//Region::getROI(){ 
-//   return Rectangle(x,y,w,h); 
-//}
-//   
-//void 
-//Region::setROI(int X, int Y, int W, int H){
-//   x = X;   y = Y;   w = W;   h = H;
-//}
-//
-//void 
-//Region::setROI(Region roi){
-//   x = roi.x;
-//   y = roi.y;
-//   w = roi.w;
-//   h = roi.h;
-//}
-//
-//void 
-//Region::setROI(Rectangle roi){
-//   x = (int)roi.x;
-//   y = (int)roi.y;
-//   w = (int)roi.w;
-//   h = (int)roi.h;
-//} 
-
 Location 
 Region::getCenter() const{ 
    return Location(x+w/2, y+h/2);
 }
-
-
-//Location 
-//Region::toRobotCoord(Location l){
-//   return Location(l.x - x, l.y - y);
-//}
-//
-//Match 
-//Region::toGlobalCoord(Match m){
-//   m.x += x;
-//   m.y += y;
-//   return m;
-//}
-
 
 ScreenImage
 Region::capture(){
@@ -192,25 +158,28 @@ Region::click(Location target, int modifiers){
 }
 
 int 
-Region::click(Pattern target, int modifiers){
-   return click(getLocationFromPSRML(target),modifiers);
+Region::click(Pattern target, int modifiers) throw(FindFailed) {
+   Match m;
+   if (findInteractive(target, m))
+      return click(m, modifiers);
+   else 
+      return false;
 }
 
 int 
-Region::click(const char* target, int modifiers){
-   return click(getLocationFromPSRML(target),modifiers);
+Region::click(const char* str, int modifiers) throw(FindFailed) {   
+   return click(Pattern(str),modifiers);
 }
 
 int 
 Region::click(Region target, int modifiers){
-   return click(getLocationFromPSRML(target),modifiers);
+   return click(target.getCenter(),modifiers);
 }
 
 int 
 Region::click(Match target, int modifiers){
-   return click(getLocationFromPSRML(target),modifiers);
+   return click(target.getCenter(),modifiers);
 }
-
 
 int 
 Region::doubleClick(int modifiers){
@@ -223,23 +192,27 @@ Region::doubleClick(Location target, int modifiers){
 }
 
 int 
-Region::doubleClick(Pattern& target, int modifiers){
-   return doubleClick(getLocationFromPSRML(target),modifiers);
+Region::doubleClick(Pattern target, int modifiers) throw(FindFailed){
+   Match m;
+   if (findInteractive(target, m))
+      return doubleClick(m, modifiers);
+   else 
+      return false;
 }
 
 int 
-Region::doubleClick(const char* target, int modifiers){
-   return doubleClick(getLocationFromPSRML(target),modifiers);
+Region::doubleClick(const char* target, int modifiers) throw(FindFailed){
+   return doubleClick(Pattern(target), modifiers);
 }
 
 int 
-Region::doubleClick(Region& target, int modifiers){
-   return doubleClick(getLocationFromPSRML(target),modifiers);
+Region::doubleClick(Region target, int modifiers){
+   return doubleClick(target.getCenter(),modifiers);
 }
 
 int 
-Region::doubleClick(Match& target, int modifiers){
-   return doubleClick(getLocationFromPSRML(target),modifiers);
+Region::doubleClick(Match target, int modifiers){
+   return doubleClick(target.getCenter(),modifiers);
 }
 
 int 
@@ -253,22 +226,26 @@ Region::rightClick(Location target, int modifiers){
 }
 
 int 
-Region::rightClick(Pattern& target, int modifiers){
+Region::rightClick(Pattern target, int modifiers) throw(FindFailed){
+   Match m;
+   if (findInteractive(target, m))
+      return rightClick(m, modifiers);
+   else 
+      return false;
+}
+
+int 
+Region::rightClick(const char* target, int modifiers) throw(FindFailed){
+   return rightClick(Pattern(target),modifiers);
+}
+
+int 
+Region::rightClick(Region target, int modifiers){
    return rightClick(getLocationFromPSRML(target),modifiers);
 }
 
 int 
-Region::rightClick(const char* target, int modifiers){
-   return rightClick(getLocationFromPSRML(target),modifiers);
-}
-
-int 
-Region::rightClick(Region& target, int modifiers){
-   return rightClick(getLocationFromPSRML(target),modifiers);
-}
-
-int 
-Region::rightClick(Match& target, int modifiers){
+Region::rightClick(Match target, int modifiers){
    return rightClick(getLocationFromPSRML(target),modifiers);
 }
 
@@ -278,23 +255,27 @@ Region::hover(Location target){
 }
 
 int 
-Region::hover(Pattern target){
-   return hover(getLocationFromPSRML(target));
+Region::hover(Pattern target) throw(FindFailed){
+   Match m;
+   if (findInteractive(target, m))
+      return hover(target);
+   else 
+      return false;
 }
 
 int 
-Region::hover(const char* target){
-   return hover(getLocationFromPSRML(target));
+Region::hover(const char* target) throw(FindFailed){
+   return hover(Pattern(target));
 }
 
 int 
 Region::hover(Region target){
-   return hover(getLocationFromPSRML(target));
+   return hover(target.getCenter());
 }
 
 int 
 Region::hover(Match target){
-   return hover(getLocationFromPSRML(target));
+   return hover(target.getCenter());
 }
 
 int 
@@ -305,30 +286,30 @@ Region::dragDrop(Location t1, Location t2, int modifiers){
 }
 
 int 
-Region::dragDrop(Pattern& t1, Pattern& t2, int modifiers ){
-   Location loc1 = getLocationFromPSRML(t1);
-   Location loc2 = getLocationFromPSRML(t2);
-   return dragDrop(loc1, loc2, modifiers);
+Region::dragDrop(Pattern t1, Pattern t2, int modifiers) throw(FindFailed){
+   Match m1,m2;
+   if (findInteractive(t1, m1) && findInteractive(t2,m2))
+      return dragDrop(m1,m2,modifiers);
+   else 
+      return false;
 }
    
 int 
-Region::dragDrop(const char* t1, const char* t2, int modifiers){
-   Location loc1 = getLocationFromPSRML(t1);
-   Location loc2 = getLocationFromPSRML(t2);
-   return dragDrop(loc1, loc2, modifiers);
+Region::dragDrop(const char* t1, const char* t2, int modifiers) throw(FindFailed){
+   return dragDrop(Pattern(t1),Pattern(t2), modifiers);
 }
 
 int 
-Region::dragDrop(Region& t1, Region& t2, int modifiers){
-   Location loc1 = getLocationFromPSRML(t1);
-   Location loc2 = getLocationFromPSRML(t2);
+Region::dragDrop(Region t1, Region t2, int modifiers){
+   Location loc1 = t1.getCenter();
+   Location loc2 = t2.getCenter();
    return dragDrop(loc1, loc2, modifiers);
 };
 
 int 
-Region::dragDrop(Match& t1, Match& t2, int modifiers){
-   Location loc1 = getLocationFromPSRML(t1);
-   Location loc2 = getLocationFromPSRML(t2);
+Region::dragDrop(Match t1, Match t2, int modifiers){
+   Location loc1 = t1.getCenter();
+   Location loc2 = t2.getCenter();
    return dragDrop(loc1, loc2, modifiers);
 }      
 
@@ -389,28 +370,32 @@ Region::paste(const char* text){
 }
 
 int
-Region::paste(const Location& target, const char* text){
+Region::paste(const Location target, const char* text){
    return Robot::paste(_screen_id, xo+x+target.x, yo+y+target.y,text);
 }
 
 int
-Region::paste(const Pattern& target, const char* text){
-   return paste(getLocationFromPSRML(target), text);
+Region::paste(const Pattern target, const char* text) throw(FindFailed){
+   Match m;
+   if (findInteractive(target, m))
+      return paste(m, text);
+   else 
+      return false;
 }
 
 int
-Region::paste(const char* target, const char* text){
-   return paste(getLocationFromPSRML(target), text);
+Region::paste(const char* target, const char* text) throw(FindFailed){
+   return paste(Pattern(target), text);
 }
 
 int
-Region::paste(const Region& target, const char* text){
-   return paste(getLocationFromPSRML(target), text);
+Region::paste(const Region target, const char* text){
+   return paste(target.getCenter(), text);
 }
 
 int
-Region::paste(const Match& target, const char* text){
-   return paste(getLocationFromPSRML(target), text);
+Region::paste(const Match target, const char* text){
+   return paste(target.getCenter(), text);
 }
 
 int
@@ -429,23 +414,27 @@ Region::type(Location target, const char* text, int modifiers){
 }
 
 int
-Region::type(Pattern& target, const char* text, int modifiers){
-   return type(getLocationFromPSRML(target), text, modifiers);
+Region::type(Pattern target, const char* text, int modifiers) throw(FindFailed){   
+   Match m;
+   if (findInteractive(target, m))
+      return type(m, text, modifiers);
+   else 
+      return false;
 }
 
 int
-Region::type(const char* target, const char* text, int modifiers){
-   return type(getLocationFromPSRML(target), text, modifiers);
+Region::type(const char* target, const char* text, int modifiers) throw(FindFailed){
+   return type(Pattern(target), text, modifiers);
 }
 
 int
-Region::type(Region& target, const char* text, int modifiers){
-   return type(getLocationFromPSRML(target), text, modifiers);
+Region::type(Region target, const char* text, int modifiers){
+   return type(target.getCenter(), text, modifiers);
 }
 
 int
-Region::type(Match& target, const char* text, int modifiers){
-   return type(getLocationFromPSRML(target), text, modifiers);
+Region::type(Match target, const char* text, int modifiers){
+   return type(target.getCenter(), text, modifiers);
 }
 
 
@@ -567,7 +556,6 @@ Region::findNow(const char* imgURL) throw(FindFailed){
 
 vector<Match> 
 Region::findAllNow(Pattern ptn){
-   // ToDo: adjust capturing region for multi-monitor
    dout << "[Region::findAll] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;   
    ScreenImage simg = capture();
    
@@ -840,9 +828,43 @@ Region::inside(){
    return *this;
 }
 
+bool 
+Region::findInteractive(Pattern target, Match& match) throw(FindFailed) {
+
+   while (true){
+      try {
+         
+         match = find(target); 
+         return true;
+         
+      }catch(FindFailed ff){
+
+         // FindFailedHandler
+         cout << target.toString() << " can not be found!!" << endl;
+
+         char ret = 0;
+         bool has_valid_response = false;
+         while (!has_valid_response){
+            cout << "(S)kip, (R)etry, (A)bort?";
+            cin >> ret;
+            
+            if (ret == 'S'){
+               return false;
+            }else if (ret == 'R'){
+               has_valid_response = true;
+            }else if (ret == 'A'){
+               throw ff;
+            }
+         }
+         
+      }
+   }
+}
+
+
 Location 
 Region::getLocationFromPSRML(Pattern target){
-   Match m = find(target);
+   Match m = find(target); 
    return m.getTarget();
 }
 
