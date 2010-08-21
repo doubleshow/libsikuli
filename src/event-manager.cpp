@@ -113,34 +113,32 @@ RegionObserver::observe(){
          }
       }
       else if (ob.event_type == APPEAR){
-            
-            try{
-               top_match = region.findNow(ob.pattern);
-               
+                        
+            if (region.exists(ob.pattern,0)){
+                  
                if (!ob.active){
                   
                   e.type = ob.event_type;
-                  e.match = top_match;
+                  e.match = region.getLastMatch();
                   e.pattern = ob.pattern;
                   e.region = region;
                   triggered = true;
-                  
+
                   ob.active = true;
                }
                
-            }catch (FindFailed ff){
+            }else{
                ob.active = false;
             }
             
       }else if (ob.event_type == VANISH){
             
             
-            try{
+            if (region.exists(ob.pattern,0)){
                
-               top_match = region.findNow(ob.pattern);
                ob.active = false;
                
-            }catch (FindFailed ff){
+            }else{
                
                if (!ob.active){
                   

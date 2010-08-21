@@ -23,3 +23,9 @@ public:
  void runTest() { suite_CoreTestSuite.testFindInterfaces(); }
 } testDescription_CoreTestSuite_testFindInterfaces;
 
+static class TestDescription_CoreTestSuite_testReadImageFromURL : public CxxTest::RealTestDescription {
+public:
+ TestDescription_CoreTestSuite_testReadImageFromURL() : CxxTest::RealTestDescription( Tests_CoreTestSuite, suiteDescription_CoreTestSuite, 40, "testReadImageFromURL" ) {}
+ void runTest() { suite_CoreTestSuite.testReadImageFromURL(); }
+} testDescription_CoreTestSuite_testReadImageFromURL;
+

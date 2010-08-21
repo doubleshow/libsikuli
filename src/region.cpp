@@ -103,6 +103,27 @@ Region::~Region(){
       delete _pLastMatches;
 }
 
+
+Region& 
+Region::operator=(const Region& r){
+   if (this == &r)
+      return *this;
+   
+   if (r._pLastMatch != NULL)
+      setLastMatch(*r._pLastMatch);
+   
+   if (r._pLastMatches != NULL)
+      setLastMatches(*r._pLastMatches);
+   
+   Rectangle::operator=(r);
+   
+   xo = r.xo;
+   yo = r.yo;
+   _screen_id = _screen_id;
+   
+   return *this;
+}
+
 Region 
 Region::inner(int x_, int y_, int w_, int h_){
    Region r(x_,y_,w_,h_);
@@ -258,7 +279,7 @@ int
 Region::hover(Pattern target) throw(FindFailed){
    Match m;
    if (findInteractive(target, m))
-      return hover(target);
+      return hover(m);
    else 
       return false;
 }
@@ -315,28 +336,32 @@ Region::dragDrop(Match t1, Match t2, int modifiers){
 
 
 int
-Region::drag(Location target){
+Region::drag(Location target){   
    return Robot::drag(_screen_id, xo+x+target.x,  yo+y+target.y);
 }
 
 int 
-Region::drag(Pattern& target){
-   return drag(getLocationFromPSRML(target));
+Region::drag(Pattern target) throw(FindFailed){
+   Match m;
+   if (findInteractive(target, m))
+      return drag(m);
+   else 
+      return false;
 }
 
 int 
-Region::drag(const char* target){
-   return drag(getLocationFromPSRML(target));
+Region::drag(const char* target) throw(FindFailed){
+   return drag(Pattern(target));
 }
 
 int 
-Region::drag(Region& target){
-   return drag(getLocationFromPSRML(target));
+Region::drag(Region target){
+   return drag(target.getCenter());
 }
 
 int 
-Region::drag(Match& target){
-   return drag(getLocationFromPSRML(target));
+Region::drag(Match target){
+   return drag(target.getCenter());
 }
 
 int
@@ -345,23 +370,27 @@ Region::dropAt(Location target, double delay){
 }
 
 int 
-Region::dropAt(Pattern& target, double delay){
-   return dropAt(getLocationFromPSRML(target),delay);
+Region::dropAt(Pattern target, double delay) throw(FindFailed){
+   Match m;
+   if (findInteractive(target, m))
+      return dropAt(m,delay);
+   else 
+      return false;
 }
 
 int 
-Region::dropAt(const char* target, double delay){
-   return dropAt(getLocationFromPSRML(target),delay);
+Region::dropAt(const char* target, double delay) throw(FindFailed){
+   return dropAt(Pattern(target), delay);
 }
 
 int 
-Region::dropAt(Region& target, double delay){
-   return dropAt(getLocationFromPSRML(target),delay);
+Region::dropAt(Region target, double delay){
+   return dropAt(target.getCenter(),delay);
 }
 
 int 
-Region::dropAt(Match& target, double delay){
-   return dropAt(getLocationFromPSRML(target),delay);
+Region::dropAt(Match target, double delay){
+   return dropAt(target.getCenter(),delay);
 }
 
 int
@@ -488,91 +517,47 @@ Region::setLastMatches(vector<Match> matches){
 
 
 Match
-Region::find(Pattern ptn) throw(FindFailed) {
-   Match m;
-   if (Settings::AutoWaitTimeout > 0)
-      m = wait(ptn, Settings::AutoWaitTimeout);
-   else
-      m = findNow(ptn);
-   
-   if (_pLastMatch == NULL)
-      _pLastMatch = new Match();
-   
-   *_pLastMatch = m;
-   return m;
-}
-
-Match 
-Region::find(const char* imgURL) throw(FindFailed){
-   return find(Pattern(imgURL));
-}
-
-vector<Match> 
-Region::findAll(Pattern ptn) {
-   vector<Match> ms;
-   if (Settings::AutoWaitTimeout > 0){
-      ms = waitAll(ptn, Settings::AutoWaitTimeout);
-   }else{
-      ms  = findAllNow(ptn);
-   }
-   if (_pLastMatches == NULL)
-      _pLastMatches = new vector<Match>();
-   *_pLastMatches = ms;
-   return ms;
-}
-
-vector<Match> 
-Region::findAll(const char* imgURL){
-   return findAll(Pattern(imgURL));
-}
-
-
-Match 
-Region::findNow(Pattern ptn) throw(FindFailed){
-   dout << "[Region::findNow] Searching in (" << xo+x << "," << yo+y << ")-(" << xo+x+w << "," << yo+y+h << ")" << endl;
-   ScreenImage simg = capture();
-   
-   vector<FindResult> rs = Vision::find(simg, ptn);
-   
-   if (rs.empty())
-      throw FindFailed(ptn);
-   
-   FindResult r = rs[0];
-   Match match(inner(r.x,r.y,r.w,r.h),r.score); 
-
-   
-   // TODO: setTargetOffset 
-   //match.setTargetOffset(ptn.getTargetOffset());
- 
-   dout << "[Region::findNow] Found at (" << match.x << "," << match.y << "), score = " << match.getScore()  << endl;
-
+Region::find(Pattern target) throw(FindFailed) {
+   Match match;
+   findInteractive(target, match);
    return match;
 }
 
 Match 
-Region::findNow(const char* imgURL) throw(FindFailed){
-   return findNow(Pattern(imgURL));
+Region::find(const char* target) throw(FindFailed){
+   return find(Pattern(target));
+}
+
+vector<Match> 
+Region::findAll(Pattern target) {
+   vector<Match> matches;
+   matches = findRepeat(target.all(), 
+                        Settings::AutoWaitTimeout,
+                        Settings::WaitScanRate);
+   return matches;
+}
+
+vector<Match> 
+Region::findAll(const char* target){
+   return findAll(Pattern(target));
+}
+
+
+Match 
+Region::findNow(Pattern target) throw(FindFailed){
+   Match match;
+   findInteractive(target, match, 0, 0);
+   return match;
+}
+
+Match 
+Region::findNow(const char* target) throw(FindFailed){
+   return findNow(Pattern(target));
 }
 
 vector<Match> 
 Region::findAllNow(Pattern ptn){
-   dout << "[Region::findAll] Searching in (" << x << "," << y << ")-(" << x+w << "," << y+h << ")" << endl;   
-   ScreenImage simg = capture();
-   
-   vector<FindResult> results = Vision::find(simg, ptn.all());
-   vector<Match> matches;
-   int n = min((int)results.size(), (int)ptn.getLimit());
-   for (int i=0; i< n; ++i){
-      FindResult& r = results[i];
-      Match match(inner(r.x,r.y,r.w,r.h),r.score); 
-      matches.push_back(match);
-   }
-   
-   for (int i=0;i<matches.size();++i)
-      matches[i].setTargetOffset(ptn.getTargetOffset());
- 
-   dout << "[Region::findAll] Found " << matches.size() << " matches" << endl;
-   return matches;
+   return doFind(ptn.all());
 }
 
 vector<Match> 
@@ -581,24 +566,66 @@ Region::findAllNow(const char* imgURL){
 }
    
 
-#include <time.h>
-//#define CLOCKS_PER_MSEC ((long)CLOCKS_PER_SEC/(long)1000)
-
-Match
-Region::wait(Pattern target) throw(FindFailed){
-   return wait(target, Settings::AutoWaitTimeout);
-} 
 
 
 vector<Match> 
-Region::try_for_n_seconds(callback func, Pattern target, int seconds){
+Region::findRepeat(Pattern target, int seconds, int frequency){
+   vector<Match> ms;
+   ms = repeat(&Region::doFind_callback, target, seconds, frequency);
+   return ms;
+}
+
+bool 
+Region::doFind_callback(Pattern target, vector<Match>& matches){
+   matches = doFind(target);
+   return !matches.empty();
+}
+
+vector<Match>
+Region::doFind(Pattern target) {
+
+ 
+   dout << "[Region::doFind] Searching in (" << xo+x << "," << yo+y << ")-(" << xo+x+w << "," << yo+y+h << ")" << endl; 
+  
+   ScreenImage simg = capture();
+   vector<FindResult> results = Vision::find(simg, target);
+   
+   vector<Match> matches;
+   int n = min((int)results.size(), (int)target.getLimit());
+   for (int i=0; i< n; ++i){
+      FindResult& r = results[i];
+      Match match(inner(r.x,r.y,r.w,r.h),r.score); 
+      matches.push_back(match);
+      
+      if (i<5)
+         dout << "[Region::doFind] Found at (" << match.x << "," << match.y << "), score = " << match.getScore()  << endl;
+      else
+         dout << n - 5 << " more matches." << endl;
+
+   }
+   
+   if (!matches.empty()){
+      setLastMatch(matches[0]);
+      setLastMatches(matches);
+   }
+   
+   // TODO: setTargetOffset 
+   //match.setTargetOffset(ptn.getTargetOffset());
+   
+   
+   return matches;
+}
+
+
+#include <time.h>
+vector<Match> 
+Region::repeat(callback func, Pattern target, int seconds, int frequency){
    vector<Match> ms;
    
-   
    //cout << CLOCKS_PER_MSEC << endl;
-   long max_clocks_per_scan = CLOCKS_PER_SEC / Settings::WaitScanRate;
+   long max_clocks_per_scan = CLOCKS_PER_SEC / frequency;
    //long start = clock();
-   long clocks_limit = clock() + seconds * CLOCKS_PER_SEC;   
+   //long clocks_limit = clock() + seconds * CLOCKS_PER_SEC;   
    time_t time_limit = time(NULL) + seconds;
    time_t start_time;
    start_time = time(NULL);
@@ -606,41 +633,35 @@ Region::try_for_n_seconds(callback func, Pattern target, int seconds){
       //while (clock() < clocks_limit){
       long before_find = clock();
       
-      ms = (this->*func)(target);
-      if (!ms.empty())
+      cout << ".";
+      bool ret = (this->*func)(target,ms);
+      if (ret)
          return ms;
       
       long actual_clocks_per_scan = clock() - before_find;
       long mseconds_to_delay = 1000*(max_clocks_per_scan - actual_clocks_per_scan)/CLOCKS_PER_SEC;
       
       //if (seconds > 0)
-         Robot::delay(max((long)10, mseconds_to_delay));
+      Robot::delay(max((long)10, mseconds_to_delay));
       //cout << 1.0*(clock() - start)/ CLOCKS_PER_SEC << " seconds" << endl;
-      cout << (time(NULL) - start_time) << " seconds" << endl;
+      //cout << (time(NULL) - start_time) << " seconds" << endl;
    } while (time(NULL) < time_limit);
    return ms;
 }
 
-vector<Match>
-Region::wait_callback(Pattern target) {
-   vector<Match> ms;
-   try{
-      Match m = findNow(target);
-      ms.push_back(m);
-   }catch(FindFailed ff){
-   }
-   return ms;
-}
+
+
+Match
+Region::wait(Pattern target) throw(FindFailed){
+   return wait(target, Settings::AutoWaitTimeout);
+} 
       
 Match
 Region::wait(Pattern target, int seconds) throw(FindFailed){
-   vector<Match> ms = try_for_n_seconds(&Region::wait_callback, target, seconds);   
-   if (!ms.empty()){
-      setLastMatch(ms[0]);
-      return getLastMatch();
-   }else {
-      throw FindFailed(target);
-   }
+   Match match;
+   findInteractive(target, match, seconds, 
+                   Settings::WaitScanRate);
+   return match;
 }
 
 Match
@@ -654,25 +675,11 @@ Region::wait(const char* target, int seconds) throw(FindFailed){
 }
 
 vector<Match>
-Region::waitAll_callback(Pattern target) {
-   vector<Match> ms;
-   try{
-      ms = findAllNow(target);
-   }catch(FindFailed ff){
-   }
-   return ms;
-}
-
-
-vector<Match>
 Region::waitAll(Pattern target, int seconds){
-   vector<Match> ms = try_for_n_seconds(&Region::waitAll_callback, target, seconds);   
-   if (!ms.empty()){
-      setLastMatches(ms);
-      return getLastMatches();
-   }else{
-      throw FindFailed(target);
-   }
+   vector<Match> matches;
+   matches = findRepeat(target.all(), seconds, 
+              Settings::WaitScanRate);
+   return matches;
 }   
 
 
@@ -683,17 +690,11 @@ Region::waitAll(const char* target, int seconds){
 
 bool
 Region::exists(Pattern target, int seconds){
-   try{
-      if (seconds == 0)
-         findNow(target);
-      else
-         wait(target, seconds);
-      
-      return true;
-   }catch (FindFailed ff){
-      return false;
-   }
+   vector<Match> ms;
+   ms = findRepeat(target, seconds, Settings::WaitScanRate);
+   return !ms.empty();
 }
+
 bool
 Region::exists(const char* target, int seconds){
    return exists(Pattern(target), seconds);
@@ -709,31 +710,17 @@ Region::exists(const char* target){
 }
 
 
-vector<Match>
-Region::waitVanish_callback(Pattern target) {
-   vector<Match> ms;
-   try{
-      Match m = findNow(target);
-      
-      // purposely return an empty vector to
-      // indicate the target is still there
-      return ms; 
-   }catch(FindFailed ff){
-      // purposely return a non-empty vector
-      // to indicate the target has vanished
-      ms.push_back(Match()); 
-      return ms;
-   }
+bool
+Region::waitVanish_callback(Pattern target, vector<Match>& matches) {
+   matches = doFind(target);
+   return matches.empty();
 }
 
 bool
 Region::waitVanish(Pattern target, int seconds){
-   vector<Match> ms = try_for_n_seconds(&Region::waitVanish_callback, target, seconds);   
-   if (!ms.empty()){
-      return true;
-   }else {
-      return false;
-   }   
+   vector<Match> ms = repeat(&Region::waitVanish_callback, target, seconds,
+                             Settings::WaitScanRate);   
+   return !ms.empty();
 }
    
 bool
@@ -748,7 +735,7 @@ Region::waitVanish(const char* target, int seconds){
 
 bool
 Region::waitVanish(const char* target){
-   return waitVanish(target, Settings::AutoWaitTimeout);
+   return waitVanish(Pattern(target));
 }
 
 Region 
@@ -828,35 +815,46 @@ Region::inside(){
    return *this;
 }
 
+
 bool 
 Region::findInteractive(Pattern target, Match& match) throw(FindFailed) {
+   return findInteractive(target, match, 
+                          Settings::AutoWaitTimeout, 
+                          Settings::WaitScanRate);
+}
 
+bool 
+Region::findInteractive(Pattern target, Match& match,
+                        int seconds, int frequency) throw(FindFailed) {
+   
    while (true){
-      try {
-         
-         match = find(target); 
+
+      vector<Match> ms;
+      if (seconds > 0)
+         ms = findRepeat(target, seconds, frequency);
+      else 
+         ms = doFind(target);
+
+      if (!ms.empty()){
+         match = ms[0];         
          return true;
-         
-      }catch(FindFailed ff){
+      }
+          
+      // FindFailedHandler
+      cout << target.toString() << " can not be found!!" << endl;
 
-         // FindFailedHandler
-         cout << target.toString() << " can not be found!!" << endl;
-
-         char ret = 0;
-         bool has_valid_response = false;
-         while (!has_valid_response){
-            cout << "(S)kip, (R)etry, (A)bort?";
-            cin >> ret;
-            
-            if (ret == 'S'){
-               return false;
-            }else if (ret == 'R'){
-               has_valid_response = true;
-            }else if (ret == 'A'){
-               throw ff;
-            }
+      char ret = 0;
+      bool has_valid_response = false;
+      while (!has_valid_response){
+         cout << "(S)kip, (R)etry, (A)bort?";
+         cin >> ret;
+         if (ret == 'S'){
+            return false;
+         }else if (ret == 'R'){
+            has_valid_response = true;
+         }else if (ret == 'A'){
+            throw FindFailed(target);
          }
-         
       }
    }
 }

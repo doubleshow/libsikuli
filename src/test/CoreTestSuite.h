@@ -1,9 +1,9 @@
 /*
- *  TempTestSuite.h
+ *  CoreTestSuite.h
  *  sikuli
  *
  *  Created by Tom Yeh on 7/29/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
+ *  Copyright 2010 sikuli.org. All rights reserved.
  *
  */
 
@@ -36,6 +36,18 @@ public:
       s.findAll(str);
       }catch(...){}
    }
+   
+   void testReadImageFromURL(void)
+   {
+      Settings::resetImagePaths();
+      Settings::addImagePath("http://localhost:4567/");
+      
+      Screen s;
+      s.click("apple.png");
+      s.click("http://localhost:4567/mac.png");
+      s.click("apple_in_workdir.png");
+   }
+   
    
 };
    

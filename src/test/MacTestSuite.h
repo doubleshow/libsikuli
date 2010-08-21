@@ -12,12 +12,12 @@
 
 using namespace sikuli;
 
-class RegionTestSuite : public CxxTest::TestSuite 
+class MacTestSuite : public CxxTest::TestSuite 
 {
 public:
    
    void setUp() {
-      Settings::addImagePath("images");
+      Settings::addImagePath("test/images");
    }
    
    void tearDown() {
@@ -31,11 +31,11 @@ public:
    {
       Settings::resetImagePaths();
       Settings::addImagePath("test");
-      Settings::addImagePath("images");
-      Settings::addImagePath("images/a");
+      Settings::addImagePath("test/images");
+      Settings::addImagePath("test/images/a");
       TS_ASSERT_EQUALS(Settings::getImagePaths().size(), 3);
-      TS_ASSERT_SAME_DATA(Settings::getImagePaths()[0], "test", 4);
-      TS_ASSERT_SAME_DATA(Settings::getImagePaths()[1], "images", 4);
+      TS_ASSERT_SAME_DATA(Settings::getImagePaths()[0], "test/test", 4);
+      TS_ASSERT_SAME_DATA(Settings::getImagePaths()[1], "test/images", 4);
       
       Screen s;
       TS_ASSERT_THROWS_NOTHING(s.find("aapple.png"));
@@ -120,31 +120,31 @@ public:
       s.type("sys\n");
       s.click("keyboard.png");
       
-      Region slider = s.find("turn_off_label.png").below(100).wider(300);
+      Region slider = s.find("turn_off_label.png").below(200).wider(300);
       Region t0 = slider.find("thumb.png");
       
-      Region never   = s.find("never.png");
-      Region one_min = s.find("one_min.png");
+      Region never   = slider.find("never.png");
+      Region one_min = slider.find("one_min.png");
       
-      s.drag(t0);
-      s.dropAt(never);
+      slider.drag(t0);
+      slider.dropAt(never);
       
       TS_ASSERT(s.exists(Pattern("thumb_at_never.png").similar(0.95)));
       
       Region t1 = slider.find("thumb.png");
-      s.drag(t1);
-      s.dropAt(t0);
+      slider.drag(t1);
+      slider.dropAt(t0);
       
-      sleep(1);
+      wait(1.0);
       
-      s.dragDrop(t0,never);
+      slider.dragDrop(t0,never);
       
       TS_ASSERT(s.exists(Pattern("thumb_at_never.png").similar(0.95)));
       
-      s.dragDrop(t1,t0);
+      slider.dragDrop(t1,t0);
       
       
-      sleep(1);
+      wait(1.0);
       s.type("q", CMD);
    }   
    
@@ -206,7 +206,7 @@ public:
       
       sleep(1);
       
-      Pattern p = Pattern("thumb.png").orderBy(RIGHTLEFT);
+      Pattern p = Pattern("thumb.png").order(RIGHTLEFT);
       vector<Match> ms = s.findAll(p);
       s.hover(ms[2]);
       sleep(2);
@@ -244,16 +244,6 @@ public:
       s.type("q",CMD);
    }   
    
-   void testReadImageFromURL(void)
-   {
-      Settings::resetImagePaths();
-      Settings::addImagePath("http://localhost:4567/");
-      
-      Screen s;
-      s.click("apple.png");
-      s.click("http://localhost:4567/mac.png");
-      s.click("apple_in_workdir.png");
-   }
    
    
 };

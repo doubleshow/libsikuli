@@ -116,6 +116,8 @@ public:
    Region();
    ~Region();   
    
+   Region& operator=(const Region& r);
+   
 protected:
    
    void init(int screen_id);
@@ -217,12 +219,26 @@ public:
 
 private:
    
-   vector<Match> wait_callback(Pattern target);
-   vector<Match> waitAll_callback(Pattern target);
-   vector<Match> waitVanish_callback(Pattern target);
+   vector<Match> findRepeat(Pattern ptn, int seconds, int frequency);
+
+   bool findInteractive(Pattern target, Match& match) throw(FindFailed);
+   bool findInteractive(Pattern target, Match& match,
+                        int seconds, int frequency) throw(FindFailed);
+      
    
-   typedef vector<Match> (Region::*callback)(Pattern target); 
-   vector<Match> try_for_n_seconds(callback func, Pattern target, int seconds);   
+   typedef bool (Region::*callback)(Pattern target, vector<Match>& matches);   
+   vector<Match> repeat(callback func, Pattern target, int seconds, int frequency);   
+
+   vector<Match> doFind(Pattern target);
+
+   bool doFind_callback(Pattern target, vector<Match>& matches);
+   bool waitVanish_callback(Pattern target, vector<Match>& matches);
+   
+//   vector<Match> wait_callback(Pattern target);
+//   vector<Match> waitAll_callback(Pattern target);
+//   vector<Match> waitVanish_callback(Pattern target);
+//   
+//   vector<Match> try_for_n_seconds(callback func, Pattern target, int seconds);   
    
    
    Location getLocationFromPSRML(Pattern target);
@@ -232,7 +248,6 @@ private:
    Location getLocationFromPSRML(Location target);   
    
    
-   bool findInteractive(Pattern target, Match& match) throw(FindFailed);
  
 //==================================================================
 // Automation Functions
@@ -274,16 +289,16 @@ public:
    int dragDrop(Match t1, Match t2, int modifiers = 0);
    
    int drag(Location target);
-   int drag(Pattern& target);
-   int drag(const char* target);
-   int drag(Region& target);
-   int drag(Match& target);
+   int drag(Pattern target) throw(FindFailed);
+   int drag(const char* target) throw(FindFailed);
+   int drag(Region target);
+   int drag(Match target);
    
    int dropAt(Location target, double delay = 0.0);
-   int dropAt(Pattern& target, double delay = 0.0);
-   int dropAt(const char* target, double delay = 0.0);
-   int dropAt(Region& target, double delay = 0.0);
-   int dropAt(Match& target, double delay = 0.0);
+   int dropAt(Pattern target, double delay = 0.0) throw(FindFailed);
+   int dropAt(const char* target, double delay = 0.0) throw(FindFailed);
+   int dropAt(Region target, double delay = 0.0);
+   int dropAt(Match target, double delay = 0.0);
    
    int type(const char* text, int modifiers = 0);   
    int type(Location target, const char* text, int modifiers = 0);
