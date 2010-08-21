@@ -15,13 +15,7 @@
 #include "vision.h"
 #include "settings.h"
 #include "event-manager.h"
-
-
-enum{
-   IGNORE,
-   RETRY,
-   ABORT
-};
+#include "ui.h"
 
 #define dout if (0) cout
 
@@ -596,23 +590,18 @@ Region::doFind(Pattern target) {
       FindResult& r = results[i];
       Match match(inner(r.x,r.y,r.w,r.h),r.score); 
       matches.push_back(match);
-      
-      if (i<5)
-         dout << "[Region::doFind] Found at (" << match.x << "," << match.y << "), score = " << match.getScore()  << endl;
-      else
-         dout << n - 5 << " more matches." << endl;
-
    }
    
+   
    if (!matches.empty()){
+      SikuliUI::sikuliUI->handleMatchFound(*this, target, matches);
+
       setLastMatch(matches[0]);
       setLastMatches(matches);
    }
    
    // TODO: setTargetOffset 
    //match.setTargetOffset(ptn.getTargetOffset());
-   
-   
    return matches;
 }
 
@@ -839,23 +828,17 @@ Region::findInteractive(Pattern target, Match& match,
          match = ms[0];         
          return true;
       }
+         
+      int response = SikuliUI::sikuliUI->handleFindFailedException(*this, target);
           
-      // FindFailedHandler
-      cout << target.toString() << " can not be found!!" << endl;
-
-      char ret = 0;
-      bool has_valid_response = false;
-      while (!has_valid_response){
-         cout << "(S)kip, (R)etry, (A)bort?";
-         cin >> ret;
-         if (ret == 'S'){
+         if (response == SKIP){
             return false;
-         }else if (ret == 'R'){
-            has_valid_response = true;
-         }else if (ret == 'A'){
+         }else if (response == RETRY){
+            continue;
+         }else if (response == ABORT){
             throw FindFailed(target);
          }
-      }
+      
    }
 }
 

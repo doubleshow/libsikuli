@@ -295,7 +295,7 @@ Pattern::getText() {
 
 #include <sstream>
 string 
-Pattern::toString(){
+Pattern::toString() const{
    stringstream ret;
    ret << "Pattern(\"" << str + "\")";
    ret << ".similar(" << similarity << ")";
