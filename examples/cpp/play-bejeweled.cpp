@@ -294,7 +294,7 @@ bool move(int type){
 
 int main(void){
    Screen s;
-   addImagePath("images");
+   addImagePath("examples/images");
    
    
    // Load the game in the web browser, in this

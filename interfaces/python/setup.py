@@ -8,19 +8,13 @@ setup.py file for libsikuli Python
 
 from distutils.core import setup, Extension
 
-sources = [
-   'sikuli-python_wrap.cxx', 
-   'sikuli.cpp','region.cpp','screen.cpp','location.cpp','pattern.cpp','settings.cpp',
-   'event-manager.cpp',
-   'robot.cpp','glgrab.c',
-   'vision.cpp','finder.cpp','ocr.cpp',
-   'cv-util.cpp','pyramid-template-matcher.cpp']
-
-
+sources = ['sikuli-python_wrap.cxx']
 
 sikuli_module = Extension('_sikuli',
-                           sources = ['src/' + x for x in sources],
-                           extra_link_args=[
+                           sources = sources,
+                           include_dirs=['../../src'],
+                           library_dirs=['../../lib'],
+                           extra_link_args=['-Rlib',
                            '-framework,AppplicationServices',
                            '-framework,OpenGL'],
                            libraries=[
@@ -28,7 +22,8 @@ sikuli_module = Extension('_sikuli',
                            'opencv_highgui',
                            'opencv_legacy',
                            'opencv_objdetect',
-                           'curl'
+                           'curl',
+                           'sikuli'
                            ]
                            )
 

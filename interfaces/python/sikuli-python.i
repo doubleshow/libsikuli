@@ -27,7 +27,8 @@ def _swig_setattr_nondynamic(self,class_type,name,value,static=1):
 %include "std_vector.i"
 %template(Matches) std::vector<sikuli::Match>;
 
-%feature("director") sikuli::SikuliEventHandler;   
+%feature("director") sikuli::SikuliEventHandler;  
+%feature("director") sikuli::SikuliUI;
    
 %include "sikuli.h"
 %include "keys.h"
@@ -38,6 +39,7 @@ def _swig_setattr_nondynamic(self,class_type,name,value,static=1):
 %include "settings.h"
 %include "exceptions.h"
 %include "event-manager.h"
+%include "ui.h"
 
    
 %pythoncode

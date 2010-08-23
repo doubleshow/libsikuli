@@ -1,0 +1,1 @@
+swig -c++ -python -I../../src sikuli-python.i
