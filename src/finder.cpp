@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
-#include "opencv2/opencv.hpp"
-//#include "highgui.h"
 
 #include "finder.h"
 #include "pyramid-template-matcher.h"

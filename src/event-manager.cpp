@@ -3,6 +3,7 @@
 #include <list>
 #include <algorithm>
 
+#include <time.h>
 #include "finder.h"
 #include "event-manager.h"
 

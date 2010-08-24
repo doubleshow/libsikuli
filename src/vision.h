@@ -11,7 +11,6 @@
 #define _VISION_H_
 
 #include "region.h"
-#include "opencv2/opencv.hpp"
 #include "finder.h"
 
 namespace sikuli {

@@ -57,24 +57,25 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 }
 
 string downloadImageFromURL(string url){
-   CURL *curl;
-   FILE *fp;
-   CURLcode res;
-   char outfilename[FILENAME_MAX];
-   tmpnam(outfilename);
-   curl = curl_easy_init();
-   if (curl) {
-      fp = fopen(outfilename,"wb");
-      curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-      curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-      res = curl_easy_perform(curl);
-      /* always cleanup */
-      curl_easy_cleanup(curl);
-      fclose(fp);
-   }
-   
-   return string(outfilename);
+   //CURL *curl;
+   //FILE *fp;
+   //CURLcode res;
+   //char outfilename[FILENAME_MAX];
+   //tmpnam(outfilename);
+   //curl = curl_easy_init();
+   //if (curl) {
+   //   fp = fopen(outfilename,"wb");
+   //   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+   //   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+   //   curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+   //   res = curl_easy_perform(curl);
+   //   /* always cleanup */
+   //   curl_easy_cleanup(curl);
+   //   fclose(fp);
+   //}
+   //
+   //return string(outfilename);
+	return string();
 }
 
 string findImageHelper(string image_url) throw(FileNotFound){
@@ -105,7 +106,7 @@ string findImageFromPaths(string image_filename) throw(FileNotFound) {
    
    for (int i=0; i<image_paths.size(); ++i){
       string image_filename_with_path = string(image_paths[i]) + 
-      "/" + string(image_filename);
+      "\\" + string(image_filename);
 
       try { 
          return findImageHelper(image_filename_with_path);
@@ -129,7 +130,7 @@ Pattern::Pattern(){
    _position = ANYWHERE;
    _limit = 999999;
    _imageURL = "";
-   _resolved_imageURL = "";
+   _resolved_imageURL = string("");
    
 }
 
@@ -146,7 +147,7 @@ Pattern::Pattern(const Pattern& p){
    _limit= p._limit;
    
    _imageURL = p._imageURL;
-   _resolved_imageURL = p._resolved_imageURL;
+   _resolved_imageURL = string(p._resolved_imageURL);
 }
 
 Pattern::Pattern(const char* str_){

@@ -46,8 +46,13 @@ getFindResults(Mat screenImage, Pattern ptn, bool all, double similarity) {
       
    }else{
       
-      TemplateFinder f(screenImage);      
-      Mat image = imread(ptn.getImageURL());
+      TemplateFinder f(screenImage);
+	  //string str(ptn.getImageURL());
+	  //char filename[] = "c:\\cygwin\\home\\tomyeh\\libsikuli\\examples\\images\\startpage.png";
+	  //string name("examples\\images\\startpage.png"); 
+	  Mat image = imread(ptn.getImageURL());
+	  
+	  //ptn.getImageURL());
       
       if (all){
          f.find_all(image, similarity);
@@ -116,8 +121,16 @@ Vision::compare(Mat im1, Mat im2){
    return score;
 }
 
+
 vector<FindResult> 
 Vision::find(ScreenImage simg, Pattern ptn) { 
+
+	SYSTEMTIME begin, end;
+    
+    GetSystemTime(&begin);
+
+
+	//TimingBlock tb("vision");
    
    //TemplateFinder f(simg.getMat());   
    
@@ -183,5 +196,9 @@ Vision::find(ScreenImage simg, Pattern ptn) {
       final_results.push_back(results[i]);
    }
    
+    GetSystemTime(&end);
+	WORD elapsed_ms = (end.wSecond - begin.wSecond)*1000+(end.wMilliseconds - begin.wMilliseconds);
+	cout << elapsed_ms << " ms." << endl;
+
    return final_results;
 }

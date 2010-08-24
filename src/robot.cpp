@@ -8,16 +8,13 @@
  */
 
 #include "robot.h"
-
-#include <ApplicationServices/ApplicationServices.h>
-
-
 #include "keys.h"
+
+
+using namespace sikuli;
 
 int Robot::_modifiers = 0;
 bool Robot::_dragged = false;
-
-
 
 int
 Robot::click(int screen, int x, int y, int buttons, int modifiers, bool dblClick){
@@ -48,6 +45,7 @@ Robot::click(int buttons, int modifiers, bool dblClick){
 
 void 
 Robot::pressModifiers(int modifiers){
+/*
    if(modifiers & SHIFT) Robot::keyPress(VK_SHIFT);
    if(modifiers & CTRL) Robot::keyPress(VK_CONTROL);
    if(modifiers & ALT) Robot::keyPress(VK_ALT);
@@ -58,10 +56,12 @@ Robot::pressModifiers(int modifiers){
       //      else
       Robot::keyPress(VK_META);
    }
+*/
 }
 
 void 
 Robot::releaseModifiers(int modifiers){
+/*
    if(modifiers & SHIFT) Robot::keyRelease(VK_SHIFT);
    if(modifiers & CTRL) Robot::keyRelease(VK_CONTROL);
    if(modifiers & ALT) Robot::keyRelease(VK_ALT);//
@@ -72,6 +72,7 @@ Robot::releaseModifiers(int modifiers){
       //      else
       Robot::keyRelease(VK_META);
    }
+*/
 }
 
 
@@ -196,6 +197,7 @@ Robot::type(int screen, int x, int y, const char* text, int modifiers){
 
 void 
 Robot::type_ch(char character, int mode){
+/*
    switch (character) {
       case 'a': doType(mode,VK_A); break;
       case 'b': doType(mode,VK_B); break;
@@ -297,10 +299,12 @@ Robot::type_ch(char character, int mode){
       case '?': doType(mode,VK_SHIFT, VK_SLASH); break;
       case ' ': doType(mode,VK_SPACE); break;
    }
+*/
 }
 
 void 
 Robot::type_key(int key, int mode){
+/*
    switch (key) {
       case ESC: doType(mode,VK_ESCAPE); break;
       case ENTER: doType(mode,VK_ENTER); break;
@@ -334,6 +338,7 @@ Robot::type_key(int key, int mode){
       case F14: doType(mode,VK_F14); break;
       case F15: doType(mode,VK_F15); break;
    }
+*/
 }
 
 void 
@@ -428,8 +433,10 @@ Robot::keyUp(int key){
 //
 // OS-depdenet Implemntation
 //
-
+#ifdef MAC
+#include <ApplicationServices/ApplicationServices.h>
 #include <time.h>
+
 void
 Robot::delay(int msec){
    usleep(1000*msec);
@@ -438,7 +445,7 @@ Robot::delay(int msec){
 void
 Robot::mouseMoveTo(int x, int y, bool dragged)
 {
-   CGPoint newloc;
+	CGPoint newloc;
    CGEventRef eventRef;
    newloc.x = x;
    newloc.y = y;
@@ -924,3 +931,316 @@ Robot::openApp(const char* appname){
  } 
  
  */
+#endif
+
+
+//vector<int> xs;
+vector<RECT> gMonitorRCs;
+//vector<int> ys;
+BOOL CALLBACK MyInfoMonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData){
+	gMonitorRCs.push_back(RECT(*lprcMonitor));		
+	return true;
+}
+
+void getScreenOffset(int screen, int& xo, int& yo){
+	gMonitorRCs.clear();
+	EnumDisplayMonitors(NULL, NULL, &MyInfoMonitorEnumProc, 0);
+
+	xo = gMonitorRCs[screen].left;
+	yo = gMonitorRCs[screen].top;
+}
+
+void
+Robot::delay(int msec){
+	Sleep(msec);
+}
+
+void
+Robot::mouseMoveTo(int x, int y, bool dragged){
+	double fScreenWidth    = ::GetSystemMetrics(SM_CXSCREEN)-1; 
+  double fScreenHeight  = ::GetSystemMetrics(SM_CYSCREEN)-1; 
+  double fx = x*(65535.0f/fScreenWidth);
+  double fy = y*(65535.0f/fScreenHeight);
+  INPUT  Input={0};
+  Input.type      = INPUT_MOUSE;
+  Input.mi.dwFlags  = MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE;
+  Input.mi.dx = fx;
+  Input.mi.dy = fy;
+  ::SendInput(1,&Input,sizeof(INPUT));
+}
+   
+void 
+Robot::mouseMoveFromTo(int x0, int y0, int x1, int y1, bool dragged){ 
+   int stepsize = 20;
+   
+   int xsteps = (x1-x0)/stepsize;
+   int ysteps = (y1-y0)/stepsize;
+   
+   int steps = max(max(abs(xsteps),abs(ysteps)),1);
+ 
+   int xstep = (x1-x0)/steps;
+   int ystep = (y1-y0)/steps;
+   
+   for (int i=0; i < steps; i++){
+      int xi = x0 + i * xstep;
+      int yi = y0 + i * ystep;
+      mouseMoveTo(xi,yi,dragged);
+      Robot::delay(10);
+   }
+   mouseMoveTo(x1,y1,dragged);
+   Robot::delay(10);
+}
+
+
+void 
+Robot::mouseMove(int x, int y){
+   mouseMove(0,x,y);
+}
+
+void 
+Robot::mouseMove(int screen, int xdest, int ydest){
+
+    CURSORINFO cursor; 
+    cursor.cbSize = sizeof(CURSORINFO); 
+    GetCursorInfo(&cursor);
+
+	int xcur = cursor.ptScreenPos.x;
+	int ycur = cursor.ptScreenPos.y;
+
+	int xo,yo;
+	getScreenOffset(screen, xo, yo);
+
+	xdest += xo;
+	ydest += yo;
+	
+	mouseMoveFromTo(xcur,ycur,xdest,ydest,false);
+}
+
+void 
+Robot::mousePress(int buttons){
+  INPUT    Input={0};
+  // left down 
+  Input.type      = INPUT_MOUSE;
+  Input.mi.dwFlags  = MOUSEEVENTF_LEFTDOWN;
+  ::SendInput(1,&Input,sizeof(INPUT));
+}
+
+void
+Robot::singleClick(int button){
+   mousePress(button);
+   mouseRelease(button);
+}
+
+void
+Robot::drag(){
+}
+
+void
+Robot::drop(){
+}
+
+void
+Robot::doubleClick(int buttons){
+}
+
+void 
+Robot::mouseRelease(int buttons){
+}
+
+void 
+Robot::keyPress(int keycode){
+}
+
+void 
+Robot::keyRelease(int keycode){
+}
+
+void 
+Robot::waitForIdle(){
+}
+
+void 
+Robot::pasteText(const char* text){
+}
+
+void
+Robot::getScreenBounds(int screen, int& x, int& y, int& w, int& h){
+}
+
+void
+Robot::getScreenSize(int screen, int& w, int& h){
+
+	if (screen == 0){
+		w = ::GetSystemMetrics(SM_CXSCREEN);
+		h = ::GetSystemMetrics(SM_CYSCREEN);
+	}else{
+
+		gMonitorRCs.clear();
+		EnumDisplayMonitors(NULL, NULL, &MyInfoMonitorEnumProc, 0);
+		w = gMonitorRCs[screen].right - gMonitorRCs[screen].left; 
+		h = gMonitorRCs[screen].bottom - gMonitorRCs[screen].top;
+	}
+}
+
+using namespace cv;
+
+Mat
+Robot::capture(int screen){
+	int w,h;
+	getScreenSize(screen, w, h);
+   return capture(screen,0,0,w,h);
+}
+
+Mat
+Robot::capture(int screen, int x, int y, int w, int h){
+	
+	int xo,yo;
+	getScreenOffset(screen, xo, yo);
+
+	x += xo;
+	y += yo;
+
+    HWND hWnd = GetDesktopWindow();
+
+// Ref: http://msdn.microsoft.com/en-us/library/dd183402(v=VS.85).aspx
+
+    HDC hdcScreen;
+    HDC hdcWindow;
+    HDC hdcMemDC = NULL;
+    HBITMAP hbmScreen = NULL;
+    BITMAP bmpScreen;
+
+    // Retrieve the handle to a display device context for the client 
+    // area of the window. 
+    hdcScreen = GetDC(NULL);
+    hdcWindow = GetDC(hWnd);
+
+    // Create a compatible DC which is used in a BitBlt from the window DC
+    hdcMemDC = CreateCompatibleDC(hdcWindow); 
+
+    if(!hdcMemDC)
+    {
+        //MessageBox(hWnd, L"StretchBlt has failed",L"Failed", MB_OK);
+      //  goto done;
+    }
+
+    // Get the client area for size calculation
+    RECT rcClient;
+    GetClientRect(hWnd, &rcClient);
+
+    ////This is the best stretch mode
+    //SetStretchBltMode(hdcWindow,HALFTONE);
+
+    ////The source DC is the entire screen and the destination DC is the current window (HWND)
+    //if(!StretchBlt(hdcWindow, 
+    //           0,0, 
+    //           rcClient.right, rcClient.bottom, 
+    //           hdcScreen, 
+    //           0,0,
+    //           GetSystemMetrics (SM_CXSCREEN),
+    //           GetSystemMetrics (SM_CYSCREEN),
+    //           SRCCOPY))
+    //{
+    //    MessageBox(hWnd, L"StretchBlt has failed",L"Failed", MB_OK);
+    //    goto done;
+    //}
+    
+    // Create a compatible bitmap from the Window DC
+	// FULL-SCREEN
+    //hbmScreen = CreateCompatibleBitmap(hdcWindow, rcClient.right-rcClient.left, rcClient.bottom-rcClient.top);
+	hbmScreen = CreateCompatibleBitmap(hdcWindow, w, h);
+	//rcClient.bottom-rcClient.top);
+    
+    if(!hbmScreen)
+    {
+        //MessageBox(hWnd, L"CreateCompatibleBitmap Failed",L"Failed", MB_OK);
+    //    goto done;
+    }
+
+    // Select the compatible bitmap into the compatible memory DC.
+    SelectObject(hdcMemDC,hbmScreen);
+    
+    // Bit block transfer into our compatible memory DC.
+    if(!BitBlt(hdcMemDC, 
+               0,0, 
+               //rcClient.right-rcClient.left, rcClient.bottom-rcClient.top, 
+			   w,h,
+               hdcWindow, 
+               //-200,0,
+			   x,y,
+               SRCCOPY))
+    {
+        //MessageBox(hWnd, L"BitBlt has failed", L"Failed", MB_OK);
+      //  goto done;
+    }
+
+    // Get the BITMAP from the HBITMAP
+    GetObject(hbmScreen,sizeof(BITMAP),&bmpScreen);
+     
+    BITMAPFILEHEADER   bmfHeader;    
+    BITMAPINFOHEADER   bi;
+     
+    bi.biSize = sizeof(BITMAPINFOHEADER);    
+    bi.biWidth = bmpScreen.bmWidth;    
+    bi.biHeight = bmpScreen.bmHeight;  
+    bi.biPlanes = 1;
+    bi.biBitCount = 32;    
+    bi.biCompression = BI_RGB;    
+    bi.biSizeImage = 0;  
+    bi.biXPelsPerMeter = 0;    
+    bi.biYPelsPerMeter = 0;    
+    bi.biClrUsed = 0;    
+    bi.biClrImportant = 0;
+
+    DWORD dwBmpSize = ((bmpScreen.bmWidth * bi.biBitCount + 31) / 32) * 4 * bmpScreen.bmHeight;
+
+    // Starting with 32-bit Windows, GlobalAlloc and LocalAlloc are implemented as wrapper functions that 
+    // call HeapAlloc using a handle to the process's default heap. Therefore, GlobalAlloc and LocalAlloc 
+    // have greater overhead than HeapAlloc.
+    HANDLE hDIB = GlobalAlloc(GHND,dwBmpSize); 
+    char *lpbitmap = (char *)GlobalLock(hDIB);    
+
+    // Gets the "bits" from the bitmap and copies them into a buffer 
+    // which is pointed to by lpbitmap.
+    GetDIBits(hdcWindow, hbmScreen, 0,
+        (UINT)bmpScreen.bmHeight,
+        lpbitmap,
+        (BITMAPINFO *)&bi, DIB_RGB_COLORS);
+
+
+	int nChannels = bi.biBitCount/8 ;
+	int depth = IPL_DEPTH_8U;
+	int bpr = bi.biBitCount * bi.biWidth / 8; // bytes per row
+
+	
+
+	Mat bgra(cvSize(bi.biWidth,bi.biHeight), CV_8UC4, lpbitmap, bpr);
+
+	Mat bgrat;	
+	flip(bgra,bgrat,0);
+
+	
+	Mat bgr( bgrat.rows, bgrat.cols, CV_8UC3 );
+   cvtColor(bgrat,bgr,CV_RGBA2RGB);
+
+	
+    //Unlock and Free the DIB from the heap
+    GlobalUnlock(hDIB);    
+    GlobalFree(hDIB);
+       
+    //Clean up
+//done:
+
+    DeleteObject(hbmScreen);
+    ReleaseDC(hWnd, hdcMemDC);
+    ReleaseDC(NULL,hdcScreen);
+    ReleaseDC(hWnd,hdcWindow);
+
+
+   return bgr;
+}
+
+void
+Robot::openApp(const char* appname){
+}
+
