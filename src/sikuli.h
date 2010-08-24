@@ -12,6 +12,7 @@
 #include "screen.h"
 #include "settings.h"
 #include "event-manager.h"
+#include "ui.h"
 
 namespace sikuli{
 
@@ -22,6 +23,7 @@ namespace sikuli{
    void addImagePath(const char* imagePath);
    
    void wait(double seconds);
+   
    
 };
 

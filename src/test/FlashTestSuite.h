@@ -248,7 +248,10 @@ public:
    
    void testWakAMole(void)
    {
-//      Match g = s.find("startpage.png");
+      switchApp("Google Chrome.app");
+      
+      Match g = s.find("startpage.png");
+      
 //      g.click("play.png");
 // 
 //      while (!g.exists("enter.png",0)){

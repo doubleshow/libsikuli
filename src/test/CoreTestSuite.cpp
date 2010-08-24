@@ -29,3 +29,9 @@ public:
  void runTest() { suite_CoreTestSuite.testReadImageFromURL(); }
 } testDescription_CoreTestSuite_testReadImageFromURL;
 
+static class TestDescription_CoreTestSuite_testPageUpDown : public CxxTest::RealTestDescription {
+public:
+ TestDescription_CoreTestSuite_testPageUpDown() : CxxTest::RealTestDescription( Tests_CoreTestSuite, suiteDescription_CoreTestSuite, 51, "testPageUpDown" ) {}
+ void runTest() { suite_CoreTestSuite.testPageUpDown(); }
+} testDescription_CoreTestSuite_testPageUpDown;
+

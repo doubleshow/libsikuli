@@ -21,18 +21,21 @@ class SikuliInitCleanup{
 public:
    SikuliInitCleanup(){
       SikuliUI::sikuliUI  = new SikuliUI();
+      ptr = SikuliUI::sikuliUI;
    }
    
    ~SikuliInitCleanup(){
-      delete SikuliUI::sikuliUI ;
+      delete ptr;
    }
+private:
+   SikuliUI* ptr;
 };
 SikuliInitCleanup sic;
 
-void setSikuiUI(SikuliUI* ui){
+void 
+SikuliUI::set(SikuliUI* ui){
    SikuliUI::sikuliUI  = ui;
 }
-
 
 int
 SikuliUI::handleMatchFound(Region region, Pattern target, vector<Match> matches){
@@ -44,7 +47,7 @@ SikuliUI::handleMatchFound(Region region, Pattern target, vector<Match> matches)
       Match& match = matches[i];
       if (i<5)
          cout << '\t' << i+1 << ": (" << match.x << "," << match.y << "), score = " << match.getScore()  << endl;
-      else 
+      else if (i==5) 
          cout << '\t' << "... more" << endl;
    }
    

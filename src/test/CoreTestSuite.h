@@ -48,6 +48,16 @@ public:
       s.click("apple_in_workdir.png");
    }
    
+   void testPageUpDown(void)
+   {
+      switchApp("firefox.app");
+      s.press(PAGE_DOWN);
+      s.press(PAGE_DOWN);
+      
+      
+      
+   }
+   
    
 };
    

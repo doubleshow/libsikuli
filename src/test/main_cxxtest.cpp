@@ -11,12 +11,15 @@
 #include <cxxtest/StdioPrinter.h>
 
 int main() {
+
+   CxxTest::leaveOnly("CoreTestSuite","testPageUpDown");
+   
    //CxxTest::leaveOnly("MacTestSuite","testHoverAndClick");
    //CxxTest::leaveOnly("MacTestSuite","testDragDrop");
    //CxxTest::leaveOnly("FlashTestSuite","testClick");
    //CxxTest::leaveOnly("FlashTestSuite","testFindAll");
    //CxxTest::leaveOnly("FlashTestSuite","testVanish");
-   CxxTest::leaveOnly("FlashTestSuite","testEvent");
+   //CxxTest::leaveOnly("FlashTestSuite","testEvent");
    
    //CxxTest::leaveOnly("FlashTestSuite");
    //CxxTest::leaveOnly("CoreTestSuite","");

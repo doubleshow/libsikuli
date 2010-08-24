@@ -37,10 +37,16 @@ public:
    virtual int handleMatchFound(Region region,
                                 Pattern target,
                                 std::vector<Match> matches);
-   
+
+   static void set(SikuliUI* ui);
    static SikuliUI* sikuliUI;
    
+private:
+   
+   
+   
 };
+   
 
    
 
