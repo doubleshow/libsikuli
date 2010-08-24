@@ -113,7 +113,7 @@ Region::operator=(const Region& r){
    
    xo = r.xo;
    yo = r.yo;
-   _screen_id = _screen_id;
+   _screen_id = r._screen_id;
    
    return *this;
 }
@@ -582,6 +582,11 @@ Region::doFind(Pattern target) {
    dout << "[Region::doFind] Searching in (" << xo+x << "," << yo+y << ")-(" << xo+x+w << "," << yo+y+h << ")" << endl; 
   
    ScreenImage simg = capture();
+
+	//namedWindow("Test");
+	//imshow("Test",simg.getMat());
+	//waitKey();
+
    vector<FindResult> results = Vision::find(simg, target);
    
    vector<Match> matches;

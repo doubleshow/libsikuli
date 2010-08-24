@@ -11,14 +11,23 @@
 
 #include <string>
 
-#include "opencv2/opencv.hpp"
+#ifdef OPENCV_NEW
+	#include "opencv2/opencv.hpp"
+#else
+	#include "cv.h"
+	#include "cxcore.h"
+	#include "highgui.h"
+#endif
+
 using namespace std;
 
-
+namespace sikuli{
 // BUTTON
 #define BUTTON1_MASK 1
 #define BUTTON2_MASK 2  
 #define BUTTON3_MASK 4   
+
+#ifdef MAC
 
 // VIRTUAL KEYS
 // Mac: keyboard map
@@ -108,7 +117,7 @@ using namespace std;
 #define VK_ALT 58
 #define VK_META   55
 
-
+#endif
 
 // TYPE MODE
 #define PRESS_RELEASE 0
@@ -207,6 +216,8 @@ private:
    static int _modifiers;
    static bool _dragged;
    
+};
+
 };
 
 #endif

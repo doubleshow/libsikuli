@@ -8,9 +8,6 @@
  */
 
 #include "screen.h"
-
-#include <ApplicationServices/ApplicationServices.h>
-
 #include "robot.h"
 
 using namespace sikuli;
@@ -43,18 +40,18 @@ Screen::~Screen(){
 //   return screenimage;
 //}
 
-int 
-Screen::getNumberScreens(){
-   CGDisplayErr err;
-   CGDirectDisplayID ids[10];
-   CGDisplayCount dspyCnt;
-   err = CGGetActiveDisplayList(10,ids,&dspyCnt); 
-   return (int) dspyCnt;
-}
+//int 
+//Screen::getNumberScreens(){
+   //CGDisplayErr err;
+   //CGDirectDisplayID ids[10];
+   //CGDisplayCount dspyCnt;
+   //err = CGGetActiveDisplayList(10,ids,&dspyCnt); 
+   //return (int) dspyCnt;
+//}
 
-Rectangle
-Screen::getBounds(){
-   int x,y,w,h;
-   Robot::getScreenBounds(_screen_id,x,y,w,h);
-   return Rectangle(x,y,w,h);
-}
+//Rectangle
+//Screen::getBounds(){
+//   int x,y,w,h;
+//   Robot::getScreenBounds(_screen_id,x,y,w,h);
+//   return Rectangle(x,y,w,h);
+//}

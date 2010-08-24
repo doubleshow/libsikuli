@@ -2,8 +2,8 @@
 #include <vector>
 #include <iomanip>
 
-#include "opencv2/opencv.hpp"
-//#include "highgui.h"
+
+
 
 #include "cv-util.h"
 

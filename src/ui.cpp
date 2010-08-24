@@ -8,8 +8,10 @@
  */
 
 #include "ui.h"
+#include <iostream>
 
 using namespace sikuli;
+using namespace std;
 
 //SikuliUI* 
 //sikuliUI = 0;

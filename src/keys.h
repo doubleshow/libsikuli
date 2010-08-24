@@ -14,6 +14,11 @@
 //#define KEY_CTRL  2
 //#define KEY_META  4  
 //#define KEY_ALT   8
+namespace sikuli{
+
+#ifdef DELETE
+	#undef DELETE
+#endif
 
 enum specialKeys{
    ALT = 1,
@@ -54,5 +59,7 @@ enum specialKeys{
    PAGE_DOWN,
    PAGE_UP
 }; 
+
+};
 
 #endif // _KEYS_H_

@@ -11,8 +11,15 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "opencv2/opencv.hpp"
-//#include "highgui.h"
+
+#ifdef OPENCV_NEW
+	#include "opencv2/opencv.hpp"
+#else
+	#include "cv.h"
+	#include "cxcore.h"
+	#include "highgui.h"
+#endif
+
 #include "result.h"
 
 using namespace cv;
