@@ -24,9 +24,9 @@ public:
    
 //   ScreenImage capture(int x, int y, int w, int h);
    
-   Rectangle getBounds();
+   //Rectangle getBounds();
 
-   static int getNumberScreens();
+   //static int getNumberScreens();
    
 };
 
