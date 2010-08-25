@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(Sikuli)
 
+if (APPLE)
+
 find_package(curl)
 
 find_library(OPENCV_CORE_LIBRARY 
@@ -26,9 +28,10 @@ set(OPENCV_LIBRARIES
 		     ${OPENCV_IMGPROC_LIBRARY}
 		     ${OPENCV_OBJDETECT_LIBRARY})
 
-include_directories(/Developer/Headers/FlatCarbon )
-find_library(APP_SERVICES_LIBRARY ApplicationServices)
-mark_as_advanced(APP_SERVICES_LIBRARY)
+	include_directories(/Developer/Headers/FlatCarbon )
+	find_library(APP_SERVICES_LIBRARY ApplicationServices)
+	mark_as_advanced(APP_SERVICES_LIBRARY)
+endif (APPLE)
 
 add_subdirectory(examples)
 add_subdirectory(src)
