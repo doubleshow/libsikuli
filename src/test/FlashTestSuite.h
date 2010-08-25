@@ -241,39 +241,7 @@ public:
       r.onVanish(Pattern("flower.png"), &ve);
       
       r.onAppear(Pattern("bug.png"), &appear_and_stop_callback);      
-      EventManager::observe(20);
- 
-  
-   }
-   
-   void testWakAMole(void)
-   {
-      switchApp("Google Chrome.app");
-      
-      Match g = s.find("startpage.png");
-      
-//      g.click("play.png");
-// 
-//      while (!g.exists("enter.png",0)){
-//         try{
-//            
-//            vector<Match> ms = g.findAllNow(Pattern("mole.png"));
-//            cout << ms.size() << ": ------" << endl;
-//            for (int j=0;j<ms.size();++j){
-//               g.click(ms[j]);
-//               cout << ms[j].toString() << endl; 
-//            }
-//            
-//            if (ms.size()>0)
-//               Robot::delay(200);
-//            
-//         }catch (FindFailed ff){
-//            
-//         }
-//         
-//         
-//      }
-      
+      EventManager::observe(20);      
    }
    
 };

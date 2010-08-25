@@ -12,7 +12,7 @@
 
 int main() {
 
-   CxxTest::leaveOnly("CoreTestSuite","testPageUpDown");
+   //CxxTest::leaveOnly("CoreTestSuite","testPageUpDown");
    
    //CxxTest::leaveOnly("MacTestSuite","testHoverAndClick");
    //CxxTest::leaveOnly("MacTestSuite","testDragDrop");
@@ -21,7 +21,7 @@ int main() {
    //CxxTest::leaveOnly("FlashTestSuite","testVanish");
    //CxxTest::leaveOnly("FlashTestSuite","testEvent");
    
-   //CxxTest::leaveOnly("FlashTestSuite");
+   CxxTest::leaveOnly("FlashTestSuite");
    //CxxTest::leaveOnly("CoreTestSuite","");
    return CxxTest::StdioPrinter().run();
 }

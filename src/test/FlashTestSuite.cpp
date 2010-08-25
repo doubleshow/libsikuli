@@ -4,7 +4,6 @@
 #define CXXTEST_RUNNING
 #endif
 
-#define _CXXTEST_HAVE_EH
 #include <cxxtest/TestListener.h>
 #include <cxxtest/TestTracker.h>
 #include <cxxtest/TestRunner.h>
@@ -94,10 +93,4 @@ public:
  TestDescription_FlashTestSuite_testEvent() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 227, "testEvent" ) {}
  void runTest() { suite_FlashTestSuite.testEvent(); }
 } testDescription_FlashTestSuite_testEvent;
-
-static class TestDescription_FlashTestSuite_testWakAMole : public CxxTest::RealTestDescription {
-public:
- TestDescription_FlashTestSuite_testWakAMole() : CxxTest::RealTestDescription( Tests_FlashTestSuite, suiteDescription_FlashTestSuite, 249, "testWakAMole" ) {}
- void runTest() { suite_FlashTestSuite.testWakAMole(); }
-} testDescription_FlashTestSuite_testWakAMole;
 
