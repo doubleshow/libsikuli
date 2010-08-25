@@ -25,7 +25,7 @@ void addImagePath(const char* imagePath){
 }
  
 void wait(double seconds){
-   Robot::delay(seconds/1000);
+   Robot::delay(seconds*1000);
 }
       
       

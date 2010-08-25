@@ -20,8 +20,13 @@ int main() {
    //CxxTest::leaveOnly("FlashTestSuite","testFindAll");
    //CxxTest::leaveOnly("FlashTestSuite","testVanish");
    //CxxTest::leaveOnly("FlashTestSuite","testEvent");
+	CxxTest::leaveOnly("FlashTestSuite","testDragDrop");
+	//CxxTest::leaveOnly("FlashTestSuite","testDoubleClick");
+	//CxxTest::leaveOnly("FlashTestSuite","testType");
+	//CxxTest::leaveOnly("FlashTestSuite","testKeys");
+	//CxxTest::leaveOnly("FlashTestSuite","testPaste");
    
-   CxxTest::leaveOnly("FlashTestSuite");
+  //CxxTest::leaveOnly("FlashTestSuite");
    //CxxTest::leaveOnly("CoreTestSuite","");
    return CxxTest::StdioPrinter().run();
 }

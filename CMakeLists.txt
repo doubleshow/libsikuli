@@ -2,18 +2,18 @@ cmake_minimum_required(VERSION 2.6)
 project(Sikuli)
 
 
-if (W32)
+#if (W64)
 
 add_definitions(-DWINDOWS)
 
 find_library(OPENCV_CORE_LIBRARY 
-			    NAMES cxcore2.1
+			    NAMES cxcore210
 			    PATHS C:\\OpenCV2.1\lib)
 find_library(OPENCV_HIGHGUI_LIBRARY 
-			    NAMES highgui2.1
+			    NAMES highgui210
 			    PATHS C:\\OpenCV2.1\lib)
 find_library(OPENCV_CV_LIBRARY 
-			    NAMES cv2.1
+			    NAMES cv210
 			    PATHS C:\\OpenCV2.1\lib)
 
 set(OPENCV_LIBRARIES 
@@ -23,7 +23,7 @@ set(OPENCV_LIBRARIES
 
 option(OPENCV_NEW "use new opencv" NO)
 
-endif (W32)
+#endif (W32)
 
 if (APPLE)
 
