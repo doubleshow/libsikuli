@@ -3,7 +3,7 @@
  *  sikuli
  *
  *  Created by Tom Yeh on 7/27/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
+ *  Copyright 2010 sikuli.org. All rights reserved.
  *
  */
 
@@ -45,7 +45,6 @@ Robot::click(int buttons, int modifiers, bool dblClick){
 
 void 
 Robot::pressModifiers(int modifiers){
-/*
    if(modifiers & SHIFT) Robot::keyPress(VK_SHIFT);
    if(modifiers & CTRL) Robot::keyPress(VK_CONTROL);
    if(modifiers & ALT) Robot::keyPress(VK_ALT);
@@ -56,15 +55,13 @@ Robot::pressModifiers(int modifiers){
       //      else
       Robot::keyPress(VK_META);
    }
-*/
 }
 
 void 
 Robot::releaseModifiers(int modifiers){
-/*
    if(modifiers & SHIFT) Robot::keyRelease(VK_SHIFT);
    if(modifiers & CTRL) Robot::keyRelease(VK_CONTROL);
-   if(modifiers & ALT) Robot::keyRelease(VK_ALT);//
+   if(modifiers & ALT) Robot::keyRelease(VK_ALT);
    if(modifiers & CMD) Robot::keyRelease(VK_META);   
    if(modifiers & META){ 
       //      if( Env.getOS() == OS.WINDOWS )
@@ -72,7 +69,6 @@ Robot::releaseModifiers(int modifiers){
       //      else
       Robot::keyRelease(VK_META);
    }
-*/
 }
 
 
@@ -197,7 +193,7 @@ Robot::type(int screen, int x, int y, const char* text, int modifiers){
 
 void 
 Robot::type_ch(char character, int mode){
-/*
+#ifdef MAC
    switch (character) {
       case 'a': doType(mode,VK_A); break;
       case 'b': doType(mode,VK_B); break;
@@ -299,12 +295,12 @@ Robot::type_ch(char character, int mode){
       case '?': doType(mode,VK_SHIFT, VK_SLASH); break;
       case ' ': doType(mode,VK_SPACE); break;
    }
-*/
+#endif
 }
 
 void 
 Robot::type_key(int key, int mode){
-/*
+#ifdef MAC
    switch (key) {
       case ESC: doType(mode,VK_ESCAPE); break;
       case ENTER: doType(mode,VK_ENTER); break;
@@ -338,7 +334,7 @@ Robot::type_key(int key, int mode){
       case F14: doType(mode,VK_F14); break;
       case F15: doType(mode,VK_F15); break;
    }
-*/
+#endif
 }
 
 void 
@@ -822,34 +818,9 @@ Robot::capture(int screen, int x, int y, int w, int h){
    Mat bgra(cv::Size(imgw,imgh), CV_8UC4, buffer, bpr);
    Mat bgr( bgra.rows, bgra.cols, CV_8UC3 );
    cvtColor(bgra,bgr,CV_RGBA2RGB);
-   // 
+   
    delete buffer;
-   //namedWindow("test");
-//   imshow("test",bgr);
-//   waitKey(0);
-//   
    return bgr;
-   //
-//   //
-////   IplImage* img = cvCreateImageHeader(cvSize(imgw,imgh),8,bpp/8); //create the "shell"   
-////   cvSetData(img, buffer, bpr);    //set the buffer
-//   
-//   //Mat argb(img);
-//   Mat bgr( argb.rows, argb.cols, CV_8UC3 );
-//   Mat alpha( argb.rows, argb.cols, CV_8UC1 );
-//   
-//   Mat out[] = { bgr, alpha };
-//   int from_to[] = { 1,2,  2,1,  3,0,  0,3 };
-//   mixChannels( &argb, 1, out, 2, from_to, 4 ); 
-//   
-//   namedWindow("test");
-//   imshow("test",argb);
-//   waitKey(0);
-//// 
-//   delete buffer;
-//   //cvReleaseImageHeader(&img);
-//   
-//   return bgr;
 }
 
 void
@@ -932,7 +903,7 @@ Robot::openApp(const char* appname){
  
  */
 #endif
-
+#ifdef WINDOWS
 
 //vector<int> xs;
 vector<RECT> gMonitorRCs;
@@ -1243,4 +1214,5 @@ Robot::capture(int screen, int x, int y, int w, int h){
 void
 Robot::openApp(const char* appname){
 }
+#endif
 

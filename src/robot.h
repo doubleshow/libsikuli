@@ -3,16 +3,17 @@
  *  sikuli
  *
  *  Created by Tom Yeh on 7/27/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
+ *  Copyright 2010 sikuli.org. All rights reserved.
  *
  */
 #ifndef _SIKULI_ROBOT_
 #define _SIKULI_ROBOT_
 
+#include "config.h"
 #include <string>
 
 #ifdef OPENCV_NEW
-	#include "opencv2/opencv.hpp"
+	#include "opencv.hpp"
 #else
 	#include "cv.h"
 	#include "cxcore.h"

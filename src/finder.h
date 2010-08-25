@@ -1,6 +1,7 @@
 #ifndef _FINDER_H_
 #define _FINDER_H_
 
+#include "config.h"
 #include "pyramid-template-matcher.h"
 
 class BaseFinder{

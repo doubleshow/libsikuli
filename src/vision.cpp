@@ -125,21 +125,12 @@ Vision::compare(Mat im1, Mat im2){
 vector<FindResult> 
 Vision::find(ScreenImage simg, Pattern ptn) { 
 
-	SYSTEMTIME begin, end;
+//	SYSTEMTIME begin, end;
     
-    GetSystemTime(&begin);
+//    GetSystemTime(&begin);
 
-
-	//TimingBlock tb("vision");
-   
-   //TemplateFinder f(simg.getMat());   
-   
    Mat screenImage = simg.getMat();
-   
-//   Mat image = imread(ptn.getImageURL());
-//   if (image.data == NULL)
-//      throw FindFailed(ptn);
-   
+      
    vector<FindResult> results;
    if (ptn.bAll()){
       
@@ -196,9 +187,9 @@ Vision::find(ScreenImage simg, Pattern ptn) {
       final_results.push_back(results[i]);
    }
    
-    GetSystemTime(&end);
-	WORD elapsed_ms = (end.wSecond - begin.wSecond)*1000+(end.wMilliseconds - begin.wMilliseconds);
-	cout << elapsed_ms << " ms." << endl;
+//    GetSystemTime(&end);
+//	WORD elapsed_ms = (end.wSecond - begin.wSecond)*1000+(end.wMilliseconds - begin.wMilliseconds);
+//	cout << elapsed_ms << " ms." << endl;
 
    return final_results;
 }

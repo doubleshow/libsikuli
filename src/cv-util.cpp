@@ -3,7 +3,7 @@
  *  block
  *
  *  Created by Tom Yeh on 5/19/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
+ *  Copyright 2010 sikuli.org. All rights reserved.
  *
  */
 
@@ -17,7 +17,7 @@
 #endif
 
 using namespace std;
-
+using namespace cv;
 
 void imshowCompare(const Mat& m1, const Mat& m2, bool pause){
 	Size canvasSize(max(m1.cols, m2.cols), m1.rows + m2.rows);

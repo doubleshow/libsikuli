@@ -3,17 +3,19 @@
  *  vision
  *
  *  Created by Tom Yeh on 5/1/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
+ *  Copyright 2010 sikuli.org. All rights reserved.
  *
  */
 #ifndef _PYRAMID_TEMPLATE_MATCHER_
 #define _PYRAMID_TEMPLATE_MATCHER_
 
+#include "config.h"
+
 #include <stdio.h>
 #include <iostream>
 
 #ifdef OPENCV_NEW
-	#include "opencv2/opencv.hpp"
+	#include "opencv.hpp"
 #else
 	#include "cv.h"
 	#include "cxcore.h"

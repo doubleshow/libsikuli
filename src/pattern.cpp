@@ -3,7 +3,7 @@
  *  sikuli
  *
  *  Created by Tom Yeh on 8/5/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
+ *  Copyright 2010 sikuli.org. All rights reserved.
  *
  */
 
@@ -106,8 +106,12 @@ string findImageFromPaths(string image_filename) throw(FileNotFound) {
    
    for (int i=0; i<image_paths.size(); ++i){
       string image_filename_with_path = string(image_paths[i]) + 
+#if WINDOWS
       "\\" + string(image_filename);
-
+#else
+      "/" + string(image_filename);
+#endif
+      
       try { 
          return findImageHelper(image_filename_with_path);
       }catch (...) {}

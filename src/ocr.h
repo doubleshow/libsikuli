@@ -1,8 +1,9 @@
 #ifndef _OCR_H_
 #define _OCR_H_
 
+#include "config.h"
 #ifdef OPENCV_NEW
-	#include "opencv2/opencv.hpp"
+	#include "opencv.hpp"
 #else
 	#include "cv.h"
 	#include "cxcore.h"

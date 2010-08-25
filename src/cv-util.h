@@ -1,21 +1,22 @@
-#ifndef _CV_UTIL_H_
-#define _CV_UTIL_H_
-
 /*
  *  cv-util.h
  *  block
  *
  *  Created by Tom Yeh on 5/19/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
+ *  Copyright 2010 sikuli.org. All rights reserved.
  *
  */
 
+#ifndef _CV_UTIL_H_
+#define _CV_UTIL_H_
+
+#include "config.h"
 #ifdef OPENCV_NEW
-	#include "opencv2/opencv.hpp"
+#include "opencv.hpp"
 #else
-	#include "cv.h"
-	#include "cxcore.h"
-	#include "highgui.h"
+#include "cv.h"
+#include "cxcore.h"
+#include "highgui.h"
 #endif
 
 using namespace cv;

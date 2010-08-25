@@ -10,15 +10,10 @@
 #ifndef _KEYS_H_
 #define _KEYS_H_
 
-//#define KEY_SHIFT 1
-//#define KEY_CTRL  2
-//#define KEY_META  4  
-//#define KEY_ALT   8
-namespace sikuli{
 
 #ifdef DELETE
-	#undef DELETE
-#endif
+#undef DELETE
+#endif   
 
 enum specialKeys{
    ALT = 1,
@@ -60,6 +55,5 @@ enum specialKeys{
    PAGE_UP
 }; 
 
-};
 
 #endif // _KEYS_H_

@@ -61,6 +61,15 @@ public:
    private:
       string repr;
 };    
+   
+   
+#ifdef OPENCV_NEW
+#include "opencv.hpp"
+#else
+#include "cv.h"
+#include "cxcore.h"
+#include "highgui.h"
+#endif   
 
 class ScreenImage{
    
