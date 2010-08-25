@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
 project(Sikuli)
 
+if (APPLE)
+add_definitions(-DMAC)
+endif (APPLE)
+
 find_package(curl)
 
 find_library(OPENCV_CORE_LIBRARY 
