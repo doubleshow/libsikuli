@@ -350,6 +350,7 @@
 				</mx:Script>
 				
 				
+				
 			<mx:Image id="vanishFlower"  visible="true" source="@Embed('flower.png')" x="10" y="156"/>		
 				
 				
@@ -393,9 +394,11 @@
 							
 							case 4:
 							flower.visible = true;	
+							break
 							
 							case 5:
 							bug.visible = true;		
+							break
 							
 						}
 						step = step + 1;
