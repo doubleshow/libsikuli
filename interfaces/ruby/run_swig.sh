@@ -1,0 +1,1 @@
+swig -c++ -ruby -I../../src sikuli-ruby.i

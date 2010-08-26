@@ -3,10 +3,43 @@
 	layout="absolute" 
 	backgroundColor="#cc9966"	
 	borderColor="#B9D8EE">
-			<mx:Script>
+	
+	
+	<mx:Style>
+     @font-face {
+        src: local("Arial");/*url("ImperiumSerif.ttf");*/
+        fontFamily: myFontFamily;
+        advancedAntiAliasing: true;
+     }
+     
+     Application {
+        fontFamily: myFontFamily;
+        fontSize: 12;
+     }
+     
+     
+     
+     Panel {
+     	embedFonts: true;
+     	fontFamily: myFontFamily;
+     	fontWeight: normal;
+     	skin: ClassReference(null);
+     }
+     
+     Button {
+     	embedFonts: true;
+     	fontFamily: myFontFamily;
+     	fontWeight: normal;
+     	cornerRadius: 0;
+        textRollOverColor: red;
+     	fontSize: 14;
+     }
+     
+     </mx:Style>
+     <mx:Script>
 			<![CDATA[
 				private function tabChangeHandler(event:Event):void{
-					result.text = ''
+					thumbup.visible = false;
 					debug.text = ''
 				}
 			]]>
@@ -19,7 +52,7 @@
 		        }
   		  </mx:Style>
   		  
-	<mx:Panel title="Sikuli Tester" x="136" y="10">
+	<mx:Panel title="Sikuli Tester" x="152" y="10">
 		
 	<mx:ViewStack id="myViewStack" x="124" y="10" width="600" height="291"
 		change="tabChangeHandler(event)">
@@ -28,7 +61,7 @@
 		<mx:Script>
 			<![CDATA[
 				private function clickHandler(event:MouseEvent):void{
-					result.text = 'SUCCESS'
+					thumbup.visible = true;
 				}
 			]]>
 		</mx:Script>			
@@ -40,7 +73,7 @@
 			<![CDATA[
 				private function doubleClickHandler(event:MouseEvent):void{
 					if (event.type == MouseEvent.DOUBLE_CLICK){
-						result.text = 'SUCCESS'
+						thumbup.visible = true;
 					}
 				}
 			]]>
@@ -63,7 +96,7 @@
 						
 						if (testTypeTextInput.text 
 						== "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&*()_+ 1234567890-=`~;':,./<>?\"[]{}\\|")
-							result.text = "SUCCESS"
+							thumbup.visible = true;
 					}
 				]]>
 			</mx:Script>
@@ -125,7 +158,7 @@
 																
 						debug.text = keysPressed.toString() + "\n" + keysWanted.toString()
 						if (keysPressed.toString() == keysWanted.toString())
-							result.text = "SUCCESS"
+							thumbup.visible = true;
 					}
 				]]>
 			</mx:Script>
@@ -142,7 +175,8 @@
 					}
 					private function checkDragDropResult(event:Event):void{
 						if (slider.value == 10)
-							result.text = "SUCCESS"
+							thumbup.visible = true;
+
 					}
 				]]>
 			</mx:Script>
@@ -173,7 +207,7 @@
 						checkbox2.selected &&
 						checkbox3.selected &&
 						checkbox4.selected){
-							result.text = "SUCCESS"
+							thumbup.visible = true;
 						}
 					}
 				]]>
@@ -215,7 +249,7 @@
 						spatialOpBtnPressHistory = spatialOpBtnPressHistory + "{" + btn.id + "}"
 						debug.text = spatialOpBtnPressHistory
 						if (spatialOpBtnPressHistory == "{leftBtn}{belowBtn}{rightBtn}{aboveBtn}")
-							result.text = "SUCCESS"
+							thumbup.visible = true;
 					}
 					
 				]]>
@@ -249,7 +283,7 @@
 						testOCRHistory = testOCRHistory + "{" + btn.id + "}"
 						debug.text = testOCRHistory
 						if (testOCRHistory == "{sp}{c}{k}{mf}")
-							result.text = "SUCCESS"
+							thumbup.visible = true;
 					}
 					
 				]]>
@@ -279,7 +313,7 @@
 						testOrderingHistory = testOrderingHistory + "{" + btn.id + "}"
 						debug.text = testOrderingHistory
 						if (testOrderingHistory == "{leftMost}{bottomMost}{rightMost}{topMost}{left3rd}{bottom2nd}{right3rd}{top2nd}")
-							result.text = "SUCCESS"
+							thumbup.visible = true;
 					}
 					
 				]]>
@@ -318,7 +352,7 @@
 					
 					private function checkTestPaste(event:Event):void{
 						if (testPasteInput.text == "paSte tHis text here!!!")
-							result.text = "SUCCESS"
+							thumbup.visible = true;
 					}	
 						
 					]]>
@@ -418,15 +452,14 @@
 	</mx:ViewStack>
 	
 	</mx:Panel>
-	<mx:Label id="result"
-		text="" x="136" y="349" width="600" height="37" 
-		fontSize="22" color="#71FA42" fontWeight="bold"/>
+	
+	<mx:Image x="152" y="349" id="thumbup" source="@Embed(source='thumbup.png')"/>
 	
 	<mx:ButtonBar direction="vertical"
    x="10" y="10" dataProvider="{myViewStack}">
 
 	</mx:ButtonBar>
-	<mx:TextArea x="136" y="394" text="" width="600" id="debug"/>
+	<mx:TextArea x="260" y="349" text="" width="512" id="debug" height="106"/>
 	
 
 	
