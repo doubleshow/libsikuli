@@ -1,11 +1,15 @@
 #include "sikuli.h"
 
+#include <iostream>
+using namespace std;
 using namespace sikuli;
 
 int main(void){
+	Screen s(1);
    
-   Screen s;
-   addImagePath("examples/images");
+   
+	//addImagePath("examples/images");
+	addImagePath("examples\\images");
    
    cout << "Welcome! This is a sample program that uses libsikuli to automatically " << endl;
    cout << "play a whack-a-mole game. First, please load the game by openning the \n";
@@ -18,9 +22,16 @@ int main(void){
    cin.get();
    
    Match g = s.find("startpage.png");
+   s.click(g);   
+   wait(1);
+   s.click(g);   
+   wait(1);
    g.click("play.png");
-   wait(0.1);
-   g.click("play.png");   
+   wait(1);
+   g.click();
+
+   //g.hover(Location(0,0));	
+	//g.click();
    
 
    while (!g.exists("enter.png",0)){
@@ -37,4 +48,5 @@ int main(void){
    
    return 1;
 }
+
 

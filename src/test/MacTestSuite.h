@@ -21,9 +21,8 @@ public:
    }
    
    void tearDown() {
-      // sleep to let previous test complete
-      sleep(1);
-      
+      // wait to let previous test complete
+      wait(1);      
       Settings::resetImagePaths();
    }
    
@@ -84,7 +83,7 @@ public:
    {  
       Screen s;
       s.hover("magnifying_glass.png");
-      sleep(1);
+      wait(1);
       s.click();
       TS_ASSERT(s.exists("spotlight.png"));
       s.press(ESC);      
@@ -204,16 +203,16 @@ public:
       s.type("sys\n");
       s.click("trackpad.png");
       
-      sleep(1);
+      wait(1);
       
       Pattern p = Pattern("thumb.png").order(RIGHTLEFT);
       vector<Match> ms = s.findAll(p);
       s.hover(ms[2]);
-      sleep(2);
+      wait(2);
       TS_ASSERT(s.exists("tracking_speed_tooltip.png"));
       
       s.hover(ms[0]);
-      sleep(2);
+      wait(2);
       TS_ASSERT(s.exists("scrolling_speed_tooltip.png"));
       
       s.type("q", CMD);
@@ -227,7 +226,7 @@ public:
       s.type("sys\n");
       s.click("sharing.png");
       
-      sleep(2);
+      wait(2);
       Pattern p = Pattern("checkbox.png").limit(5);
       vector<Match> ms = s.findAll(p);
       TS_ASSERT_EQUALS(ms.size(), 5);

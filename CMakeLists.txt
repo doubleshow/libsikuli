@@ -1,9 +1,33 @@
 cmake_minimum_required(VERSION 2.6)
 project(Sikuli)
 
+
+#if (W64)
+
+add_definitions(-DWINDOWS)
+
+find_library(OPENCV_CORE_LIBRARY 
+			    NAMES cxcore210
+			    PATHS C:\\OpenCV2.1\lib)
+find_library(OPENCV_HIGHGUI_LIBRARY 
+			    NAMES highgui210
+			    PATHS C:\\OpenCV2.1\lib)
+find_library(OPENCV_CV_LIBRARY 
+			    NAMES cv210
+			    PATHS C:\\OpenCV2.1\lib)
+
+set(OPENCV_LIBRARIES 
+		     ${OPENCV_CORE_LIBRARY} 
+		     ${OPENCV_HIGHGUI_LIBRARY}
+		     ${OPENCV_CV_LIBRARY})
+
+option(OPENCV_NEW "use new opencv" NO)
+
+#endif (W32)
+
 if (APPLE)
+
 add_definitions(-DMAC)
-endif (APPLE)
 
 find_package(curl)
 
@@ -30,9 +54,13 @@ set(OPENCV_LIBRARIES
 		     ${OPENCV_IMGPROC_LIBRARY}
 		     ${OPENCV_OBJDETECT_LIBRARY})
 
-include_directories(/Developer/Headers/FlatCarbon )
-find_library(APP_SERVICES_LIBRARY ApplicationServices)
-mark_as_advanced(APP_SERVICES_LIBRARY)
+	include_directories(/Developer/Headers/FlatCarbon )
+	find_library(APP_SERVICES_LIBRARY ApplicationServices)
+	mark_as_advanced(APP_SERVICES_LIBRARY)
+
+endif (APPLE)
+
+configure_file(src/config.h.cmake src/config.h)
 
 add_subdirectory(examples)
 add_subdirectory(src)

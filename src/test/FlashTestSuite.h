@@ -10,8 +10,9 @@
 #include <cxxtest/TestSuite.h>
 #include "sikuli.h"
 #include "event-manager.h"
-
+#include <iostream>
 using namespace sikuli;
+using namespace std;
 
 void play_rome_puzzle();
 
@@ -57,21 +58,20 @@ public:
    Screen s;
    
    void setUp() {
-      Robot::openApp("Google Chrome.app");
+      //Robot::openApp("Google Chrome.app");
       Settings::addImagePath("test/flash/images");
-      s = Screen(1);
+      s = Screen(0);
    }
    
    void tearDown() {      
-      // sleep to allow the previous test to complete
-      sleep(1);
+      wait(0.5);
       Settings::resetImagePaths();
    }
    
    void switchToTest(const char* testTabImage)
    {
       s.click(testTabImage);
-      sleep(1);
+      wait(0.5);
    }
    
    void testClick(void)
@@ -228,9 +228,9 @@ public:
    {
       switchToTest("TestEvent.png");
       
-      Match m = s.find("SikuliTester.png");
+      Match m = s.find("TestClick.png");
       
-      Region r = s.inner(m.x,m.y,230,250);
+      Region r = s.inner(m.x+50,m.y,350,250);
       
       EventManager::addObserver(r, Observer(APPEAR, Pattern("computer.png"), &appear_callback));
       

@@ -47,6 +47,8 @@ void
 Robot::pressModifiers(int modifiers){
    if(modifiers & SHIFT) Robot::keyPress(VK_SHIFT);
    if(modifiers & CTRL) Robot::keyPress(VK_CONTROL);
+
+#ifdef MAC   
    if(modifiers & ALT) Robot::keyPress(VK_ALT);
    if(modifiers & CMD) Robot::keyPress(VK_META);
    if(modifiers & META) {
@@ -55,12 +57,14 @@ Robot::pressModifiers(int modifiers){
       //      else
       Robot::keyPress(VK_META);
    }
+#endif
 }
 
 void 
 Robot::releaseModifiers(int modifiers){
    if(modifiers & SHIFT) Robot::keyRelease(VK_SHIFT);
    if(modifiers & CTRL) Robot::keyRelease(VK_CONTROL);
+#ifdef MAC   
    if(modifiers & ALT) Robot::keyRelease(VK_ALT);
    if(modifiers & CMD) Robot::keyRelease(VK_META);   
    if(modifiers & META){ 
@@ -69,6 +73,7 @@ Robot::releaseModifiers(int modifiers){
       //      else
       Robot::keyRelease(VK_META);
    }
+#endif
 }
 
 
@@ -193,7 +198,7 @@ Robot::type(int screen, int x, int y, const char* text, int modifiers){
 
 void 
 Robot::type_ch(char character, int mode){
-#ifdef MAC
+
    switch (character) {
       case 'a': doType(mode,VK_A); break;
       case 'b': doType(mode,VK_B); break;
@@ -295,12 +300,12 @@ Robot::type_ch(char character, int mode){
       case '?': doType(mode,VK_SHIFT, VK_SLASH); break;
       case ' ': doType(mode,VK_SPACE); break;
    }
-#endif
+
 }
 
 void 
 Robot::type_key(int key, int mode){
-#ifdef MAC
+
    switch (key) {
       case ESC: doType(mode,VK_ESCAPE); break;
       case ENTER: doType(mode,VK_ENTER); break;
@@ -334,7 +339,7 @@ Robot::type_key(int key, int mode){
       case F14: doType(mode,VK_F14); break;
       case F15: doType(mode,VK_F15); break;
    }
-#endif
+
 }
 
 void 
@@ -903,7 +908,7 @@ Robot::openApp(const char* appname){
  
  */
 #endif
-#ifdef WINDOWS
+#if 1//def WINDOWS
 
 //vector<int> xs;
 vector<RECT> gMonitorRCs;
@@ -990,9 +995,17 @@ Robot::mouseMove(int screen, int xdest, int ydest){
 void 
 Robot::mousePress(int buttons){
   INPUT    Input={0};
-  // left down 
   Input.type      = INPUT_MOUSE;
-  Input.mi.dwFlags  = MOUSEEVENTF_LEFTDOWN;
+
+   if (buttons & BUTTON1_MASK)
+      Input.mi.dwFlags  = MOUSEEVENTF_LEFTDOWN;
+   else if (buttons & BUTTON2_MASK)
+      Input.mi.dwFlags = MOUSEEVENTF_MIDDLEDOWN ;   
+   else if (buttons & BUTTON3_MASK)
+	  Input.mi.dwFlags  = MOUSEEVENTF_RIGHTDOWN;
+
+
+  
   ::SendInput(1,&Input,sizeof(INPUT));
 }
 
@@ -1004,26 +1017,51 @@ Robot::singleClick(int button){
 
 void
 Robot::drag(){
+	mousePress(BUTTON1_MASK);
 }
 
 void
 Robot::drop(){
+	mouseRelease(BUTTON1_MASK);
 }
 
 void
 Robot::doubleClick(int buttons){
+	singleClick(buttons);
+	delay(20);
+	singleClick(buttons);
 }
 
 void 
 Robot::mouseRelease(int buttons){
+  INPUT    Input={0};
+  Input.type      = INPUT_MOUSE;
+   if (buttons & BUTTON1_MASK)
+      Input.mi.dwFlags  = MOUSEEVENTF_LEFTUP;
+   else if (buttons & BUTTON2_MASK)
+      Input.mi.dwFlags = MOUSEEVENTF_MIDDLEUP;   
+   else if (buttons & BUTTON3_MASK)
+	  Input.mi.dwFlags  = MOUSEEVENTF_RIGHTUP;
+
+  ::SendInput(1,&Input,sizeof(INPUT));
 }
 
 void 
 Robot::keyPress(int keycode){
+
+	keybd_event(keycode,
+				0,
+                KEYEVENTF_EXTENDEDKEY | 0,
+                0 );
 }
 
 void 
 Robot::keyRelease(int keycode){
+      
+         keybd_event( keycode,
+                      0,
+                      KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP,
+                      0);
 }
 
 void 
@@ -1032,10 +1070,35 @@ Robot::waitForIdle(){
 
 void 
 Robot::pasteText(const char* text){
+
+//text to send
+ LPCTSTR sText = text; 
+
+ if (!OpenClipboard(NULL)){ return; }    //if failed to open clipboard, return
+ EmptyClipboard();    //empty the clipboard
+ 
+ HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, (lstrlen(sText)+1));    //allocate memory as big as the text-string
+ LPTSTR sMem = (TCHAR*)GlobalLock(hMem);        //make memory-data space, lock the memory
+ memcpy(sMem, sText, (lstrlen(sText)+1));    //copy text-data into memory-data
+ GlobalUnlock(hMem);        //unlock the memory
+ SetClipboardData(CF_TEXT, hMem);    //put the data (text) to the clipboard 
+ CloseClipboard();    //we don't want to put anymore data to it so..}
+
+ keyPress(VK_CONTROL);
+ keyPress(VK_V);
+ keyRelease(VK_V);
+ keyRelease(VK_CONTROL);
+
 }
 
 void
 Robot::getScreenBounds(int screen, int& x, int& y, int& w, int& h){
+		gMonitorRCs.clear();
+		EnumDisplayMonitors(NULL, NULL, &MyInfoMonitorEnumProc, 0);
+		w = gMonitorRCs[screen].right - gMonitorRCs[screen].left; 
+		h = gMonitorRCs[screen].bottom - gMonitorRCs[screen].top;
+		x = gMonitorRCs[screen].right;
+		y = gMonitorRCs[screen].top;
 }
 
 void

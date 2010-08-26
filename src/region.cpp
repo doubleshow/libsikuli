@@ -615,7 +615,7 @@ Region::doFind(Pattern target) {
 vector<Match> 
 Region::repeat(callback func, Pattern target, int seconds, int frequency){
    vector<Match> ms;
-   
+   seconds = 5;
    //cout << CLOCKS_PER_MSEC << endl;
    long max_clocks_per_scan = CLOCKS_PER_SEC / frequency;
    //long start = clock();
@@ -636,7 +636,7 @@ Region::repeat(callback func, Pattern target, int seconds, int frequency){
       long mseconds_to_delay = 1000*(max_clocks_per_scan - actual_clocks_per_scan)/CLOCKS_PER_SEC;
       
       //if (seconds > 0)
-      Robot::delay(max((long)10, mseconds_to_delay));
+      //Robot::delay(max((long)10, mseconds_to_delay));
       //cout << 1.0*(clock() - start)/ CLOCKS_PER_SEC << " seconds" << endl;
       //cout << (time(NULL) - start_time) << " seconds" << endl;
    } while (time(NULL) < time_limit);
@@ -685,7 +685,10 @@ Region::waitAll(const char* target, int seconds){
 bool
 Region::exists(Pattern target, int seconds){
    vector<Match> ms;
-   ms = findRepeat(target, seconds, Settings::WaitScanRate);
+   if (seconds > 0)
+	ms = findRepeat(target, seconds, Settings::WaitScanRate);
+   else
+    ms = doFind(target);
    return !ms.empty();
 }
 
