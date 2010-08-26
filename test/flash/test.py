@@ -15,7 +15,11 @@ class SikuliCallbackEventHandler(SikuliEventHandler):
         self.handler = handler
 
     def handle(self, event):
-        self.handler(event)
+        if len(inspect.getargspec(self.handler).args) == 1:
+            self.handler(event)
+        else:
+            self.handler()
+
 
 Region_onAppear_old = Region.onAppear
 def Region_onAppear(self, target, handler):
@@ -55,9 +59,14 @@ def switchToTest(x):
 
 def appear_callback(event):
     print event.pattern.getImageURL() + " appeared!"
+    print event.match.toString()
+    print event.region.hover(event.match
 
 def vanish_callback(event):
     print event.pattern.getImageURL() + " vanished!"
+
+def flower_vanish_callback():
+    print "flower vanished!"
 
 def appear_and_stop_callback(event):
     print event.pattern.getImageURL() + " appeared!"
@@ -215,7 +224,7 @@ class TestFlash(unittest.TestCase):
         r.onVanish(Pattern("computer.png"), vanish_callback)
 
         r.onAppear(Pattern("flower.png"), appear_callback)
-        r.onVanish(Pattern("flower.png"), vanish_callback)
+        r.onVanish(Pattern("flower.png"), flower_vanish_callback)
 
         r.onAppear(Pattern("bug.png"), appear_and_stop_callback)
 

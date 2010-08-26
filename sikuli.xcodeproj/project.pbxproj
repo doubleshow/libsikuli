@@ -86,6 +86,9 @@
 		A0DB50791220AC4500BF48E5 /* result.h in Headers */ = {isa = PBXBuildFile; fileRef = A06B996D1208350C000C73A3 /* result.h */; };
 		A0DB507A1220AC4500BF48E5 /* screen.h in Headers */ = {isa = PBXBuildFile; fileRef = A06B99711208350C000C73A3 /* screen.h */; };
 		A0DB507B1220AC4500BF48E5 /* ui.h in Headers */ = {isa = PBXBuildFile; fileRef = A0DB4F07121F766800BF48E5 /* ui.h */; };
+		A0FE970C1224A502002179C1 /* test_register.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0FE970B1224A502002179C1 /* test_register.cpp */; };
+		A0FE97181224A615002179C1 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0FE97171224A615002179C1 /* Carbon.framework */; };
+		A0FE98171224BCB3002179C1 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0FE98161224BCB3002179C1 /* CoreFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,7 +96,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A0DB4FF6121FF3B500BF48E5 /* libsikuli */;
+			remoteGlobalIDString = A0DB4FF6121FF3B500BF48E5;
 			remoteInfo = libsikuli;
 		};
 		A024CA67122332D600E21C0C /* PBXContainerItemProxy */ = {
@@ -208,6 +211,10 @@
 		A0EB76A71210DAF200C243A5 /* exceptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = exceptions.h; path = src/exceptions.h; sourceTree = "<group>"; };
 		A0EB793A12116F7100C243A5 /* event-manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "event-manager.cpp"; path = "src/event-manager.cpp"; sourceTree = "<group>"; };
 		A0EB793B12116F7100C243A5 /* event-manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "event-manager.h"; path = "src/event-manager.h"; sourceTree = "<group>"; };
+		A0FE970A1224A502002179C1 /* test_register.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_register.h; sourceTree = "<group>"; };
+		A0FE970B1224A502002179C1 /* test_register.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_register.cpp; sourceTree = "<group>"; };
+		A0FE97171224A615002179C1 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
+		A0FE98161224BCB3002179C1 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -248,6 +255,8 @@
 				A024CA091222955400E21C0C /* libopencv_features2d.dylib in Frameworks */,
 				A024CA0A1222955400E21C0C /* libopencv_contrib.dylib in Frameworks */,
 				A024CA0B1222955400E21C0C /* libopencv_calib3d.dylib in Frameworks */,
+				A0FE97181224A615002179C1 /* Carbon.framework in Frameworks */,
+				A0FE98171224BCB3002179C1 /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,6 +369,8 @@
 				A03736E8120B86C60000682B /* libcurl.dylib */,
 				A0454E7F11FF19570018D949 /* ApplicationServices.framework */,
 				A045505F11FF44440018D949 /* OpenGL.framework */,
+				A0FE97171224A615002179C1 /* Carbon.framework */,
+				A0FE98161224BCB3002179C1 /* CoreFoundation.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -429,6 +440,8 @@
 			children = (
 				A024CA62122332B500E21C0C /* play-bejeweled.cpp */,
 				A024CA63122332B500E21C0C /* play-whackamole.cpp */,
+				A0FE970A1224A502002179C1 /* test_register.h */,
+				A0FE970B1224A502002179C1 /* test_register.cpp */,
 			);
 			name = Examples;
 			sourceTree = "<group>";
@@ -575,6 +588,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A024CA64122332D200E21C0C /* play-bejeweled.cpp in Sources */,
+				A0FE970C1224A502002179C1 /* test_register.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -639,9 +653,13 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = OPENCV_NEW;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = /usr/local/include;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/opencv2,
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				SDKROOT = macosx10.6;
@@ -654,8 +672,13 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = OPENCV_NEW;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/opencv2,
+				);
 				PREBINDING = NO;
 				SDKROOT = macosx10.6;
 			};
@@ -700,6 +723,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					MAC,
+					OPENCV_NEW,
+				);
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = "play-bejeweled";
 			};
@@ -712,6 +739,10 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					MAC,
+					OPENCV_NEW,
+				);
 				HEADER_SEARCH_PATHS = /usr/local/include;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = "play-bejeweled";
@@ -762,6 +793,11 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					MAC,
+					OPENCV_NEW,
+				);
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = sikuli;
@@ -778,6 +814,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					MAC,
+					OPENCV_NEW,
+				);
 				HEADER_SEARCH_PATHS = /usr/local/include;
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;

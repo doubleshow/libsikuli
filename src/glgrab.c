@@ -113,12 +113,12 @@ CGImageRef grabViaOpenGL(CGDirectDisplayID display, CGRect srcRect)
    long bytewidth;
    GLint width, height;
    long bytes;
-   //CGColorSpaceRef cSpace = CGColorSpaceCreateWithName (kCGColorSpaceGenericRGB);
-   CGColorSpaceRef cSpace = CGColorSpaceCreateDeviceRGB();
+   CGColorSpaceRef cSpace = CGColorSpaceCreateWithName (kCGColorSpaceGenericRGB);
+   //CGColorSpaceRef cSpace = CGColorSpaceCreateDeviceRGB();
    
    CGLContextObj    glContextObj;
    CGLPixelFormatObj pixelFormatObj ;
-   long numPixelFormats ;
+   GLint numPixelFormats ;
    CGLPixelFormatAttribute attribs[] =
    {
       kCGLPFAFullScreen,
@@ -126,6 +126,20 @@ CGImageRef grabViaOpenGL(CGDirectDisplayID display, CGRect srcRect)
       0,    /* Display mask bit goes here */
       0
    } ;
+//   
+//   int attribs[] =
+//   {
+//      //      kCGLPFAClosestPolicy,
+//      kCGLPFAFullScreen,
+//      kCGLPFADisplayMask,
+//      0,//NULL,    /* Display mask bit goes here */
+//      kCGLPFAColorSize, 24,
+//      kCGLPFAAlphaSize, 0,
+//      kCGLPFADepthSize, 32,
+//      kCGLPFASupersample,
+//      0//NULL
+//   } ;
+   
    
    
    if ( display == kCGNullDirectDisplay )
@@ -142,10 +156,30 @@ CGImageRef grabViaOpenGL(CGDirectDisplayID display, CGRect srcRect)
    if ( glContextObj == NULL )
       return NULL;
    
+   if ( pixelFormatObj == NULL )    // No full screen context support
+   {
+      // GL didn't find any suitable pixel formats. Try again without the supersample bit:
+      attribs[10] = 0;//NULL;
+      CGLChoosePixelFormat( (CGLPixelFormatAttribute*) attribs, &pixelFormatObj, &numPixelFormats );
+      if (pixelFormatObj == NULL)
+      {
+       //  qDebug("Unable to find an openGL pixel format that meets constraints");
+         return NULL;
+      }
+   }
+//   CGLCreateContext( pixelFormatObj, NULL, &glContextObj ) ;
+//   CGLDestroyPixelFormat( pixelFormatObj ) ;
+//   if ( glContextObj == NULL )
+//   {
+//      qDebug("Unable to create OpenGL context");
+//      return NULL;
+//   }
+   
+   
    
    CGLSetCurrentContext( glContextObj ) ;
    CGLSetFullScreen( glContextObj ) ;
-   
+   //CGLSetFullScreenOnDisplay(glContextObj,attribs[2]);
    
    glReadBuffer(GL_FRONT);
    
@@ -169,11 +203,15 @@ CGImageRef grabViaOpenGL(CGDirectDisplayID display, CGRect srcRect)
    }
    bitmap = CGBitmapContextCreate(data, width, height, 8, bytewidth,
                                   cSpace, kCGImageAlphaNoneSkipFirst /* XRGB */);
-   CFRelease(cSpace);
+   CGColorSpaceRelease(cSpace);
    
    
    /* Read framebuffer into our bitmap */
    glFinish(); /* Finish all OpenGL commands */
+   
+   glPushClientAttrib(GL_CLIENT_PIXEL_STORE_BIT);
+   
+   
    glPixelStorei(GL_PACK_ALIGNMENT, 4); /* Force 4-byte alignment */
    glPixelStorei(GL_PACK_ROW_LENGTH, 0);
    glPixelStorei(GL_PACK_SKIP_ROWS, 0);
@@ -190,6 +228,10 @@ CGImageRef grabViaOpenGL(CGDirectDisplayID display, CGRect srcRect)
                 GL_UNSIGNED_INT_8_8_8_8, // for Intel! http://lists.apple.com/archives/quartz-dev/2006/May/msg00100.html
 #endif
                 data);
+   
+   
+   glPopClientAttrib();
+   
    /*
     * glReadPixels generates a quadrant I raster, with origin in the lower left
     * This isn't a problem for signal processing routines such as compressors,
@@ -199,12 +241,11 @@ CGImageRef grabViaOpenGL(CGDirectDisplayID display, CGRect srcRect)
     */
    swizzleBitmap(data, bytewidth, height);
    
-   
    /* Make an image out of our bitmap; does a cheap vm_copy of the bitmap */
    image = CGBitmapContextCreateImage(bitmap);
    
    /* Get rid of bitmap */
-   CFRelease(bitmap);
+   CGContextRelease(bitmap);
    free(data);
    
    
@@ -212,6 +253,7 @@ CGImageRef grabViaOpenGL(CGDirectDisplayID display, CGRect srcRect)
    CGLSetCurrentContext( NULL );
    CGLClearDrawable( glContextObj ); // disassociate from full screen
    CGLDestroyContext( glContextObj ); // and destroy the context
+   CGLReleaseContext(glContextObj);
    
    /* Returned image has a reference count of 1 */
    return image;

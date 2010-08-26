@@ -290,12 +290,14 @@ bool move(int type){
    
 }
 
-
-
 int main(void){
    Screen s;
-   addImagePath("examples/images");
-   
+
+#ifdef WINDOWS
+   addImagePath("examples\\images");
+#else
+   addImagePath("examples/images");   
+#endif
    
    // Load the game in the web browser, in this
    // example, Google's Chrome
