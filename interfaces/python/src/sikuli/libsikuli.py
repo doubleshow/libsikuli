@@ -661,7 +661,78 @@ def EventManager_stop():
   return _libsikuli.EventManager_stop()
 EventManager_stop = _libsikuli.EventManager_stop
 
-   
+SKIP = _libsikuli.SKIP
+RETRY = _libsikuli.RETRY
+ABORT = _libsikuli.ABORT
+class SikuliUI(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, SikuliUI, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, SikuliUI, name)
+    __repr__ = _swig_repr
+    def __init__(self): 
+        if self.__class__ == SikuliUI:
+            _self = None
+        else:
+            _self = self
+        this = _libsikuli.new_SikuliUI(_self, )
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _libsikuli.delete_SikuliUI
+    __del__ = lambda self : None;
+    def handleFindFailedException(self, *args): return _libsikuli.SikuliUI_handleFindFailedException(self, *args)
+    def handleMatchFound(self, *args): return _libsikuli.SikuliUI_handleMatchFound(self, *args)
+    __swig_getmethods__["set"] = lambda x: _libsikuli.SikuliUI_set
+    if _newclass:set = staticmethod(_libsikuli.SikuliUI_set)
+    __swig_setmethods__["sikuliUI"] = _libsikuli.SikuliUI_sikuliUI_set
+    __swig_getmethods__["sikuliUI"] = _libsikuli.SikuliUI_sikuliUI_get
+    if _newclass:sikuliUI = _swig_property(_libsikuli.SikuliUI_sikuliUI_get, _libsikuli.SikuliUI_sikuliUI_set)
+    def __disown__(self):
+        self.this.disown()
+        _libsikuli.disown_SikuliUI(self)
+        return weakref_proxy(self)
+SikuliUI_swigregister = _libsikuli.SikuliUI_swigregister
+SikuliUI_swigregister(SikuliUI)
+
+def SikuliUI_set(*args):
+  return _libsikuli.SikuliUI_set(*args)
+SikuliUI_set = _libsikuli.SikuliUI_set
+
+class ImageReadHelper(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, ImageReadHelper, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, ImageReadHelper, name)
+    __repr__ = _swig_repr
+    def __init__(self): 
+        if self.__class__ == ImageReadHelper:
+            _self = None
+        else:
+            _self = self
+        this = _libsikuli.new_ImageReadHelper(_self, )
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _libsikuli.delete_ImageReadHelper
+    __del__ = lambda self : None;
+    def resolveImageFilename(self, *args): return _libsikuli.ImageReadHelper_resolveImageFilename(self, *args)
+    __swig_getmethods__["instance"] = lambda x: _libsikuli.ImageReadHelper_instance
+    if _newclass:instance = staticmethod(_libsikuli.ImageReadHelper_instance)
+    __swig_getmethods__["set"] = lambda x: _libsikuli.ImageReadHelper_set
+    if _newclass:set = staticmethod(_libsikuli.ImageReadHelper_set)
+    def __disown__(self):
+        self.this.disown()
+        _libsikuli.disown_ImageReadHelper(self)
+        return weakref_proxy(self)
+ImageReadHelper_swigregister = _libsikuli.ImageReadHelper_swigregister
+ImageReadHelper_swigregister(ImageReadHelper)
+
+def ImageReadHelper_instance():
+  return _libsikuli.ImageReadHelper_instance()
+ImageReadHelper_instance = _libsikuli.ImageReadHelper_instance
+
+def ImageReadHelper_set(*args):
+  return _libsikuli.ImageReadHelper_set(*args)
+ImageReadHelper_set = _libsikuli.ImageReadHelper_set
 
 
 

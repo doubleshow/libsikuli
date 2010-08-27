@@ -3167,30 +3167,31 @@ namespace Swig {
 #define SWIGTYPE_p_sikuli__EventManager swig_types[9]
 #define SWIGTYPE_p_sikuli__FileNotFound swig_types[10]
 #define SWIGTYPE_p_sikuli__FindFailed swig_types[11]
-#define SWIGTYPE_p_sikuli__Location swig_types[12]
-#define SWIGTYPE_p_sikuli__Match swig_types[13]
-#define SWIGTYPE_p_sikuli__Observer swig_types[14]
-#define SWIGTYPE_p_sikuli__Pattern swig_types[15]
-#define SWIGTYPE_p_sikuli__Rectangle swig_types[16]
-#define SWIGTYPE_p_sikuli__Region swig_types[17]
-#define SWIGTYPE_p_sikuli__RegionObserver swig_types[18]
-#define SWIGTYPE_p_sikuli__Screen swig_types[19]
-#define SWIGTYPE_p_sikuli__ScreenImage swig_types[20]
-#define SWIGTYPE_p_sikuli__Settings swig_types[21]
-#define SWIGTYPE_p_sikuli__SikuliEventHandler swig_types[22]
-#define SWIGTYPE_p_size_type swig_types[23]
-#define SWIGTYPE_p_std__exception swig_types[24]
-#define SWIGTYPE_p_std__invalid_argument swig_types[25]
-#define SWIGTYPE_p_std__vectorT_char_const_p_std__allocatorT_char_const_p_t_t swig_types[26]
-#define SWIGTYPE_p_std__vectorT_sikuli__Event_std__allocatorT_sikuli__Event_t_t swig_types[27]
-#define SWIGTYPE_p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t swig_types[28]
-#define SWIGTYPE_p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__allocator_type swig_types[29]
-#define SWIGTYPE_p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__value_type swig_types[30]
-#define SWIGTYPE_p_string swig_types[31]
-#define SWIGTYPE_p_swig__SwigPyIterator swig_types[32]
-#define SWIGTYPE_p_value_type swig_types[33]
-static swig_type_info *swig_types[35];
-static swig_module_info swig_module = {swig_types, 34, 0, 0, 0, 0};
+#define SWIGTYPE_p_sikuli__ImageReadHelper swig_types[12]
+#define SWIGTYPE_p_sikuli__Location swig_types[13]
+#define SWIGTYPE_p_sikuli__Match swig_types[14]
+#define SWIGTYPE_p_sikuli__Observer swig_types[15]
+#define SWIGTYPE_p_sikuli__Pattern swig_types[16]
+#define SWIGTYPE_p_sikuli__Rectangle swig_types[17]
+#define SWIGTYPE_p_sikuli__Region swig_types[18]
+#define SWIGTYPE_p_sikuli__RegionObserver swig_types[19]
+#define SWIGTYPE_p_sikuli__Screen swig_types[20]
+#define SWIGTYPE_p_sikuli__ScreenImage swig_types[21]
+#define SWIGTYPE_p_sikuli__Settings swig_types[22]
+#define SWIGTYPE_p_sikuli__SikuliEventHandler swig_types[23]
+#define SWIGTYPE_p_sikuli__SikuliUI swig_types[24]
+#define SWIGTYPE_p_size_type swig_types[25]
+#define SWIGTYPE_p_std__exception swig_types[26]
+#define SWIGTYPE_p_std__invalid_argument swig_types[27]
+#define SWIGTYPE_p_std__vectorT_char_const_p_std__allocatorT_char_const_p_t_t swig_types[28]
+#define SWIGTYPE_p_std__vectorT_sikuli__Event_std__allocatorT_sikuli__Event_t_t swig_types[29]
+#define SWIGTYPE_p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t swig_types[30]
+#define SWIGTYPE_p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__allocator_type swig_types[31]
+#define SWIGTYPE_p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__value_type swig_types[32]
+#define SWIGTYPE_p_swig__SwigPyIterator swig_types[33]
+#define SWIGTYPE_p_value_type swig_types[34]
+static swig_type_info *swig_types[36];
+static swig_module_info swig_module = {swig_types, 35, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3635,6 +3636,9 @@ SWIG_AsVal_ptrdiff_t (PyObject * obj, ptrdiff_t *val)
 
 
 #include <vector>
+
+
+#include <string>
 
 
 namespace swig {  
@@ -4898,6 +4902,17 @@ SWIG_FromCharPtrAndSize(const char* carray, size_t size)
 }
 
 
+SWIGINTERNINLINE PyObject *
+SWIG_From_std_string  (const std::string& s)
+{
+  if (s.size()) {
+    return SWIG_FromCharPtrAndSize(s.data(), s.size());
+  } else {
+    return SWIG_FromCharPtrAndSize(s.c_str(), 0);
+  }
+}
+
+
 SWIGINTERNINLINE PyObject * 
 SWIG_FromCharPtr(const char *cptr)
 { 
@@ -4913,6 +4928,37 @@ SWIG_AsVal_bool (PyObject *obj, bool *val)
     return SWIG_ERROR;
   if (val) *val = r ? true : false;
   return SWIG_OK;
+}
+
+
+SWIGINTERN int
+SWIG_AsPtr_std_string (PyObject * obj, std::string **val) 
+{
+  char* buf = 0 ; size_t size = 0; int alloc = SWIG_OLDOBJ;
+  if (SWIG_IsOK((SWIG_AsCharPtrAndSize(obj, &buf, &size, &alloc)))) {
+    if (buf) {
+      if (val) *val = new std::string(buf, size - 1);
+      if (alloc == SWIG_NEWOBJ) delete[] buf;
+      return SWIG_NEWOBJ;
+    } else {
+      if (val) *val = 0;
+      return SWIG_OLDOBJ;
+    }
+  } else {
+    static int init = 0;
+    static swig_type_info* descriptor = 0;
+    if (!init) {
+      descriptor = SWIG_TypeQuery("std::string" " *");
+      init = 1;
+    }
+    if (descriptor) {
+      std::string *vptr;
+      int res = SWIG_ConvertPtr(obj, (void**)&vptr, descriptor, 0);
+      if (SWIG_IsOK(res) && val) *val = vptr;
+      return res;
+    }
+  }
+  return SWIG_ERROR;
 }
 
 
@@ -4953,6 +4999,126 @@ void SwigDirector_SikuliEventHandler::handle(sikuli::Event event) {
       Swig::DirectorMethodException::raise("Error detected when calling 'SikuliEventHandler.handle'");
     }
   }
+}
+
+
+SwigDirector_SikuliUI::SwigDirector_SikuliUI(PyObject *self): sikuli::SikuliUI(), Swig::Director(self) {
+  SWIG_DIRECTOR_RGTR((sikuli::SikuliUI *)this, this); 
+}
+
+
+
+
+SwigDirector_SikuliUI::~SwigDirector_SikuliUI() {
+}
+
+int SwigDirector_SikuliUI::handleFindFailedException(sikuli::Region region, sikuli::Pattern target) {
+  int c_result;
+  swig::SwigVar_PyObject obj0;
+  obj0 = SWIG_NewPointerObj(SWIG_as_voidptr(&region), SWIGTYPE_p_sikuli__Region,  0 );
+  swig::SwigVar_PyObject obj1;
+  obj1 = SWIG_NewPointerObj(SWIG_as_voidptr(&target), SWIGTYPE_p_sikuli__Pattern,  0 );
+  if (!swig_get_self()) {
+    Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call SikuliUI.__init__.");
+  }
+#if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
+  const size_t swig_method_index = 0;
+  const char * const swig_method_name = "handleFindFailedException";
+  PyObject* method = swig_get_method(swig_method_index, swig_method_name);
+  swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(OO)" ,(PyObject *)obj0,(PyObject *)obj1);
+#else
+  swig::SwigVar_PyObject result = PyObject_CallMethod(swig_get_self(), (char *)"handleFindFailedException", (char *)"(OO)" ,(PyObject *)obj0,(PyObject *)obj1);
+#endif
+  if (result == NULL) {
+    PyObject *error = PyErr_Occurred();
+    if (error != NULL) {
+      Swig::DirectorMethodException::raise("Error detected when calling 'SikuliUI.handleFindFailedException'");
+    }
+  }
+  int swig_val;
+  int swig_res = SWIG_AsVal_int(result, &swig_val);
+  if (!SWIG_IsOK(swig_res)) {
+    Swig::DirectorTypeMismatchException::raise(SWIG_ErrorType(SWIG_ArgError(swig_res)), "in output value of type '""int""'");
+  }
+  c_result = static_cast< int >(swig_val);
+  return (int) c_result;
+}
+
+
+int SwigDirector_SikuliUI::handleMatchFound(sikuli::Region region, sikuli::Pattern target, std::vector< sikuli::Match,std::allocator< sikuli::Match > > matches) {
+  int c_result;
+  swig::SwigVar_PyObject obj0;
+  obj0 = SWIG_NewPointerObj(SWIG_as_voidptr(&region), SWIGTYPE_p_sikuli__Region,  0 );
+  swig::SwigVar_PyObject obj1;
+  obj1 = SWIG_NewPointerObj(SWIG_as_voidptr(&target), SWIGTYPE_p_sikuli__Pattern,  0 );
+  swig::SwigVar_PyObject obj2;
+  obj2 = swig::from(static_cast< std::vector<sikuli::Match,std::allocator< sikuli::Match > > >(matches));
+  if (!swig_get_self()) {
+    Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call SikuliUI.__init__.");
+  }
+#if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
+  const size_t swig_method_index = 1;
+  const char * const swig_method_name = "handleMatchFound";
+  PyObject* method = swig_get_method(swig_method_index, swig_method_name);
+  swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(OOO)" ,(PyObject *)obj0,(PyObject *)obj1,(PyObject *)obj2);
+#else
+  swig::SwigVar_PyObject result = PyObject_CallMethod(swig_get_self(), (char *)"handleMatchFound", (char *)"(OOO)" ,(PyObject *)obj0,(PyObject *)obj1,(PyObject *)obj2);
+#endif
+  if (result == NULL) {
+    PyObject *error = PyErr_Occurred();
+    if (error != NULL) {
+      Swig::DirectorMethodException::raise("Error detected when calling 'SikuliUI.handleMatchFound'");
+    }
+  }
+  int swig_val;
+  int swig_res = SWIG_AsVal_int(result, &swig_val);
+  if (!SWIG_IsOK(swig_res)) {
+    Swig::DirectorTypeMismatchException::raise(SWIG_ErrorType(SWIG_ArgError(swig_res)), "in output value of type '""int""'");
+  }
+  c_result = static_cast< int >(swig_val);
+  return (int) c_result;
+}
+
+
+SwigDirector_ImageReadHelper::SwigDirector_ImageReadHelper(PyObject *self): sikuli::ImageReadHelper(), Swig::Director(self) {
+  SWIG_DIRECTOR_RGTR((sikuli::ImageReadHelper *)this, this); 
+}
+
+
+
+
+SwigDirector_ImageReadHelper::~SwigDirector_ImageReadHelper() {
+}
+
+std::string SwigDirector_ImageReadHelper::resolveImageFilename(std::string image_filename) {
+  std::string c_result;
+  swig::SwigVar_PyObject obj0;
+  obj0 = SWIG_From_std_string(static_cast< std::string >(image_filename));
+  if (!swig_get_self()) {
+    Swig::DirectorException::raise("'self' uninitialized, maybe you forgot to call ImageReadHelper.__init__.");
+  }
+#if defined(SWIG_PYTHON_DIRECTOR_VTABLE)
+  const size_t swig_method_index = 0;
+  const char * const swig_method_name = "resolveImageFilename";
+  PyObject* method = swig_get_method(swig_method_index, swig_method_name);
+  swig::SwigVar_PyObject result = PyObject_CallFunction(method, (char *)"(O)" ,(PyObject *)obj0);
+#else
+  swig::SwigVar_PyObject result = PyObject_CallMethod(swig_get_self(), (char *)"resolveImageFilename", (char *)"(O)" ,(PyObject *)obj0);
+#endif
+  if (result == NULL) {
+    PyObject *error = PyErr_Occurred();
+    if (error != NULL) {
+      Swig::DirectorMethodException::raise("Error detected when calling 'ImageReadHelper.resolveImageFilename'");
+    }
+  }
+  std::string *swig_optr = 0;
+  int swig_ores = SWIG_AsPtr_std_string(result, &swig_optr);
+  if (!SWIG_IsOK(swig_ores) || !swig_optr) {
+    Swig::DirectorTypeMismatchException::raise(SWIG_ErrorType(SWIG_ArgError((swig_optr ? swig_ores : SWIG_TypeError))), "in output value of type '""std::string""'");
+  }
+  c_result = *swig_optr;
+  if (SWIG_IsNewObj(swig_ores)) delete swig_optr;
+  return (std::string) c_result;
 }
 
 
@@ -7500,7 +7666,14 @@ SWIGINTERN PyObject *_wrap_delete_Matches(PyObject *SWIGUNUSEDPARM(self), PyObje
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_Matches" "', argument " "1"" of type '" "std::vector< sikuli::Match > *""'"); 
   }
   arg1 = reinterpret_cast< std::vector< sikuli::Match > * >(argp1);
-  delete arg1;
+  {
+    try{
+      delete arg1;
+    } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -8048,7 +8221,7 @@ SWIGINTERN PyObject *_wrap_Pattern_toString(PyObject *SWIGUNUSEDPARM(self), PyOb
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  string result;
+  std::string result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:Pattern_toString",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__Pattern, 0 |  0 );
@@ -8057,7 +8230,7 @@ SWIGINTERN PyObject *_wrap_Pattern_toString(PyObject *SWIGUNUSEDPARM(self), PyOb
   }
   arg1 = reinterpret_cast< sikuli::Pattern * >(argp1);
   result = ((sikuli::Pattern const *)arg1)->toString();
-  resultobj = SWIG_NewPointerObj((new string(static_cast< const string& >(result))), SWIGTYPE_p_string, SWIG_POINTER_OWN |  0 );
+  resultobj = SWIG_From_std_string(static_cast< std::string >(result));
   return resultobj;
 fail:
   return NULL;
@@ -8275,7 +8448,14 @@ SWIGINTERN PyObject *_wrap_delete_Pattern(PyObject *SWIGUNUSEDPARM(self), PyObje
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_Pattern" "', argument " "1"" of type '" "sikuli::Pattern *""'"); 
   }
   arg1 = reinterpret_cast< sikuli::Pattern * >(argp1);
-  delete arg1;
+  {
+    try{
+      delete arg1;
+    } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -8803,7 +8983,14 @@ SWIGINTERN PyObject *_wrap_delete_Location(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_Location" "', argument " "1"" of type '" "sikuli::Location *""'"); 
   }
   arg1 = reinterpret_cast< sikuli::Location * >(argp1);
-  delete arg1;
+  {
+    try{
+      delete arg1;
+    } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -9247,7 +9434,14 @@ SWIGINTERN PyObject *_wrap_delete_Rectangle(PyObject *SWIGUNUSEDPARM(self), PyOb
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_Rectangle" "', argument " "1"" of type '" "sikuli::Rectangle *""'"); 
   }
   arg1 = reinterpret_cast< sikuli::Rectangle * >(argp1);
-  delete arg1;
+  {
+    try{
+      delete arg1;
+    } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -9424,7 +9618,7 @@ SWIGINTERN PyObject *_wrap_ScreenImage_getFilename(PyObject *SWIGUNUSEDPARM(self
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  string result;
+  std::string result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:ScreenImage_getFilename",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__ScreenImage, 0 |  0 );
@@ -9433,7 +9627,7 @@ SWIGINTERN PyObject *_wrap_ScreenImage_getFilename(PyObject *SWIGUNUSEDPARM(self
   }
   arg1 = reinterpret_cast< sikuli::ScreenImage * >(argp1);
   result = (arg1)->getFilename();
-  resultobj = SWIG_NewPointerObj((new string(static_cast< const string& >(result))), SWIGTYPE_p_string, SWIG_POINTER_OWN |  0 );
+  resultobj = SWIG_From_std_string(static_cast< std::string >(result));
   return resultobj;
 fail:
   return NULL;
@@ -9475,7 +9669,14 @@ SWIGINTERN PyObject *_wrap_delete_ScreenImage(PyObject *SWIGUNUSEDPARM(self), Py
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_ScreenImage" "', argument " "1"" of type '" "sikuli::ScreenImage *""'"); 
   }
   arg1 = reinterpret_cast< sikuli::ScreenImage * >(argp1);
-  delete arg1;
+  {
+    try{
+      delete arg1;
+    } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -19205,7 +19406,14 @@ SWIGINTERN PyObject *_wrap_new_Settings(PyObject *SWIGUNUSEDPARM(self), PyObject
   sikuli::Settings *result = 0 ;
   
   if (!PyArg_ParseTuple(args,(char *)":new_Settings")) SWIG_fail;
-  result = (sikuli::Settings *)new sikuli::Settings();
+  {
+    try{
+      result = (sikuli::Settings *)new sikuli::Settings();
+    } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sikuli__Settings, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
@@ -19226,7 +19434,14 @@ SWIGINTERN PyObject *_wrap_delete_Settings(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_Settings" "', argument " "1"" of type '" "sikuli::Settings *""'"); 
   }
   arg1 = reinterpret_cast< sikuli::Settings * >(argp1);
-  delete arg1;
+  {
+    try{
+      delete arg1;
+    } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -19243,25 +19458,19 @@ SWIGINTERN PyObject *Settings_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObj
 
 SWIGINTERN PyObject *_wrap_new_FindFailed__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  string arg1 ;
-  void *argp1 ;
-  int res1 = 0 ;
+  std::string arg1 ;
   PyObject * obj0 = 0 ;
   sikuli::FindFailed *result = 0 ;
   
   if (!PyArg_ParseTuple(args,(char *)"O:new_FindFailed",&obj0)) SWIG_fail;
   {
-    res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_string,  0  | 0);
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_FindFailed" "', argument " "1"" of type '" "string""'"); 
-    }  
-    if (!argp1) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_FindFailed" "', argument " "1"" of type '" "string""'");
-    } else {
-      string * temp = reinterpret_cast< string * >(argp1);
-      arg1 = *temp;
-      if (SWIG_IsNewObj(res1)) delete temp;
+    std::string *ptr = (std::string *)0;
+    int res = SWIG_AsPtr_std_string(obj0, &ptr);
+    if (!SWIG_IsOK(res) || !ptr) {
+      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), "in method '" "new_FindFailed" "', argument " "1"" of type '" "std::string""'"); 
     }
+    arg1 = *ptr;
+    if (SWIG_IsNewObj(res)) delete ptr;
   }
   result = (sikuli::FindFailed *)new sikuli::FindFailed(arg1);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sikuli__FindFailed, SWIG_POINTER_NEW |  0 );
@@ -19313,25 +19522,25 @@ SWIGINTERN PyObject *_wrap_new_FindFailed(PyObject *self, PyObject *args) {
   }
   if (argc == 1) {
     int _v;
-    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_string, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      return _wrap_new_FindFailed__SWIG_0(self, args);
-    }
-  }
-  if (argc == 1) {
-    int _v;
     int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_sikuli__Pattern, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       return _wrap_new_FindFailed__SWIG_1(self, args);
     }
   }
+  if (argc == 1) {
+    int _v;
+    int res = SWIG_AsPtr_std_string(argv[0], (std::string**)(0));
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_new_FindFailed__SWIG_0(self, args);
+    }
+  }
   
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_FindFailed'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    sikuli::FindFailed(string)\n"
+    "    sikuli::FindFailed(std::string)\n"
     "    sikuli::FindFailed(sikuli::Pattern)\n");
   return NULL;
 }
@@ -19675,7 +19884,14 @@ SWIGINTERN PyObject *_wrap_new_Event(PyObject *SWIGUNUSEDPARM(self), PyObject *a
   sikuli::Event *result = 0 ;
   
   if (!PyArg_ParseTuple(args,(char *)":new_Event")) SWIG_fail;
-  result = (sikuli::Event *)new sikuli::Event();
+  {
+    try{
+      result = (sikuli::Event *)new sikuli::Event();
+    } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sikuli__Event, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
@@ -19696,7 +19912,14 @@ SWIGINTERN PyObject *_wrap_delete_Event(PyObject *SWIGUNUSEDPARM(self), PyObject
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_Event" "', argument " "1"" of type '" "sikuli::Event *""'"); 
   }
   arg1 = reinterpret_cast< sikuli::Event * >(argp1);
-  delete arg1;
+  {
+    try{
+      delete arg1;
+    } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -20605,7 +20828,14 @@ SWIGINTERN PyObject *_wrap_new_EventManager(PyObject *SWIGUNUSEDPARM(self), PyOb
   sikuli::EventManager *result = 0 ;
   
   if (!PyArg_ParseTuple(args,(char *)":new_EventManager")) SWIG_fail;
-  result = (sikuli::EventManager *)new sikuli::EventManager();
+  {
+    try{
+      result = (sikuli::EventManager *)new sikuli::EventManager();
+    } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sikuli__EventManager, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
@@ -20626,7 +20856,14 @@ SWIGINTERN PyObject *_wrap_delete_EventManager(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_EventManager" "', argument " "1"" of type '" "sikuli::EventManager *""'"); 
   }
   arg1 = reinterpret_cast< sikuli::EventManager * >(argp1);
-  delete arg1;
+  {
+    try{
+      delete arg1;
+    } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -20638,6 +20875,448 @@ SWIGINTERN PyObject *EventManager_swigregister(PyObject *SWIGUNUSEDPARM(self), P
   PyObject *obj;
   if (!PyArg_ParseTuple(args,(char*)"O:swigregister", &obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_sikuli__EventManager, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *_wrap_new_SikuliUI(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PyObject *arg1 = (PyObject *) 0 ;
+  PyObject * obj0 = 0 ;
+  sikuli::SikuliUI *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:new_SikuliUI",&obj0)) SWIG_fail;
+  arg1 = obj0;
+  if ( arg1 != Py_None ) {
+    /* subclassed */
+    result = (sikuli::SikuliUI *)new SwigDirector_SikuliUI(arg1); 
+  } else {
+    result = (sikuli::SikuliUI *)new sikuli::SikuliUI(); 
+  }
+  
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sikuli__SikuliUI, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_SikuliUI(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::SikuliUI *arg1 = (sikuli::SikuliUI *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:delete_SikuliUI",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__SikuliUI, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_SikuliUI" "', argument " "1"" of type '" "sikuli::SikuliUI *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::SikuliUI * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_SikuliUI_handleFindFailedException(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::SikuliUI *arg1 = (sikuli::SikuliUI *) 0 ;
+  sikuli::Region arg2 ;
+  sikuli::Pattern arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  void *argp3 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  Swig::Director *director = 0;
+  bool upcall = false;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:SikuliUI_handleFindFailedException",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__SikuliUI, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "SikuliUI_handleFindFailedException" "', argument " "1"" of type '" "sikuli::SikuliUI *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::SikuliUI * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_sikuli__Region,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "SikuliUI_handleFindFailedException" "', argument " "2"" of type '" "sikuli::Region""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "SikuliUI_handleFindFailedException" "', argument " "2"" of type '" "sikuli::Region""'");
+    } else {
+      sikuli::Region * temp = reinterpret_cast< sikuli::Region * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  {
+    res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_sikuli__Pattern,  0  | 0);
+    if (!SWIG_IsOK(res3)) {
+      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "SikuliUI_handleFindFailedException" "', argument " "3"" of type '" "sikuli::Pattern""'"); 
+    }  
+    if (!argp3) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "SikuliUI_handleFindFailedException" "', argument " "3"" of type '" "sikuli::Pattern""'");
+    } else {
+      sikuli::Pattern * temp = reinterpret_cast< sikuli::Pattern * >(argp3);
+      arg3 = *temp;
+      if (SWIG_IsNewObj(res3)) delete temp;
+    }
+  }
+  director = SWIG_DIRECTOR_CAST(arg1);
+  upcall = (director && (director->swig_get_self()==obj0));
+  try {
+    if (upcall) {
+      result = (int)(arg1)->sikuli::SikuliUI::handleFindFailedException(arg2,arg3);
+    } else {
+      result = (int)(arg1)->handleFindFailedException(arg2,arg3);
+    }
+  } catch (Swig::DirectorException&) {
+    SWIG_fail;
+  }
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_SikuliUI_handleMatchFound(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::SikuliUI *arg1 = (sikuli::SikuliUI *) 0 ;
+  sikuli::Region arg2 ;
+  sikuli::Pattern arg3 ;
+  std::vector< sikuli::Match,std::allocator< sikuli::Match > > arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  void *argp3 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  Swig::Director *director = 0;
+  bool upcall = false;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:SikuliUI_handleMatchFound",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__SikuliUI, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "SikuliUI_handleMatchFound" "', argument " "1"" of type '" "sikuli::SikuliUI *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::SikuliUI * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_sikuli__Region,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "SikuliUI_handleMatchFound" "', argument " "2"" of type '" "sikuli::Region""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "SikuliUI_handleMatchFound" "', argument " "2"" of type '" "sikuli::Region""'");
+    } else {
+      sikuli::Region * temp = reinterpret_cast< sikuli::Region * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  {
+    res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_sikuli__Pattern,  0  | 0);
+    if (!SWIG_IsOK(res3)) {
+      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "SikuliUI_handleMatchFound" "', argument " "3"" of type '" "sikuli::Pattern""'"); 
+    }  
+    if (!argp3) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "SikuliUI_handleMatchFound" "', argument " "3"" of type '" "sikuli::Pattern""'");
+    } else {
+      sikuli::Pattern * temp = reinterpret_cast< sikuli::Pattern * >(argp3);
+      arg3 = *temp;
+      if (SWIG_IsNewObj(res3)) delete temp;
+    }
+  }
+  {
+    std::vector<sikuli::Match,std::allocator< sikuli::Match > > *ptr = (std::vector<sikuli::Match,std::allocator< sikuli::Match > > *)0;
+    int res = swig::asptr(obj3, &ptr);
+    if (!SWIG_IsOK(res) || !ptr) {
+      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), "in method '" "SikuliUI_handleMatchFound" "', argument " "4"" of type '" "std::vector< sikuli::Match,std::allocator< sikuli::Match > >""'"); 
+    }
+    arg4 = *ptr;
+    if (SWIG_IsNewObj(res)) delete ptr;
+  }
+  director = SWIG_DIRECTOR_CAST(arg1);
+  upcall = (director && (director->swig_get_self()==obj0));
+  try {
+    if (upcall) {
+      result = (int)(arg1)->sikuli::SikuliUI::handleMatchFound(arg2,arg3,arg4);
+    } else {
+      result = (int)(arg1)->handleMatchFound(arg2,arg3,arg4);
+    }
+  } catch (Swig::DirectorException&) {
+    SWIG_fail;
+  }
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_SikuliUI_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::SikuliUI *arg1 = (sikuli::SikuliUI *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:SikuliUI_set",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__SikuliUI, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "SikuliUI_set" "', argument " "1"" of type '" "sikuli::SikuliUI *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::SikuliUI * >(argp1);
+  sikuli::SikuliUI::set(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN int Swig_var_SikuliUI_sikuliUI_set(PyObject *_val) {
+  {
+    void *argp = 0;
+    int res = SWIG_ConvertPtr(_val, &argp, SWIGTYPE_p_sikuli__SikuliUI,  0 );  
+    if (!SWIG_IsOK(res)) {
+      SWIG_exception_fail(SWIG_ArgError(res), "in variable '""sikuli::SikuliUI::sikuliUI""' of type '""sikuli::SikuliUI *""'");
+    }
+    sikuli::SikuliUI::sikuliUI = reinterpret_cast< sikuli::SikuliUI * >(argp);
+  }
+  return 0;
+fail:
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_SikuliUI_sikuliUI_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_NewPointerObj(SWIG_as_voidptr(sikuli::SikuliUI::sikuliUI), SWIGTYPE_p_sikuli__SikuliUI,  0 );
+  return pyobj;
+}
+
+
+SWIGINTERN PyObject *_wrap_SikuliUI_sikuliUI_get(PyObject *SWIGUNUSEDPARM(self), PyObject *SWIGUNUSEDPARM(args)) {
+  return Swig_var_SikuliUI_sikuliUI_get();
+}
+
+
+SWIGINTERN PyObject *_wrap_SikuliUI_sikuliUI_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *value;
+  int res;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:set",&value)) return NULL;
+  res = Swig_var_SikuliUI_sikuliUI_set(value);
+  return !res ? SWIG_Py_Void() : NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_disown_SikuliUI(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::SikuliUI *arg1 = (sikuli::SikuliUI *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:disown_SikuliUI",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__SikuliUI, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "disown_SikuliUI" "', argument " "1"" of type '" "sikuli::SikuliUI *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::SikuliUI * >(argp1);
+  {
+    Swig::Director *director = SWIG_DIRECTOR_CAST(arg1);
+    if (director) director->swig_disown();
+  }
+  
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *SikuliUI_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_ParseTuple(args,(char*)"O:swigregister", &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_sikuli__SikuliUI, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *_wrap_new_ImageReadHelper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PyObject *arg1 = (PyObject *) 0 ;
+  PyObject * obj0 = 0 ;
+  sikuli::ImageReadHelper *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:new_ImageReadHelper",&obj0)) SWIG_fail;
+  arg1 = obj0;
+  if ( arg1 != Py_None ) {
+    /* subclassed */
+    result = (sikuli::ImageReadHelper *)new SwigDirector_ImageReadHelper(arg1); 
+  } else {
+    result = (sikuli::ImageReadHelper *)new sikuli::ImageReadHelper(); 
+  }
+  
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sikuli__ImageReadHelper, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_ImageReadHelper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::ImageReadHelper *arg1 = (sikuli::ImageReadHelper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:delete_ImageReadHelper",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__ImageReadHelper, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_ImageReadHelper" "', argument " "1"" of type '" "sikuli::ImageReadHelper *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::ImageReadHelper * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ImageReadHelper_resolveImageFilename(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::ImageReadHelper *arg1 = (sikuli::ImageReadHelper *) 0 ;
+  std::string arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  Swig::Director *director = 0;
+  bool upcall = false;
+  std::string result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:ImageReadHelper_resolveImageFilename",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__ImageReadHelper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ImageReadHelper_resolveImageFilename" "', argument " "1"" of type '" "sikuli::ImageReadHelper *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::ImageReadHelper * >(argp1);
+  {
+    std::string *ptr = (std::string *)0;
+    int res = SWIG_AsPtr_std_string(obj1, &ptr);
+    if (!SWIG_IsOK(res) || !ptr) {
+      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), "in method '" "ImageReadHelper_resolveImageFilename" "', argument " "2"" of type '" "std::string""'"); 
+    }
+    arg2 = *ptr;
+    if (SWIG_IsNewObj(res)) delete ptr;
+  }
+  director = SWIG_DIRECTOR_CAST(arg1);
+  upcall = (director && (director->swig_get_self()==obj0));
+  try {
+    if (upcall) {
+      result = (arg1)->sikuli::ImageReadHelper::resolveImageFilename(arg2);
+    } else {
+      result = (arg1)->resolveImageFilename(arg2);
+    }
+  } catch (Swig::DirectorException&) {
+    SWIG_fail;
+  }
+  resultobj = SWIG_From_std_string(static_cast< std::string >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ImageReadHelper_instance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  Swig::Director *director = 0;
+  sikuli::ImageReadHelper *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)":ImageReadHelper_instance")) SWIG_fail;
+  result = (sikuli::ImageReadHelper *)sikuli::ImageReadHelper::instance();
+  director = SWIG_DIRECTOR_CAST(result);
+  if (director) {
+    resultobj = director->swig_get_self();
+    Py_INCREF(resultobj);
+  } else {
+    resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sikuli__ImageReadHelper, 0 |  0 );
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ImageReadHelper_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::ImageReadHelper *arg1 = (sikuli::ImageReadHelper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:ImageReadHelper_set",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__ImageReadHelper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ImageReadHelper_set" "', argument " "1"" of type '" "sikuli::ImageReadHelper *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::ImageReadHelper * >(argp1);
+  sikuli::ImageReadHelper::set(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_disown_ImageReadHelper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::ImageReadHelper *arg1 = (sikuli::ImageReadHelper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:disown_ImageReadHelper",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__ImageReadHelper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "disown_ImageReadHelper" "', argument " "1"" of type '" "sikuli::ImageReadHelper *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::ImageReadHelper * >(argp1);
+  {
+    Swig::Director *director = SWIG_DIRECTOR_CAST(arg1);
+    if (director) director->swig_disown();
+  }
+  
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *ImageReadHelper_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_ParseTuple(args,(char*)"O:swigregister", &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_sikuli__ImageReadHelper, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -20885,6 +21564,22 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_EventManager", _wrap_new_EventManager, METH_VARARGS, NULL},
 	 { (char *)"delete_EventManager", _wrap_delete_EventManager, METH_VARARGS, NULL},
 	 { (char *)"EventManager_swigregister", EventManager_swigregister, METH_VARARGS, NULL},
+	 { (char *)"new_SikuliUI", _wrap_new_SikuliUI, METH_VARARGS, NULL},
+	 { (char *)"delete_SikuliUI", _wrap_delete_SikuliUI, METH_VARARGS, NULL},
+	 { (char *)"SikuliUI_handleFindFailedException", _wrap_SikuliUI_handleFindFailedException, METH_VARARGS, NULL},
+	 { (char *)"SikuliUI_handleMatchFound", _wrap_SikuliUI_handleMatchFound, METH_VARARGS, NULL},
+	 { (char *)"SikuliUI_set", _wrap_SikuliUI_set, METH_VARARGS, NULL},
+	 { (char *)"SikuliUI_sikuliUI_get", _wrap_SikuliUI_sikuliUI_get, METH_VARARGS, NULL},
+	 { (char *)"SikuliUI_sikuliUI_set", _wrap_SikuliUI_sikuliUI_set, METH_VARARGS, NULL},
+	 { (char *)"disown_SikuliUI", _wrap_disown_SikuliUI, METH_VARARGS, NULL},
+	 { (char *)"SikuliUI_swigregister", SikuliUI_swigregister, METH_VARARGS, NULL},
+	 { (char *)"new_ImageReadHelper", _wrap_new_ImageReadHelper, METH_VARARGS, NULL},
+	 { (char *)"delete_ImageReadHelper", _wrap_delete_ImageReadHelper, METH_VARARGS, NULL},
+	 { (char *)"ImageReadHelper_resolveImageFilename", _wrap_ImageReadHelper_resolveImageFilename, METH_VARARGS, NULL},
+	 { (char *)"ImageReadHelper_instance", _wrap_ImageReadHelper_instance, METH_VARARGS, NULL},
+	 { (char *)"ImageReadHelper_set", _wrap_ImageReadHelper_set, METH_VARARGS, NULL},
+	 { (char *)"disown_ImageReadHelper", _wrap_disown_ImageReadHelper, METH_VARARGS, NULL},
+	 { (char *)"ImageReadHelper_swigregister", ImageReadHelper_swigregister, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 
@@ -20924,6 +21619,7 @@ static swig_type_info _swigt__p_sikuli__Event = {"_p_sikuli__Event", "sikuli::Ev
 static swig_type_info _swigt__p_sikuli__EventManager = {"_p_sikuli__EventManager", "sikuli::EventManager *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_sikuli__FileNotFound = {"_p_sikuli__FileNotFound", "sikuli::FileNotFound *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_sikuli__FindFailed = {"_p_sikuli__FindFailed", "sikuli::FindFailed *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_sikuli__ImageReadHelper = {"_p_sikuli__ImageReadHelper", "sikuli::ImageReadHelper *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_sikuli__Location = {"_p_sikuli__Location", "sikuli::Location *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_sikuli__Match = {"_p_sikuli__Match", "sikuli::Match *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_sikuli__Observer = {"_p_sikuli__Observer", "sikuli::Observer *", 0, 0, (void*)0, 0};
@@ -20935,6 +21631,7 @@ static swig_type_info _swigt__p_sikuli__Screen = {"_p_sikuli__Screen", "sikuli::
 static swig_type_info _swigt__p_sikuli__ScreenImage = {"_p_sikuli__ScreenImage", "sikuli::ScreenImage *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_sikuli__Settings = {"_p_sikuli__Settings", "sikuli::Settings *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_sikuli__SikuliEventHandler = {"_p_sikuli__SikuliEventHandler", "sikuli::SikuliEventHandler *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_sikuli__SikuliUI = {"_p_sikuli__SikuliUI", "sikuli::SikuliUI *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_type = {"_p_size_type", "size_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__exception = {"_p_std__exception", "std::exception *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__invalid_argument = {"_p_std__invalid_argument", "std::invalid_argument *", 0, 0, (void*)0, 0};
@@ -20943,7 +21640,6 @@ static swig_type_info _swigt__p_std__vectorT_sikuli__Event_std__allocatorT_sikul
 static swig_type_info _swigt__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t = {"_p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t", "std::vector< sikuli::Match > *|std::vector< sikuli::Match,std::allocator< sikuli::Match > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__allocator_type = {"_p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__allocator_type", "std::allocator< sikuli::Match > *|std::vector< sikuli::Match >::allocator_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__value_type = {"_p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__value_type", "std::vector< sikuli::Match >::value_type *|sikuli::Match *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_string = {"_p_string", "string *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_swig__SwigPyIterator = {"_p_swig__SwigPyIterator", "swig::SwigPyIterator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_value_type = {"_p_value_type", "value_type *", 0, 0, (void*)0, 0};
 
@@ -20960,6 +21656,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_sikuli__EventManager,
   &_swigt__p_sikuli__FileNotFound,
   &_swigt__p_sikuli__FindFailed,
+  &_swigt__p_sikuli__ImageReadHelper,
   &_swigt__p_sikuli__Location,
   &_swigt__p_sikuli__Match,
   &_swigt__p_sikuli__Observer,
@@ -20971,6 +21668,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_sikuli__ScreenImage,
   &_swigt__p_sikuli__Settings,
   &_swigt__p_sikuli__SikuliEventHandler,
+  &_swigt__p_sikuli__SikuliUI,
   &_swigt__p_size_type,
   &_swigt__p_std__exception,
   &_swigt__p_std__invalid_argument,
@@ -20979,7 +21677,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t,
   &_swigt__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__allocator_type,
   &_swigt__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__value_type,
-  &_swigt__p_string,
   &_swigt__p_swig__SwigPyIterator,
   &_swigt__p_value_type,
 };
@@ -20996,6 +21693,7 @@ static swig_cast_info _swigc__p_sikuli__Event[] = {  {&_swigt__p_sikuli__Event, 
 static swig_cast_info _swigc__p_sikuli__EventManager[] = {  {&_swigt__p_sikuli__EventManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_sikuli__FileNotFound[] = {  {&_swigt__p_sikuli__FileNotFound, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_sikuli__FindFailed[] = {  {&_swigt__p_sikuli__FindFailed, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_sikuli__ImageReadHelper[] = {  {&_swigt__p_sikuli__ImageReadHelper, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_sikuli__Location[] = {  {&_swigt__p_sikuli__Location, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_sikuli__Match[] = {  {&_swigt__p_sikuli__Match, 0, 0, 0},  {&_swigt__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__value_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_sikuli__Observer[] = {  {&_swigt__p_sikuli__Observer, 0, 0, 0},{0, 0, 0, 0}};
@@ -21007,6 +21705,7 @@ static swig_cast_info _swigc__p_sikuli__Screen[] = {  {&_swigt__p_sikuli__Screen
 static swig_cast_info _swigc__p_sikuli__ScreenImage[] = {  {&_swigt__p_sikuli__ScreenImage, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_sikuli__Settings[] = {  {&_swigt__p_sikuli__Settings, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_sikuli__SikuliEventHandler[] = {  {&_swigt__p_sikuli__SikuliEventHandler, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_sikuli__SikuliUI[] = {  {&_swigt__p_sikuli__SikuliUI, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_type[] = {  {&_swigt__p_size_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__exception[] = {  {&_swigt__p_sikuli__FindFailed, _p_sikuli__FindFailedTo_p_std__exception, 0, 0},  {&_swigt__p_std__exception, 0, 0, 0},  {&_swigt__p_sikuli__FileNotFound, _p_sikuli__FileNotFoundTo_p_std__exception, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__invalid_argument[] = {  {&_swigt__p_std__invalid_argument, 0, 0, 0},{0, 0, 0, 0}};
@@ -21015,7 +21714,6 @@ static swig_cast_info _swigc__p_std__vectorT_sikuli__Event_std__allocatorT_sikul
 static swig_cast_info _swigc__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t[] = {  {&_swigt__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__allocator_type[] = {  {&_swigt__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__allocator_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__value_type[] = {  {&_swigt__p_sikuli__Match, 0, 0, 0},  {&_swigt__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__value_type, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_string[] = {  {&_swigt__p_string, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_swig__SwigPyIterator[] = {  {&_swigt__p_swig__SwigPyIterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_value_type[] = {  {&_swigt__p_value_type, 0, 0, 0},{0, 0, 0, 0}};
 
@@ -21032,6 +21730,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_sikuli__EventManager,
   _swigc__p_sikuli__FileNotFound,
   _swigc__p_sikuli__FindFailed,
+  _swigc__p_sikuli__ImageReadHelper,
   _swigc__p_sikuli__Location,
   _swigc__p_sikuli__Match,
   _swigc__p_sikuli__Observer,
@@ -21043,6 +21742,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_sikuli__ScreenImage,
   _swigc__p_sikuli__Settings,
   _swigc__p_sikuli__SikuliEventHandler,
+  _swigc__p_sikuli__SikuliUI,
   _swigc__p_size_type,
   _swigc__p_std__exception,
   _swigc__p_std__invalid_argument,
@@ -21051,7 +21751,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t,
   _swigc__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__allocator_type,
   _swigc__p_std__vectorT_sikuli__Match_std__allocatorT_sikuli__Match_t_t__value_type,
-  _swigc__p_string,
   _swigc__p_swig__SwigPyIterator,
   _swigc__p_value_type,
 };
@@ -21704,6 +22403,10 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "APPEAR",SWIG_From_int(static_cast< int >(sikuli::APPEAR)));
   SWIG_Python_SetConstant(d, "VANISH",SWIG_From_int(static_cast< int >(sikuli::VANISH)));
   SWIG_Python_SetConstant(d, "CHANGE",SWIG_From_int(static_cast< int >(sikuli::CHANGE)));
+  SWIG_Python_SetConstant(d, "SKIP",SWIG_From_int(static_cast< int >(sikuli::SKIP)));
+  SWIG_Python_SetConstant(d, "RETRY",SWIG_From_int(static_cast< int >(sikuli::RETRY)));
+  SWIG_Python_SetConstant(d, "ABORT",SWIG_From_int(static_cast< int >(sikuli::ABORT)));
+  SWIG_addvarlink(SWIG_globals(),(char*)"SikuliUI_sikuliUI",Swig_var_SikuliUI_sikuliUI_get, Swig_var_SikuliUI_sikuliUI_set);
 #if PY_VERSION_HEX >= 0x03000000
   return m;
 #else
@@ -21711,4 +22414,3 @@ SWIG_init(void) {
 #endif
 }
 
-double NSAppKitVersionNumber = 949;

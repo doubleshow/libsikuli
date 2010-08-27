@@ -23,11 +23,13 @@ def _swig_setattr_nondynamic(self,class_type,name,value,static=1):
 %}
 
 %include "std_vector.i"
+%include "std_string.i"
 %template(Matches) std::vector<sikuli::Match>;
 
 %feature("director") sikuli::SikuliEventHandler;  
 %feature("director") sikuli::SikuliUI;
-   
+%feature("director") sikuli::ImageReadHelper;
+      
 %include "sikuli.h"
 %include "keys.h"
 %include "pattern.h"
@@ -39,3 +41,11 @@ def _swig_setattr_nondynamic(self,class_type,name,value,static=1):
 %include "event-manager.h"
 %include "ui.h"
 
+%exception {
+   try{
+      $action
+   } catch (FindFailed e){
+      PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+      return NULL;
+   }
+}

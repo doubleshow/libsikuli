@@ -1,6 +1,7 @@
 from libsikuli import *
-import os
+from imreadhelper import *
 
+import os
 import inspect
 import sys
 import __main__
