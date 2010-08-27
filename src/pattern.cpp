@@ -7,7 +7,7 @@
  *
  */
 
-#define dout if (0) cout
+//#define dout if (0) cout
 
 #include "pattern.h"
 #include "settings.h"
@@ -26,102 +26,102 @@ using namespace sikuli;
 #include "exceptions.h"
 #include <iostream>
 
-#include <sys/stat.h> 
-bool FileExists(string strFilename) {
-   struct stat stFileInfo;
-   bool blnReturn;
-   int intStat;
-   
-   // Attempt to get the file attributes
-   intStat = stat(strFilename.c_str(),&stFileInfo);
-   if(intStat == 0) {
-      // We were able to get the file attributes
-      // so the file obviously exists.
-      blnReturn = true;
-   } else {
-      // We were not able to get the file attributes.
-      // This may mean that we don't have permission to
-      // access the folder which contains this file. If you
-      // need to do that level of checking, lookup the
-      // return values of stat which will give you
-      // more details on why stat failed.
-      blnReturn = false;
-   }
-   
-   return(blnReturn);
-}
+//#include <sys/stat.h> 
+//bool FileExists(string strFilename) {
+//   struct stat stFileInfo;
+//   bool blnReturn;
+//   int intStat;
+//   
+//   // Attempt to get the file attributes
+//   intStat = stat(strFilename.c_str(),&stFileInfo);
+//   if(intStat == 0) {
+//      // We were able to get the file attributes
+//      // so the file obviously exists.
+//      blnReturn = true;
+//   } else {
+//      // We were not able to get the file attributes.
+//      // This may mean that we don't have permission to
+//      // access the folder which contains this file. If you
+//      // need to do that level of checking, lookup the
+//      // return values of stat which will give you
+//      // more details on why stat failed.
+//      blnReturn = false;
+//   }
+//   
+//   return(blnReturn);
+//}
+//
+//size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+//   int written = fwrite(ptr, size, nmemb, stream);
+//   return written;
+//}
+//
+//string downloadImageFromURL(string url){
+//   //CURL *curl;
+//   //FILE *fp;
+//   //CURLcode res;
+//   //char outfilename[FILENAME_MAX];
+//   //tmpnam(outfilename);
+//   //curl = curl_easy_init();
+//   //if (curl) {
+//   //   fp = fopen(outfilename,"wb");
+//   //   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+//   //   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+//   //   curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+//   //   res = curl_easy_perform(curl);
+//   //   /* always cleanup */
+//   //   curl_easy_cleanup(curl);
+//   //   fclose(fp);
+//   //}
+//   //
+//   //return string(outfilename);
+//	return string();
+//}
+//
+//string findImageHelper(string image_url) throw(FileNotFound){
+//   
+//   dout << "[Pattern] Resolving image url:  " << image_url << endl;
+//   
+//   string found_image_path;
+//   if (strncmp(image_url.c_str(), "http", 4) == 0)
+//      // reading the image from a web address
+//      found_image_path = downloadImageFromURL(image_url);
+//   else if (FileExists(image_url))
+//      // reading the image from the local file system
+//      return image_url;
+//   
+//   throw FileNotFound(image_url.c_str());
+//} 
+//
+//string findImageFromPaths(string image_filename) throw(FileNotFound) {
+//   
+//   
+//   // First try to check the existence of the image using the filename as is   
+//   try {
+//      return findImageHelper(image_filename);
+//   }catch (...) {}
+//   
+//   // Then, try to read the image at each image path
+//   vector<const char*> image_paths = Settings::getImagePaths();
+//   
+//   for (int i=0; i<image_paths.size(); ++i){
+//      string image_filename_with_path = string(image_paths[i]) + 
+//#ifdef WINDOWS
+//      "\\" + string(image_filename);
+//#else
+//      "/" + string(image_filename);
+//#endif
+//      
+//      try { 
+//         return findImageHelper(image_filename_with_path);
+//      }catch (...) {}
+//   }
+//   
+//   throw FileNotFound(image_filename.c_str());
+//}
 
-size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-   int written = fwrite(ptr, size, nmemb, stream);
-   return written;
-}
 
-string downloadImageFromURL(string url){
-   //CURL *curl;
-   //FILE *fp;
-   //CURLcode res;
-   //char outfilename[FILENAME_MAX];
-   //tmpnam(outfilename);
-   //curl = curl_easy_init();
-   //if (curl) {
-   //   fp = fopen(outfilename,"wb");
-   //   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-   //   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-   //   curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-   //   res = curl_easy_perform(curl);
-   //   /* always cleanup */
-   //   curl_easy_cleanup(curl);
-   //   fclose(fp);
-   //}
-   //
-   //return string(outfilename);
-	return string();
-}
-
-string findImageHelper(string image_url) throw(FileNotFound){
-   
-   dout << "[Pattern] Resolving image url:  " << image_url << endl;
-   
-   string found_image_path;
-   if (strncmp(image_url.c_str(), "http", 4) == 0)
-      // reading the image from a web address
-      found_image_path = downloadImageFromURL(image_url);
-   else if (FileExists(image_url))
-      // reading the image from the local file system
-      return image_url;
-   
-   throw FileNotFound(image_url.c_str());
-} 
-
-string findImageFromPaths(string image_filename) throw(FileNotFound) {
-   
-   
-   // First try to check the existence of the image using the filename as is   
-   try {
-      return findImageHelper(image_filename);
-   }catch (...) {}
-   
-   // Then, try to read the image at each image path
-   vector<const char*> image_paths = Settings::getImagePaths();
-   
-   for (int i=0; i<image_paths.size(); ++i){
-      string image_filename_with_path = string(image_paths[i]) + 
-#if WINDOWS
-      "\\" + string(image_filename);
-#else
-      "/" + string(image_filename);
-#endif
-      
-      try { 
-         return findImageHelper(image_filename_with_path);
-      }catch (...) {}
-   }
-   
-   throw FileNotFound(image_filename.c_str());
-}
-
-
-
+#include "ui.h"
 
 Pattern::Pattern(){
    str = "";
@@ -162,7 +162,7 @@ Pattern::Pattern(const char* str_){
       str = str.substr(1, str.length()-2);
    else{
       _imageURL = str;
-      _resolved_imageURL = findImageFromPaths(str);
+      _resolved_imageURL = string(ImageReadHelper::instance()->resolveImageFilename(str));
    }
    
    similarity = 0.8f;

@@ -32,6 +32,8 @@ enum ordering{
    LEFTRIGHT,
    RIGHTLEFT
 };
+   
+
 
 class Pattern{
    

@@ -13,7 +13,7 @@ add_executable(cxxtest
    MacTestSuite.cpp)
 
 target_link_libraries(cxxtest sikuli 
-				${APP_SERVICES_LIBRARY} 
+				${APPLE_LIBRARIES} 
 				${OPENCV_LIBRARIES})
 
 

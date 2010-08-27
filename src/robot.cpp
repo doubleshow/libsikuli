@@ -908,7 +908,7 @@ Robot::openApp(const char* appname){
  
  */
 #endif
-#if 1//def WINDOWS
+#ifdef WINDOWS
 
 //vector<int> xs;
 vector<RECT> gMonitorRCs;

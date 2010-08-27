@@ -2,19 +2,22 @@ cmake_minimum_required(VERSION 2.6)
 project(Sikuli)
 
 
-#if (W64)
+if (W32)
 
 add_definitions(-DWINDOWS)
 
+
+
+
 find_library(OPENCV_CORE_LIBRARY 
-			    NAMES cxcore210
-			    PATHS C:\\OpenCV2.1\lib)
+			    NAMES cxcore210 cxcore
+			    PATHS C:/OpenCV2.1/lib /opt/local/lib)
 find_library(OPENCV_HIGHGUI_LIBRARY 
-			    NAMES highgui210
-			    PATHS C:\\OpenCV2.1\lib)
+			    NAMES highgui210 highgui
+			    PATHS C:/OpenCV2.1/lib /opt/local/lib)
 find_library(OPENCV_CV_LIBRARY 
-			    NAMES cv210
-			    PATHS C:\\OpenCV2.1\lib)
+			    NAMES cv210 cv
+			    PATHS C:/OpenCV2.1/lib /opt/local/lib)
 
 set(OPENCV_LIBRARIES 
 		     ${OPENCV_CORE_LIBRARY} 
@@ -23,13 +26,18 @@ set(OPENCV_LIBRARIES
 
 option(OPENCV_NEW "use new opencv" NO)
 
-#endif (W32)
+endif (W32)
 
-if (APPLE)
 
-add_definitions(-DMAC)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib 
+                 ${CMAKE_CURRENT_SOURCE_DIR}/lib/opencv)
 
-find_package(curl)
+set(OPENCV_LIBRARIES 
+   opencv_legacy opencv_core opencv_imgproc opencv_highgui opencv_objdetect opencv_lapack
+   libpng libjpeg libtiff zlib)
+   
+   
+if (OPENCV211)
 
 find_library(OPENCV_CORE_LIBRARY 
 			    NAMES opencv_core 
@@ -53,10 +61,23 @@ set(OPENCV_LIBRARIES
 		     ${OPENCV_LEGACY}
 		     ${OPENCV_IMGPROC_LIBRARY}
 		     ${OPENCV_OBJDETECT_LIBRARY})
+endif (OPENCV211)
+
+if (APPLE)
+
+	add_definitions(-DMAC)
 
 	include_directories(/Developer/Headers/FlatCarbon )
 	find_library(APP_SERVICES_LIBRARY ApplicationServices)
-	mark_as_advanced(APP_SERVICES_LIBRARY)
+#	find_library(CARBON_LIBRARY Carbon)      
+	find_library(COCOA_LIBRARY Cocoa)      
+   
+	mark_as_advanced(APP_SERVICES_LIBRARY COCOA_LIBRARY)
+
+   set(APPLE_LIBRARIES 
+      ${APP_SERVICES_LIBRARY} 
+#      ${CARBON_LIBRARY}
+      ${COCOA_LIBRARY})
 
 endif (APPLE)
 

@@ -43,7 +43,23 @@ public:
    
 private:
    
+};
    
+class ImageReadHelper{
+   
+public:
+   
+   ImageReadHelper(){};
+   virtual ~ImageReadHelper(){};
+   virtual string resolveImageFilename(string image_filename);
+   
+   
+   static ImageReadHelper* instance();
+   static void set(ImageReadHelper* ptr);
+
+private:
+   
+   static ImageReadHelper* ptr;
    
 };
    
