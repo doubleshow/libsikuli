@@ -50,7 +50,9 @@ getFindResults(Mat screenImage, Pattern ptn, bool all, double similarity) {
 	  //string str(ptn.getImageURL());
 	  //char filename[] = "c:\\cygwin\\home\\tomyeh\\libsikuli\\examples\\images\\startpage.png";
 	  //string name("examples\\images\\startpage.png"); 
-	  Mat image = imread(ptn.getImageURL());
+      ScreenImage ptn_img = ptn.getScreenImage();
+	   Mat image = ptn_img.getMat();
+      //imread(ptn.getImageURL());
 
 	  
 	  //ptn.getImageURL());

@@ -26,7 +26,6 @@
 		A0DB5001121FF3E600BF48E5 /* pyramid-template-matcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A06B9958120834B5000C73A3 /* pyramid-template-matcher.cpp */; };
 		A0DB5002121FF3E600BF48E5 /* vision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A06B995A120834B5000C73A3 /* vision.cpp */; };
 		A0DB5003121FF3E600BF48E5 /* TimingBlock.cc in Sources */ = {isa = PBXBuildFile; fileRef = A06B9963120834DF000C73A3 /* TimingBlock.cc */; };
-		A0DB5005121FF3E600BF48E5 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A06B996A1208350C000C73A3 /* main.cpp */; };
 		A0DB5006121FF3E600BF48E5 /* region.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A06B996B1208350C000C73A3 /* region.cpp */; };
 		A0DB5007121FF3E600BF48E5 /* robot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A06B996E1208350C000C73A3 /* robot.cpp */; };
 		A0DB5008121FF3E600BF48E5 /* screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A06B99701208350C000C73A3 /* screen.cpp */; };
@@ -89,6 +88,8 @@
 		A0FE9DC41227D9C3002179C1 /* libopencv_lapack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0FE9DC21227D9C3002179C1 /* libopencv_lapack.a */; };
 		A0FE9DC51227D9C3002179C1 /* libopencv_lapack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0FE9DC21227D9C3002179C1 /* libopencv_lapack.a */; };
 		A0FE9DC61227D9C3002179C1 /* libopencv_lapack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0FE9DC21227D9C3002179C1 /* libopencv_lapack.a */; };
+		A0FEA047122949A7002179C1 /* screen-image.h in Headers */ = {isa = PBXBuildFile; fileRef = A0FEA045122949A7002179C1 /* screen-image.h */; };
+		A0FEA048122949A7002179C1 /* screen-image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0FEA046122949A7002179C1 /* screen-image.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -171,7 +172,6 @@
 		A06B99671208350C000C73A3 /* glgrab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = glgrab.c; path = src/glgrab.c; sourceTree = "<group>"; };
 		A06B99681208350C000C73A3 /* glgrab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glgrab.h; path = src/glgrab.h; sourceTree = "<group>"; };
 		A06B99691208350C000C73A3 /* keys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = keys.h; path = src/keys.h; sourceTree = "<group>"; };
-		A06B996A1208350C000C73A3 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = "<group>"; };
 		A06B996B1208350C000C73A3 /* region.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = region.cpp; path = src/region.cpp; sourceTree = "<group>"; };
 		A06B996C1208350C000C73A3 /* region.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = region.h; path = src/region.h; sourceTree = "<group>"; };
 		A06B996D1208350C000C73A3 /* result.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = result.h; path = src/result.h; sourceTree = "<group>"; };
@@ -213,6 +213,8 @@
 		A0FE9DAE1227D98A002179C1 /* liblibtiff.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibtiff.a; path = ../../../install/opencv/3rdparty/lib/liblibtiff.a; sourceTree = SOURCE_ROOT; };
 		A0FE9DAF1227D98A002179C1 /* libzlib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzlib.a; path = ../../../install/opencv/3rdparty/lib/libzlib.a; sourceTree = SOURCE_ROOT; };
 		A0FE9DC21227D9C3002179C1 /* libopencv_lapack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libopencv_lapack.a; path = ../../../install/opencv/3rdparty/lib/libopencv_lapack.a; sourceTree = SOURCE_ROOT; };
+		A0FEA045122949A7002179C1 /* screen-image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "screen-image.h"; path = "src/screen-image.h"; sourceTree = "<group>"; };
+		A0FEA046122949A7002179C1 /* screen-image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "screen-image.cpp"; path = "src/screen-image.cpp"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -312,6 +314,8 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				A0FEA045122949A7002179C1 /* screen-image.h */,
+				A0FEA046122949A7002179C1 /* screen-image.cpp */,
 				A0EB793A12116F7100C243A5 /* event-manager.cpp */,
 				A0EB793B12116F7100C243A5 /* event-manager.h */,
 				A0EB76A71210DAF200C243A5 /* exceptions.h */,
@@ -324,7 +328,6 @@
 				A06BA2D6120AE886000C73A3 /* sikuli.cpp */,
 				A06BA2D7120AE886000C73A3 /* sikuli.h */,
 				A06B99691208350C000C73A3 /* keys.h */,
-				A06B996A1208350C000C73A3 /* main.cpp */,
 				A06B996B1208350C000C73A3 /* region.cpp */,
 				A06B996C1208350C000C73A3 /* region.h */,
 				A06B996D1208350C000C73A3 /* result.h */,
@@ -467,6 +470,7 @@
 				A0DB50791220AC4500BF48E5 /* result.h in Headers */,
 				A0DB507A1220AC4500BF48E5 /* screen.h in Headers */,
 				A0DB507B1220AC4500BF48E5 /* ui.h in Headers */,
+				A0FEA047122949A7002179C1 /* screen-image.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -609,7 +613,6 @@
 				A0DB5001121FF3E600BF48E5 /* pyramid-template-matcher.cpp in Sources */,
 				A0DB5002121FF3E600BF48E5 /* vision.cpp in Sources */,
 				A0DB5003121FF3E600BF48E5 /* TimingBlock.cc in Sources */,
-				A0DB5005121FF3E600BF48E5 /* main.cpp in Sources */,
 				A0DB5006121FF3E600BF48E5 /* region.cpp in Sources */,
 				A0DB5007121FF3E600BF48E5 /* robot.cpp in Sources */,
 				A0DB5008121FF3E600BF48E5 /* screen.cpp in Sources */,
@@ -619,6 +622,7 @@
 				A0DB500B121FF3E600BF48E5 /* sikuli.cpp in Sources */,
 				A0DB500C121FF3E600BF48E5 /* event-manager.cpp in Sources */,
 				A0DB500D121FF3E600BF48E5 /* ui.cpp in Sources */,
+				A0FEA048122949A7002179C1 /* screen-image.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

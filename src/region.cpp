@@ -21,24 +21,6 @@
 
 using namespace sikuli;
 
-void
-ScreenImage::show(int seconds){
-   cv::namedWindow("sikuli",CV_WINDOW_AUTOSIZE);
-   cv::imshow("sikuli", _image);
-   cv::waitKey(seconds);
-   cvDestroyWindow("sikuli");
-}
-
-void
-ScreenImage::show(){
-   show(0);
-}
-
-void
-ScreenImage::save(const char* filename){
-   cv::imwrite(filename, _image);
-}
-
 ////////////////////////////////////////////////////////////////////
 /// Match Class
 ////////////////////////////////////////////////////////////////////

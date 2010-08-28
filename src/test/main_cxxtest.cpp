@@ -13,7 +13,8 @@
 int main() {
 
    //CxxTest::leaveOnly("CoreTestSuite","testPageUpDown");
-   CxxTest::leaveOnly("CoreTestSuite","testGetMouseLocation");
+   //CxxTest::leaveOnly("CoreTestSuite","testGetMouseLocation");
+   CxxTest::leaveOnly("CoreTestSuite","testCapture");
    
    //CxxTest::leaveOnly("MacTestSuite","testHoverAndClick");
    //CxxTest::leaveOnly("MacTestSuite","testDragDrop");

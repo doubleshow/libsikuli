@@ -53,6 +53,11 @@ public:
       return repr.c_str();
    }
    
+   friend ostream& operator<<(ostream& os, const Rectangle& r){
+      os << r.x << "," << r.y << "," << r.w << "," << r.h;
+      return os;
+   }
+   
    int x;
    int y;
    int w;
@@ -71,44 +76,7 @@ public:
 #include "highgui.h"
 #endif   
 
-class ScreenImage{
-   
-public:
-   
-   ScreenImage(){};
-   ScreenImage(cv::Mat image) : _image(image){};
-   ScreenImage(Rectangle roi, 
-               cv::Mat image) : _roi(roi), _image(image){};
-   
-   Rectangle getROI(){
-      return _roi;
-   }
-   
-   string getFilename(){
-      return _filename;
-   }
-   
-   cv::Mat getMat() { return _image;}
-   
-   // save the image as the given filename
-   void save(const char* filename);
-   
-   // show the image for the given number of seconds
-   void show(int seconds);
-   
-   // show the image until the user presses a key
-   void show();
-   
-private:
-   
-   string _filename;
-   Rectangle _roi;
-   cv::Mat _image;
 
-};
-  
-
-   //
 class Match;
 class SikuliEventManager;
 class SikuliEventHandler;

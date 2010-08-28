@@ -12,6 +12,7 @@
 
 #include <string>
 #include "location.h"
+#include "screen-image.h"
 
 using namespace std;
 
@@ -34,7 +35,7 @@ enum ordering{
 };
    
 
-
+class ScreenImage;
 class Pattern{
    
 public:
@@ -42,6 +43,7 @@ public:
    Pattern();
    Pattern(const Pattern& p);
    Pattern(const char* str);
+   Pattern(ScreenImage simg);
    
    Pattern all();
    Pattern one();
@@ -84,7 +86,11 @@ public:
    
    //int getDesiredLocation();
    
+   ScreenImage getScreenImage();
+   
 private:
+   
+   void init();
    
    bool bText;
    string str;
@@ -99,6 +105,8 @@ private:
    int  _limit;
    int  _ordering;
    int  _position;
+   
+   ScreenImage _screen_image;
    
 }; 
 

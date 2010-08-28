@@ -16,6 +16,7 @@
 using namespace std;
 using namespace sikuli;
 
+#include "opencv.hpp"
 
 #include <stdio.h>
 #include <curl/curl.h>
@@ -123,7 +124,51 @@ using namespace sikuli;
 
 #include "ui.h"
 
+
+
 Pattern::Pattern(){
+   init();
+}
+
+Pattern::Pattern(const Pattern& p){
+   (*this) = p;
+//   str = p.str;
+//   bText = p.bText;
+//   similarity = p.similarity;
+//   dx = p.dx;
+//   dy = p.dy;
+//   
+//   _bAll = p._bAll;
+//   _ordering = p._ordering;
+//   _position = p._position;
+//   _limit= p._limit;
+//   
+//   _imageURL = p._imageURL;
+//   _resolved_imageURL = string(p._resolved_imageURL);
+//   _screen_image = p._screen_image;
+}
+
+Pattern::Pattern(const char* str_){
+   init();
+   str = string(str_);   
+   bText = str.length()>3 && str[0] == '/' && str[str.length()-1] == '/';
+   if (bText)
+      str = str.substr(1, str.length()-2);
+   else{
+      _imageURL = str;
+      _resolved_imageURL = string(ImageReadHelper::instance()->resolveImageFilename(str));
+      _screen_image = ScreenImage(cv::imread(getImageURL()));
+
+   }
+}
+
+Pattern::Pattern(ScreenImage simg){
+   init();
+   _screen_image = simg;
+}
+
+void
+Pattern::init(){
    str = "";
    similarity = 0.8f;
    dx = 0;
@@ -135,44 +180,12 @@ Pattern::Pattern(){
    _limit = 999999;
    _imageURL = "";
    _resolved_imageURL = string("");
-   
+   _screen_image = ScreenImage();   
 }
 
-Pattern::Pattern(const Pattern& p){
-   str = p.str;
-   bText = p.bText;
-   similarity = p.similarity;
-   dx = p.dx;
-   dy = p.dy;
-   
-   _bAll = p._bAll;
-   _ordering = p._ordering;
-   _position = p._position;
-   _limit= p._limit;
-   
-   _imageURL = p._imageURL;
-   _resolved_imageURL = string(p._resolved_imageURL);
-}
-
-Pattern::Pattern(const char* str_){
-   str = string(str_);
-   
-   bText = str.length()>3 && str[0] == '/' && str[str.length()-1] == '/';
-   if (bText)
-      str = str.substr(1, str.length()-2);
-   else{
-      _imageURL = str;
-      _resolved_imageURL = string(ImageReadHelper::instance()->resolveImageFilename(str));
-   }
-   
-   similarity = 0.8f;
-   dx = 0;
-   dy = 0;   
-   
-   _bAll = false;
-   _ordering = SCORE;
-   _position = ANYWHERE;
-   _limit = 999999;   
+ScreenImage
+Pattern::getScreenImage(){
+   return _screen_image;
 }
 
 bool

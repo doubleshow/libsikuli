@@ -22,7 +22,8 @@ public:
    
    void setUp() {
      // Robot::openApp("Google Chrome.app");
-      Settings::addImagePath("flash/images");
+      Settings::addImagePath("test/flash/images");
+      Settings::addImagePath("test/images");
    }   
    
    void testFindInterfaces(void)
@@ -75,6 +76,25 @@ public:
       
    }
    
+   void testCapture(void)
+   {
+      // define a region
+      Region r = s.inner(50,50,100,100);
+      
+      // capture a screen image of the region
+      ScreenImage r_img = r.capture();
+      
+      // find the image
+      Match m = s.find(r_img);
+      
+      // the match should be the same as the region
+      TS_ASSERT(r == m);
+      TS_ASSERT_EQUALS(r.getX(), m.getX());
+      TS_ASSERT_EQUALS(r.getY(), m.getY());
+      TS_ASSERT_EQUALS(r.getW(), m.getW());
+      TS_ASSERT_EQUALS(r.getH(), m.getH());
+
+   }
    
 };
    
