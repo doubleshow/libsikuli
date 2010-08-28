@@ -19,97 +19,97 @@ CxxTest::StaticSuiteDescription suiteDescription_MacTestSuite( "MacTestSuite.h",
 
 static class TestDescription_MacTestSuite_testAddImagePaths : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testAddImagePaths() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 30, "testAddImagePaths" ) {}
+ TestDescription_MacTestSuite_testAddImagePaths() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 29, "testAddImagePaths" ) {}
  void runTest() { suite_MacTestSuite.testAddImagePaths(); }
 } testDescription_MacTestSuite_testAddImagePaths;
 
 static class TestDescription_MacTestSuite_testCreation : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testCreation() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 46, "testCreation" ) {}
+ TestDescription_MacTestSuite_testCreation() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 45, "testCreation" ) {}
  void runTest() { suite_MacTestSuite.testCreation(); }
 } testDescription_MacTestSuite_testCreation;
 
 static class TestDescription_MacTestSuite_testExists : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testExists() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 52, "testExists" ) {}
+ TestDescription_MacTestSuite_testExists() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 51, "testExists" ) {}
  void runTest() { suite_MacTestSuite.testExists(); }
 } testDescription_MacTestSuite_testExists;
 
 static class TestDescription_MacTestSuite_testModifiers : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testModifiers() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 59, "testModifiers" ) {}
+ TestDescription_MacTestSuite_testModifiers() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 58, "testModifiers" ) {}
  void runTest() { suite_MacTestSuite.testModifiers(); }
 } testDescription_MacTestSuite_testModifiers;
 
 static class TestDescription_MacTestSuite_testESC : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testESC() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 67, "testESC" ) {}
+ TestDescription_MacTestSuite_testESC() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 66, "testESC" ) {}
  void runTest() { suite_MacTestSuite.testESC(); }
 } testDescription_MacTestSuite_testESC;
 
 static class TestDescription_MacTestSuite_testClick : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testClick() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 75, "testClick" ) {}
+ TestDescription_MacTestSuite_testClick() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 74, "testClick" ) {}
  void runTest() { suite_MacTestSuite.testClick(); }
 } testDescription_MacTestSuite_testClick;
 
 static class TestDescription_MacTestSuite_testHoverAndClick : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testHoverAndClick() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 83, "testHoverAndClick" ) {}
+ TestDescription_MacTestSuite_testHoverAndClick() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 82, "testHoverAndClick" ) {}
  void runTest() { suite_MacTestSuite.testHoverAndClick(); }
 } testDescription_MacTestSuite_testHoverAndClick;
 
 static class TestDescription_MacTestSuite_testType : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testType() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 94, "testType" ) {}
+ TestDescription_MacTestSuite_testType() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 93, "testType" ) {}
  void runTest() { suite_MacTestSuite.testType(); }
 } testDescription_MacTestSuite_testType;
 
 static class TestDescription_MacTestSuite_testTrackPadWaitForToolTip : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testTrackPadWaitForToolTip() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 105, "testTrackPadWaitForToolTip" ) {}
+ TestDescription_MacTestSuite_testTrackPadWaitForToolTip() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 104, "testTrackPadWaitForToolTip" ) {}
  void runTest() { suite_MacTestSuite.testTrackPadWaitForToolTip(); }
 } testDescription_MacTestSuite_testTrackPadWaitForToolTip;
 
 static class TestDescription_MacTestSuite_testDragDrop : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testDragDrop() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 116, "testDragDrop" ) {}
+ TestDescription_MacTestSuite_testDragDrop() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 115, "testDragDrop" ) {}
  void runTest() { suite_MacTestSuite.testDragDrop(); }
 } testDescription_MacTestSuite_testDragDrop;
 
 static class TestDescription_MacTestSuite_testOpenApp : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testOpenApp() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 151, "testOpenApp" ) {}
+ TestDescription_MacTestSuite_testOpenApp() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 150, "testOpenApp" ) {}
  void runTest() { suite_MacTestSuite.testOpenApp(); }
 } testDescription_MacTestSuite_testOpenApp;
 
 static class TestDescription_MacTestSuite_testFindAll : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testFindAll() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 159, "testFindAll" ) {}
+ TestDescription_MacTestSuite_testFindAll() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 158, "testFindAll" ) {}
  void runTest() { suite_MacTestSuite.testFindAll(); }
 } testDescription_MacTestSuite_testFindAll;
 
 static class TestDescription_MacTestSuite_testOCR : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testOCR() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 173, "testOCR" ) {}
+ TestDescription_MacTestSuite_testOCR() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 172, "testOCR" ) {}
  void runTest() { suite_MacTestSuite.testOCR(); }
 } testDescription_MacTestSuite_testOCR;
 
 static class TestDescription_MacTestSuite_testTargetOffset : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testTargetOffset() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 186, "testTargetOffset" ) {}
+ TestDescription_MacTestSuite_testTargetOffset() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 185, "testTargetOffset" ) {}
  void runTest() { suite_MacTestSuite.testTargetOffset(); }
 } testDescription_MacTestSuite_testTargetOffset;
 
 static class TestDescription_MacTestSuite_testPatternOrderBy : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testPatternOrderBy() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 199, "testPatternOrderBy" ) {}
+ TestDescription_MacTestSuite_testPatternOrderBy() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 198, "testPatternOrderBy" ) {}
  void runTest() { suite_MacTestSuite.testPatternOrderBy(); }
 } testDescription_MacTestSuite_testPatternOrderBy;
 
 static class TestDescription_MacTestSuite_testPatternLimit : public CxxTest::RealTestDescription {
 public:
- TestDescription_MacTestSuite_testPatternLimit() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 223, "testPatternLimit" ) {}
+ TestDescription_MacTestSuite_testPatternLimit() : CxxTest::RealTestDescription( Tests_MacTestSuite, suiteDescription_MacTestSuite, 222, "testPatternLimit" ) {}
  void runTest() { suite_MacTestSuite.testPatternLimit(); }
 } testDescription_MacTestSuite_testPatternLimit;
 

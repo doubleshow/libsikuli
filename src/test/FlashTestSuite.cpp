@@ -4,6 +4,7 @@
 #define CXXTEST_RUNNING
 #endif
 
+#define _CXXTEST_HAVE_STD
 #include <cxxtest/TestListener.h>
 #include <cxxtest/TestTracker.h>
 #include <cxxtest/TestRunner.h>
@@ -14,7 +15,7 @@
 static FlashTestSuite suite_FlashTestSuite;
 
 static CxxTest::List Tests_FlashTestSuite = { 0, 0 };
-CxxTest::StaticSuiteDescription suiteDescription_FlashTestSuite( "FlashTestSuite.h", 53, "FlashTestSuite", suite_FlashTestSuite, Tests_FlashTestSuite );
+CxxTest::StaticSuiteDescription suiteDescription_FlashTestSuite( "FlashTestSuite.h", 54, "FlashTestSuite", suite_FlashTestSuite, Tests_FlashTestSuite );
 
 static class TestDescription_FlashTestSuite_testClick : public CxxTest::RealTestDescription {
 public:

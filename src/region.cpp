@@ -21,6 +21,24 @@
 
 using namespace sikuli;
 
+void
+ScreenImage::show(int seconds){
+   cv::namedWindow("sikuli",CV_WINDOW_AUTOSIZE);
+   cv::imshow("sikuli", _image);
+   cv::waitKey(seconds);
+   cvDestroyWindow("sikuli");
+}
+
+void
+ScreenImage::show(){
+   show(0);
+}
+
+void
+ScreenImage::save(const char* filename){
+   cv::imwrite(filename, _image);
+}
+
 ////////////////////////////////////////////////////////////////////
 /// Match Class
 ////////////////////////////////////////////////////////////////////
@@ -256,12 +274,12 @@ Region::rightClick(const char* target, int modifiers) throw(FindFailed){
 
 int 
 Region::rightClick(Region target, int modifiers){
-   return rightClick(getLocationFromPSRML(target),modifiers);
+   return rightClick(target.getCenter(),modifiers);
 }
 
 int 
 Region::rightClick(Match target, int modifiers){
-   return rightClick(getLocationFromPSRML(target),modifiers);
+   return rightClick(target.getCenter(),modifiers);
 }
 
 int 
@@ -851,32 +869,32 @@ Region::findInteractive(Pattern target, Match& match,
 }
 
 
-Location 
-Region::getLocationFromPSRML(Pattern target){
-   Match m = find(target); 
-   return m.getTarget();
-}
-
-Location 
-Region::getLocationFromPSRML(const char* target){
-   Match m = find(target);
-   return m.getTarget();  
-}
-
-Location 
-Region::getLocationFromPSRML(Region target){
-   return target.getCenter();
-}
-
-Location 
-Region::getLocationFromPSRML(Match target){
-   return target.getTarget();
-}
-
-Location 
-Region::getLocationFromPSRML(Location target){
-   return target;
-}
+//Location 
+//Region::getLocationFromPSRML(Pattern target){
+//   Match m = find(target); 
+//   return m.getTarget();
+//}
+//
+//Location 
+//Region::getLocationFromPSRML(const char* target){
+//   Match m = find(target);
+//   return m.getTarget();  
+//}
+//
+//Location 
+//Region::getLocationFromPSRML(Region target){
+//   return target.getCenter();
+//}
+//
+//Location 
+//Region::getLocationFromPSRML(Match target){
+//   return target.getTarget();
+//}
+//
+//Location 
+//Region::getLocationFromPSRML(Location target){
+//   return target;
+//}
 
 void 
 Region::onEvent(int event_type, Pattern ptn, SikuliEventHandler* handler){
@@ -921,4 +939,11 @@ Region::onChange(SikuliEventCallback func){
    onEvent(CHANGE, Pattern(), func);
 }
 
-
+Location
+Region::getMouseLocation(){
+   Location loc;
+   Robot::getMouseLocation(_screen_id, loc.x,loc.y);
+   loc.x -= x;
+   loc.y -= y;
+   return loc;
+}

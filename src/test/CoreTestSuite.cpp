@@ -35,3 +35,9 @@ public:
  void runTest() { suite_CoreTestSuite.testPageUpDown(); }
 } testDescription_CoreTestSuite_testPageUpDown;
 
+static class TestDescription_CoreTestSuite_testGetMouseLocation : public CxxTest::RealTestDescription {
+public:
+ TestDescription_CoreTestSuite_testGetMouseLocation() : CxxTest::RealTestDescription( Tests_CoreTestSuite, suiteDescription_CoreTestSuite, 58, "testGetMouseLocation" ) {}
+ void runTest() { suite_CoreTestSuite.testGetMouseLocation(); }
+} testDescription_CoreTestSuite_testGetMouseLocation;
+

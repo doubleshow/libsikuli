@@ -431,6 +431,18 @@ Robot::keyUp(int key){
 }
 
 
+void
+Robot::getMouseLocation(int screen, int& x, int& y){
+   
+   getMouseLocation(x,y);
+   
+   int x0,y0,w0,h0;
+   getScreenBounds(screen, x0, y0, w0, h0);
+
+   x -= x0;
+   y -= y0;
+}
+
 //
 // OS-depdenet Implemntation
 //
@@ -442,6 +454,20 @@ void
 Robot::delay(int msec){
    usleep(1000*msec);
 }
+
+void
+Robot::getMouseLocation(int& x, int& y){
+   
+   CGPoint curloc;
+   CGEventRef eventRef;
+   eventRef = CGEventCreate(NULL);
+   curloc = CGEventGetLocation(eventRef);
+   CFRelease(eventRef);
+   x = curloc.x;
+   y = curloc.y;
+      
+}
+
 
 void
 Robot::mouseMoveTo(int x, int y, bool dragged)

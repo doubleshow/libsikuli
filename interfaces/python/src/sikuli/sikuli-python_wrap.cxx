@@ -9656,6 +9656,134 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_ScreenImage_save(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::ScreenImage *arg1 = (sikuli::ScreenImage *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:ScreenImage_save",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__ScreenImage, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ScreenImage_save" "', argument " "1"" of type '" "sikuli::ScreenImage *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::ScreenImage * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ScreenImage_save" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  (arg1)->save((char const *)arg2);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ScreenImage_show__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::ScreenImage *arg1 = (sikuli::ScreenImage *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:ScreenImage_show",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__ScreenImage, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ScreenImage_show" "', argument " "1"" of type '" "sikuli::ScreenImage *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::ScreenImage * >(argp1);
+  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ScreenImage_show" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  (arg1)->show(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ScreenImage_show__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sikuli::ScreenImage *arg1 = (sikuli::ScreenImage *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:ScreenImage_show",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sikuli__ScreenImage, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ScreenImage_show" "', argument " "1"" of type '" "sikuli::ScreenImage *""'"); 
+  }
+  arg1 = reinterpret_cast< sikuli::ScreenImage * >(argp1);
+  (arg1)->show();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ScreenImage_show(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_sikuli__ScreenImage, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_ScreenImage_show__SWIG_1(self, args);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_sikuli__ScreenImage, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_double(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_ScreenImage_show__SWIG_0(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'ScreenImage_show'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    show(sikuli::ScreenImage *,double)\n"
+    "    show(sikuli::ScreenImage *)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_ScreenImage(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   sikuli::ScreenImage *arg1 = (sikuli::ScreenImage *) 0 ;
@@ -21435,6 +21563,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"ScreenImage_getROI", _wrap_ScreenImage_getROI, METH_VARARGS, NULL},
 	 { (char *)"ScreenImage_getFilename", _wrap_ScreenImage_getFilename, METH_VARARGS, NULL},
 	 { (char *)"ScreenImage_getMat", _wrap_ScreenImage_getMat, METH_VARARGS, NULL},
+	 { (char *)"ScreenImage_save", _wrap_ScreenImage_save, METH_VARARGS, NULL},
+	 { (char *)"ScreenImage_show", _wrap_ScreenImage_show, METH_VARARGS, NULL},
 	 { (char *)"delete_ScreenImage", _wrap_delete_ScreenImage, METH_VARARGS, NULL},
 	 { (char *)"ScreenImage_swigregister", ScreenImage_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_Region", _wrap_new_Region, METH_VARARGS, NULL},

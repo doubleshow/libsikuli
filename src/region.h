@@ -90,6 +90,15 @@ public:
    
    cv::Mat getMat() { return _image;}
    
+   // save the image as the given filename
+   void save(const char* filename);
+   
+   // show the image for the given number of seconds
+   void show(int seconds);
+   
+   // show the image until the user presses a key
+   void show();
+   
 private:
    
    string _filename;
@@ -155,13 +164,9 @@ public:
    void setW(int w_){ w = w_; }
    void setH(int h_){ h = h_; }   
    
-   
-   
-   // Deprecated
-//   Rectangle getROI();
-//   void setROI(int X, int Y, int W, int H);
-//   void setROI(Region roi);
-//   void setROI(Rectangle roi);
+   // return the current location of the mouse cursor relative to
+   // the origin of this region
+   Location getMouseLocation();
    
   
    // Compare whether two regions are spatially equivalent. Two
@@ -250,12 +255,11 @@ private:
 //   vector<Match> try_for_n_seconds(callback func, Pattern target, int seconds);   
    
    
-   Location getLocationFromPSRML(Pattern target);
-   Location getLocationFromPSRML(const char* target);
-   Location getLocationFromPSRML(Region target);
-   Location getLocationFromPSRML(Match target);
-   Location getLocationFromPSRML(Location target);   
-   
+//   Location getLocationFromPSRML(Pattern target);
+//   Location getLocationFromPSRML(const char* target);
+//   Location getLocationFromPSRML(Region target);
+//   Location getLocationFromPSRML(Match target);
+//   Location getLocationFromPSRML(Location target);      
    
  
 //==================================================================

@@ -3,54 +3,9 @@ from sikuli import *
 import time
 
 Settings.addImagePath("images")
-click("SikuliTester.png")
+#click("SikuliTester.png")
+click("images/TestClick.png")
 time.sleep(1)
-
-sikuli_event_handler_global_array = []
-
-class SikuliCallbackEventHandler(SikuliEventHandler):
-
-    def __init__(self, handler):
-        SikuliEventHandler.__init__(self)
-        self.handler = handler
-
-    def handle(self, event):
-        if len(inspect.getargspec(self.handler).args) == 1:
-            self.handler(event)
-        else:
-            self.handler()
-
-
-Region_onAppear_old = Region.onAppear
-def Region_onAppear(self, target, handler):
-    ae = SikuliCallbackEventHandler(handler)
-
-    # Keep a reference to the handler in a 
-    # global array. This is a trick to 
-    # to keep handler objects in memory 
-    # so that they don't get garbage collected 
-    # after the call is returned
-    sikuli_event_handler_global_array.append(ae)
-
-    return Region_onAppear_old(self, target, ae)
-Region.onAppear = Region_onAppear
-
-Region_onVanish_old = Region.onVanish
-def Region_onVanish(self, target, handler):
-    ae = SikuliCallbackEventHandler(handler)
-    sikuli_event_handler_global_array.append(ae)
-    return Region_onVanish_old(self, target, ae)
-Region.onVanish = Region_onVanish
-
-Region_onChange_old = Region.onChange
-def Region_onChange(self, handler):
-    ae = SikuliCallbackEventHandler(handler)
-    sikuli_event_handler_global_array.append(ae)
-    return Region_onChange_old(self, ae)
-Region.onChange = Region_onChange
-
-
-
 
 
 def switchToTest(x):
@@ -60,7 +15,7 @@ def switchToTest(x):
 def appear_callback(event):
     print event.pattern.getImageURL() + " appeared!"
     print event.match.toString()
-    print event.region.hover(event.match
+    print event.region.hover(event.match)
 
 def vanish_callback(event):
     print event.pattern.getImageURL() + " vanished!"

@@ -335,6 +335,8 @@ class ScreenImage(_object):
     def getROI(self): return _libsikuli.ScreenImage_getROI(self)
     def getFilename(self): return _libsikuli.ScreenImage_getFilename(self)
     def getMat(self): return _libsikuli.ScreenImage_getMat(self)
+    def save(self, *args): return _libsikuli.ScreenImage_save(self, *args)
+    def show(self, *args): return _libsikuli.ScreenImage_show(self, *args)
     __swig_destroy__ = _libsikuli.delete_ScreenImage
     __del__ = lambda self : None;
 ScreenImage_swigregister = _libsikuli.ScreenImage_swigregister

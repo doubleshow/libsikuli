@@ -53,8 +53,25 @@ public:
       switchApp("firefox.app");
       s.press(PAGE_DOWN);
       s.press(PAGE_DOWN);
+   }
+   
+   void testGetMouseLocation(void)
+   {
+      s.hover(Location(150,150));
+      Location loc = s.getMouseLocation();
+      TS_ASSERT_EQUALS(loc.x, 150);
+      TS_ASSERT_EQUALS(loc.y, 150);
       
+      Region r = s.inner(100,100,100,100);
+      loc = r.getMouseLocation();
+      TS_ASSERT_EQUALS(loc.x, 50);
+      TS_ASSERT_EQUALS(loc.y, 50);
       
+//      for (int i=0;i<50;++i){
+//         loc = s.getMouseLocation();
+//         cout << "(" << loc.x << "," << loc.y << ")" << endl;
+//         wait(0.1);
+//      }
       
    }
    

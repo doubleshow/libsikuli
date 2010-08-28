@@ -132,7 +132,7 @@
 						Keyboard.DOWN,Keyboard.UP,Keyboard.LEFT,Keyboard.RIGHT,
 						Keyboard.F1,Keyboard.F2,Keyboard.F3,Keyboard.F4,Keyboard.F5,
 						Keyboard.F6,Keyboard.F7,Keyboard.F8,Keyboard.F9,Keyboard.F10,
-						Keyboard.F11,Keyboard.F12,
+						Keyboard.F11,Keyboard.F12, //112 - 123
 						Keyboard.BACKSPACE,
 						Keyboard.DELETE,
 						Keyboard.END,
