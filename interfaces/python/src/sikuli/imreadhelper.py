@@ -3,7 +3,7 @@ import urllib
 import urlparse
 import os.path
 
-global_sikuli_image_paths = []
+global_sikuli_image_paths = ['']
 
 def addImagePath(path):
     global_sikuli_image_paths.append(path)
@@ -17,9 +17,6 @@ class pyImageReadHelper(ImageReadHelper):
         ImageReadHelper.__init__(self)
 
     def resolveImageFilename(self, image_filename):
-
-        if os.path.exists(image_filename):
-            return image_filename
 
         for p in global_sikuli_image_paths:
             relpath = os.path.join(p, image_filename)
