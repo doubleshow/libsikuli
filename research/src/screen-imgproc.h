@@ -12,7 +12,18 @@
 
 using namespace cv;
 
-class ImageProc {
+
+class Blob{
+   
+public:
+   
+   double area;
+   Rect bound;
+   
+};
+
+
+class cvgui {
    
 public:
    
@@ -23,6 +34,9 @@ public:
    static void extractRects(const Mat& src, vector<Rect>& rects);
 
    
+   static void extractBlobs(const Mat& src, vector<Blob>& blobs);
+
+   
    static void extractSmallRects(const Mat& src, vector<Rect>& rects);
    
    
@@ -30,6 +44,11 @@ public:
    
    
    static bool areHorizontallyAligned(const vector<Rect>& rects);
+   
+   
+   
+   static void segmentScreenshot(const Mat& screen, vector<Blob>& text_blobs, vector<Blob>& image_blobs);
+      
 };
 
 

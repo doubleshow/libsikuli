@@ -17,6 +17,31 @@ using namespace std;
 #define SHOW0(x) namedWindow(#x,1); imshow(#x,x); waitKey(0);
 
 
+void VLOG(const char* name, const Mat& image){
+   static int i = 0;
+   
+   char buf[100];
+   sprintf(buf, "research/result/vlog-%d-%s.png", i, name);           
+   imwrite(buf, image);
+   
+   i = i + 1;
+   
+}
+
+void drawBlobs(Mat& image, vector<Blob> blobs, Scalar color){
+   for (vector<Blob>::iterator b = blobs.begin();
+        b != blobs.end(); ++b){
+      
+      Rect& r = b->bound;
+      
+      rectangle(image, 
+                Point(r.x, r.y),
+                Point(r.x + r.width, r.y + r.height),
+                color);
+   }
+}
+
+
 void drawRects(Mat& image, vector<Rect> rects, Scalar color){
    for (vector<Rect>::iterator r = rects.begin();
         r != rects.end(); ++r){
@@ -109,57 +134,57 @@ void extractFeatures(Mat src){
 
 }
 
-
-#include "blob.h"
-#include "BlobResult.h"
-void bwareaopen(Mat& src, int p){
-   
-   
-   //////////////////////////////////////////////////////////////
-   // get blobs and filter them using its area
-   /////////////////////////////////////////////////////////////
-   CBlobResult blobs;
-   int i;
-   CBlob *currentBlob;
-   //IplImage *original, *originalThr;
-   
-   // load an image and threshold it
-   //original = cvLoadImage("pic1.png", 0);
-   //cvThreshold( original, originalThr, 100, 0, 255, CV_THRESH_BINARY );
-   
-   IplImage originalThr = src;
-   
-   
-   // find non-white blobs in thresholded image
-   blobs = CBlobResult( &originalThr, NULL, 255 );
-   // exclude the ones smaller than param2 value
-   blobs.Filter( blobs, B_EXCLUDE, CBlobGetArea(), B_LESS, 1);
-   blobs.Filter( blobs, B_EXCLUDE, CBlobGetArea(), B_GREATER, 50000);
-   
-   
-   // get mean gray color of biggest blob
-  // CBlob biggestBlob;
-//   CBlobGetMean getMeanColor( original );
-//   double meanGray;
+//
+//#include "blob.h"
+//#include "BlobResult.h"
+//void bwareaopen(Mat& src, int p){
 //   
-//   blobs.GetNth( CBlobGetArea(), 0, biggestBlob );
-//   meanGray = getMeanColor( biggestBlob );
 //   
-//   // display filtered blobs
-//   cvMerge( originalThr, originalThr, originalThr, NULL, displayedImage );
-   
-   Mat result = Mat::zeros(src.size(), CV_8UC3);
-   IplImage ipl = result;
-   
-   for (i = 0; i < blobs.GetNumBlobs(); i++ )
-   {
-      currentBlob = blobs.GetBlob(i);
-      currentBlob->FillBlob( &ipl, CV_RGB(0,0,255));
-   }
-   
-   imwrite("pBlobs.png", result);
-}
-
+//   //////////////////////////////////////////////////////////////
+//   // get blobs and filter them using its area
+//   /////////////////////////////////////////////////////////////
+//   CBlobResult blobs;
+//   int i;
+//   CBlob *currentBlob;
+//   //IplImage *original, *originalThr;
+//   
+//   // load an image and threshold it
+//   //original = cvLoadImage("pic1.png", 0);
+//   //cvThreshold( original, originalThr, 100, 0, 255, CV_THRESH_BINARY );
+//   
+//   IplImage originalThr = src;
+//   
+//   
+//   // find non-white blobs in thresholded image
+//   blobs = CBlobResult( &originalThr, NULL, 255 );
+//   // exclude the ones smaller than param2 value
+//   blobs.Filter( blobs, B_EXCLUDE, CBlobGetArea(), B_LESS, 1);
+//   blobs.Filter( blobs, B_EXCLUDE, CBlobGetArea(), B_GREATER, 50000);
+//   
+//   
+//   // get mean gray color of biggest blob
+//  // CBlob biggestBlob;
+////   CBlobGetMean getMeanColor( original );
+////   double meanGray;
+////   
+////   blobs.GetNth( CBlobGetArea(), 0, biggestBlob );
+////   meanGray = getMeanColor( biggestBlob );
+////   
+////   // display filtered blobs
+////   cvMerge( originalThr, originalThr, originalThr, NULL, displayedImage );
+//   
+//   Mat result = Mat::zeros(src.size(), CV_8UC3);
+//   IplImage ipl = result;
+//   
+//   for (i = 0; i < blobs.GetNumBlobs(); i++ )
+//   {
+//      currentBlob = blobs.GetBlob(i);
+//      currentBlob->FillBlob( &ipl, CV_RGB(0,0,255));
+//   }
+//   
+//   imwrite("pBlobs.png", result);
+//}
+//
 
 void denoise(Mat& src){
    
@@ -181,17 +206,7 @@ void denoise(Mat& src){
    bitwise_and(src, destU, src);
 }
 
-void VLOG(const char* name, const Mat& image){
 
-   static int i = 0;
-   
-   char buf[100];
-   sprintf(buf, "results/vlog-%d-%s.png", i, name);           
-   imwrite(buf, image);
-   
-   i = i + 1;
-   
-}
 
 
 class ImageRecord{
@@ -200,7 +215,7 @@ class ImageRecord{
 public:
    
    int id;
-   int screen_id;
+   int screenshot_id;
    int x;
    int y;
    int height;
@@ -209,6 +224,7 @@ public:
    int area;
    
 };
+
 
 
 class Database{
@@ -242,7 +258,16 @@ Database::find(const ImageRecord& q){
    vector<ImageRecord>::iterator it = _image_records.begin();
    for (; it != _image_records.end(); ++it){
     
-      if (abs(q.area - it->area) < 10)
+      if (abs(q.area - it->area) > 10)
+         continue;
+      
+      if (abs(q.height - it->height) > 5)
+         continue;
+      
+      if (abs(q.width - it->width) > 5)
+         continue;
+      
+      
          ret.push_back(*it);
    }
    
@@ -251,7 +276,8 @@ Database::find(const ImageRecord& q){
 
 
 
-void segment_screenshot(const Mat& screen, vector<Rect>& text_rects, vector<Rect>& image_rects){
+void 
+cvgui::segmentScreenshot(const Mat& screen, vector<Blob>& text_blobs, vector<Blob>& image_blobs){
    
 //   Mat image = imread("pp0.png");
 //   extractFeatures(image);
@@ -271,7 +297,7 @@ void segment_screenshot(const Mat& screen, vector<Rect>& text_rects, vector<Rect
   
 
    Mat lines;
-   ImageProc::findLongLines(gray, lines);    
+   cvgui::findLongLines(gray, lines);    
    VLOG("LongLinesFound", lines);
    
    Mat not_lines;
@@ -291,7 +317,11 @@ void segment_screenshot(const Mat& screen, vector<Rect>& text_rects, vector<Rect
    VLOG("Dilated",gray);
    
    vector<Rect> rects;
-   ImageProc::extractRects(gray, rects);
+   //cvgui::extractRects(gray, rects);
+   
+   vector<Blob> blobs;
+   cvgui::extractBlobs(gray, blobs);
+   
    
    
    // visualization
@@ -306,12 +336,14 @@ void segment_screenshot(const Mat& screen, vector<Rect>& text_rects, vector<Rect
    Mat bg = result.clone();
 
    
-   text_rects.clear();
+   text_blobs.clear();
    
-   for (vector<Rect>::iterator r = rects.begin();
-        r != rects.end(); ++r){
+   for (vector<Blob>::iterator b = blobs.begin();
+        b != blobs.end(); ++b){
            
-      Mat part(screen, *r);
+      
+      Rect& r = b->bound;
+      Mat part(screen, r);
       //paste(part, result, r->x, r->y);
       
       
@@ -322,11 +354,11 @@ void segment_screenshot(const Mat& screen, vector<Rect>& text_rects, vector<Rect
                         ADAPTIVE_THRESH_MEAN_C, 
                         THRESH_BINARY_INV, 3, 1);
       vector<Rect> rs;
-      ImageProc::extractSmallRects(g, rs);
+      cvgui::extractSmallRects(g, rs);
       for (vector<Rect>::iterator x = rs.begin();
            x != rs.end(); ++x){
-         x->x += r->x;
-         x->y += r->y;
+         x->x += r.x;
+         x->y += r.y;
       }
 
       vector<Rect> rs0;
@@ -342,17 +374,18 @@ void segment_screenshot(const Mat& screen, vector<Rect>& text_rects, vector<Rect
       
       rs = rs0;
       
-      if (ImageProc::areHorizontallyAligned(rs) && rs.size()>1)
+      if (cvgui::areHorizontallyAligned(rs) && rs.size()>1)
          drawRects(result, rs, Scalar(0,255,0));
       else
          drawRects(result, rs, Scalar(0,0,255));
 
-      if (ImageProc::areHorizontallyAligned(rs) && rs.size()>1)
-         text_rects.push_back(*r);
+      if (cvgui::areHorizontallyAligned(rs) && rs.size()>1)
+         text_blobs.push_back(*b);
 
    }
    
-   drawRects(result, rects, Scalar(255,0,0));
+   //drawRects(result, rects, Scalar(255,0,0));
+   drawBlobs(result, blobs, Scalar(255,0,0));
    
    VLOG("TextBlocksExtracted",result);
    
@@ -361,12 +394,13 @@ void segment_screenshot(const Mat& screen, vector<Rect>& text_rects, vector<Rect
    Mat text_mask = Mat::zeros(screen.size(), CV_8UC1);
    
    
-   for (vector<Rect>::iterator tr = text_rects.begin();
-        tr != text_rects.end(); ++tr){
+   for (vector<Blob>::iterator b = text_blobs.begin();
+        b != text_blobs.end(); ++b){
       
+      Rect& r = b->bound;
      Mat m(text_mask, 
-           Range(tr->y,tr->y+tr->height),
-           Range(tr->x,tr->x+tr->width));
+           Range(r.y,r.y+r.height),
+           Range(r.x,r.x+r.width));
       
       m = 255;
            
@@ -381,56 +415,61 @@ void segment_screenshot(const Mat& screen, vector<Rect>& text_rects, vector<Rect
    dilate(gray,gray,Mat());
    VLOG("DilatedAgain",gray);
    
-   vector<Rect> temp;
-   ImageProc::extractRects(gray, temp);
+   vector<Blob> temp;
+   //cvgui::extractRects(gray, temp);
+   cvgui::extractBlobs(gray, temp);
    
    // only keep image rects larger than n pixels
    
    const int MIN_IMAGE_RECT_AREA = 150;
    
-   image_rects.clear();
-   for (vector<Rect>::iterator tr = temp.begin();
-        tr != temp.end(); ++tr){
+   image_blobs.clear();
+   for (vector<Blob>::iterator b = temp.begin();
+        b != temp.end(); ++b){
    
-      if (tr->width * tr->height > MIN_IMAGE_RECT_AREA){
-         image_rects.push_back(*tr);
+      if (b->bound.width * b->bound.height > MIN_IMAGE_RECT_AREA){
+         image_blobs.push_back(*b);
       }
       
    }
    
    Mat image_result = bg.clone();
    
-   drawRects(image_result, image_rects);
+   drawBlobs(image_result, image_blobs, Scalar(0,0,255));
    VLOG("ImageRecordsExtracted", image_result);
    
 }
 
 
 vector<ImageRecord>
-create_image_records(const Mat& src, const vector<Rect> image_rects){
+create_image_records(const Mat& src, const vector<Blob> image_blobs){
    
    static int image_record_id = 0;
    vector<ImageRecord> ret;
    
    
-   for (vector<Rect>::const_iterator tr = image_rects.begin();
-        tr != image_rects.end(); ++tr){
+   for (vector<Blob>::const_iterator b = image_blobs.begin();
+        b != image_blobs.end(); ++b){
       
-      Mat part(src, *tr);
+      
+      
+      Rect r = b->bound;
+      
+      Mat part(src, r);
       
       char buf[80];
-      sprintf(buf, "ir-%d.png",image_record_id);
+      sprintf(buf, "research/result/ir-%d.png",image_record_id);
       imwrite(buf, part);
       
       
       ImageRecord ib;
-      ib.x = tr->x;
-      ib.y = tr->y;
-      ib.width = tr->width;
-      ib.height = tr->height;
-      ib.area = tr->width * tr->height;
+      ib.x = r.x;
+      ib.y = r.y;
+      ib.width = r.width;
+      ib.height = r.height;
+      ib.area = b->area;
       ib.id = image_record_id;
-      
+            
       ret.push_back(ib);
       
       image_record_id++;
@@ -439,40 +478,49 @@ create_image_records(const Mat& src, const vector<Rect> image_rects){
    return ret;
 }
 
+Database db;
+void index_screenshot_file(const char* file, int screenshot_id){
 
-int main(){
-
-   
-   //   char file[] = "test/ocr/word.png";
-   char file[] = "research/test/amazon.png";
    Mat screen = imread(file, 1);
    
-   vector<Rect> text_rects;
-   vector<Rect> image_rects;
-   segment_screenshot(screen, text_rects, image_rects);
-   
+   vector<Blob> text_blobs;
+   vector<Blob> image_blobs;
+   cvgui::segmentScreenshot(screen, text_blobs, image_blobs);
    
    
    vector<ImageRecord> records;
-   records = create_image_records(screen, image_rects);
-      
-   
-   Database db;
+   records = create_image_records(screen, image_blobs);   
    for (vector<ImageRecord>::iterator r = records.begin();
-        r != records.end(); ++r){
+        r != records.end(); ++r){      
       
+      r->screenshot_id = screenshot_id;
       db.insert(*r);
    }
+   
+}
 
-   //char query_file[] = "test/ocr/kindle.png";
+int main(){
+   
+
+   index_screenshot_file("research/test/amazon.png",1);
+
+   
+//   index_screenshot_file("research/test/amazon1.png",1);
+//   index_screenshot_file("research/test/amazon2.png",2);
+//   index_screenshot_file("research/test/amazon3.png",3);
+//   index_screenshot_file("research/test/amazon4.png",4);
+//   index_screenshot_file("research/test/amazon5.png",5);
+//   index_screenshot_file("research/test/amazon6.png",6);
+   
+   vector<Blob> text_blobs;
+   vector<Blob> image_blobs;
+   vector<ImageRecord> records;
+
    char query_file[] = "research/test/amazon_logo.png";
-   
-   
    Mat query = imread(query_file, 1);
    
-   segment_screenshot(query, text_rects, image_rects);
-  
-   records = create_image_records(query, image_rects);   
+   cvgui::segmentScreenshot(query, text_blobs, image_blobs);  
+   records = create_image_records(query, image_blobs);   
    
    for (vector<ImageRecord>::iterator r = records.begin();
         r != records.end(); ++r){
@@ -482,22 +530,11 @@ int main(){
       for (vector<ImageRecord>::iterator m = matches.begin();
            m != matches.end(); ++m){
        
-         cout << m->id << " ";
+         cout << "(" << m->screenshot_id << ":" << m->id << ")";
       }
    }
    
    
-   
-   // save all extracted image blocks
-   
-   
-   
-   
-   
-//   screen.setTo(Scalar(0,0,255), lines);
-//   SHOW(result);
-   
-//   waitKey(0);   
 }   
 
 
@@ -512,7 +549,7 @@ bool sort_by_x (Rect a, Rect b){
 }
 
 bool 
-ImageProc::areHorizontallyAligned(const vector<Rect>& rects){
+cvgui::areHorizontallyAligned(const vector<Rect>& rects){
    
    if (rects.size() <= 1)
       return true;
@@ -546,7 +583,7 @@ ImageProc::areHorizontallyAligned(const vector<Rect>& rects){
 
 
 bool
-ImageProc::hasMoreThanNUniqueColors(const Mat& src, int n){
+cvgui::hasMoreThanNUniqueColors(const Mat& src, int n){
    
                                        
    Mat_<Vec3b>::const_iterator it = src.begin<Vec3b>(),
@@ -604,7 +641,7 @@ ImageProc::hasMoreThanNUniqueColors(const Mat& src, int n){
 
 
 void 
-ImageProc::extractSmallRects(const Mat& src, 
+cvgui::extractSmallRects(const Mat& src, 
                               vector<Rect>& rects){
    
    Mat copy = src.clone();
@@ -621,9 +658,38 @@ ImageProc::extractSmallRects(const Mat& src,
    
 }
 
+void 
+cvgui::extractBlobs(const Mat& src, vector<Blob>& blobs){
+   
+   Mat copy = src.clone();
+   blobs.clear();
+      
+   vector<vector<Point> > contours;
+   findContours(copy, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+   
+   
+   for (vector<vector<Point> >::iterator contour = contours.begin();
+        contour != contours.end(); ++contour){
+      
+      
+      double area = contourArea(Mat(*contour));
+      
+      Rect bound = boundingRect(Mat(*contour));
+      
+      
+      Blob blob;
+      blob.area = area;
+      blob.bound = bound;
+      
+      blobs.push_back(blob);
+      
+   }
+   
+}
+
 
 void 
-ImageProc::extractRects(const Mat& src, 
+cvgui::extractRects(const Mat& src, 
                         vector<Rect>& rects){
    
    Mat copy = src.clone();
@@ -659,18 +725,18 @@ ImageProc::extractRects(const Mat& src,
 
 
 void
-ImageProc::findLongLines(const Mat& src, Mat& dest){
+cvgui::findLongLines(const Mat& src, Mat& dest){
    
    dest = src.clone();
 //   adaptiveThreshold(src, dest, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 3, 1);
 //   Canny(dest, dest, 10, 0);  
    
    Mat mask;
-   ImageProc::findLongLines_Horizontal(dest,mask);
+   cvgui::findLongLines_Horizontal(dest,mask);
    
    Mat maskT, destT;
    transpose(dest,destT);
-   ImageProc::findLongLines_Horizontal(destT,maskT);
+   cvgui::findLongLines_Horizontal(destT,maskT);
    
    Mat maskTT;
    transpose(maskT,maskTT);
@@ -682,7 +748,7 @@ ImageProc::findLongLines(const Mat& src, Mat& dest){
 
 #define LONGLINE_THRESHOLD 50
 void
-ImageProc::findLongLines_Horizontal(const Mat& binary, Mat& dest){
+cvgui::findLongLines_Horizontal(const Mat& binary, Mat& dest){
  
    typedef uchar T;
    
@@ -747,7 +813,7 @@ ImageProc::findLongLines_Horizontal(const Mat& binary, Mat& dest){
 
 
 Mat
-ImageProc::obtainGrayBackgroundMask(const Mat& input){
+cvgui::obtainGrayBackgroundMask(const Mat& input){
    
    Mat copy = input.clone();
    
@@ -788,7 +854,7 @@ ImageProc::obtainGrayBackgroundMask(const Mat& input){
 
 
 Mat
-ImageProc::removeGrayBackground(const Mat& input){
+cvgui::removeGrayBackground(const Mat& input){
    
    Mat copy = input.clone();
    Mat mask;
