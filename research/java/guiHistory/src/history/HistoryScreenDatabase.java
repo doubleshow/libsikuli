@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -127,9 +128,10 @@ public class HistoryScreenDatabase{
 				System.out.println("" + id + ":" + path);
 				
 				ret.add(find(id));
-
-
 			}
+			
+			Collections.sort(ret);
+			
 		}catch(Exception e){
 
 		}

@@ -152,12 +152,10 @@ public class HistoryViewer extends JPanel {
 		controls.add(exitBtn);
 		
 		navigationControl = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		//navigationControl.setBounds(200,400,250,50);
 		navigationControl.setPreferredSize(new Dimension(350,40));
 		navigationControl.setBorder(new LineBorder(Color.black, 1));
 		
 		earlier = new JButton("Earlier");
-		//earlier.setPreferredSize(new Dimension(20,20));
 		earlier.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -181,13 +179,15 @@ public class HistoryViewer extends JPanel {
 						hs.setHighlightedWord(input_query_string.getText());
 						setHistoryScreen(hs);
 						
+						later.setEnabled(find_result.hasAfter());
+						earlier.setEnabled(find_result.hasBefore());
+						
 					}
 				
 			}			
 		});
 		
 		later = new JButton("Later");
-		//later.setPreferredSize(new Dimension(20,20));
 		later.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -201,6 +201,8 @@ public class HistoryViewer extends JPanel {
 					hs.setHighlightedWord(input_query_string.getText());
 					setHistoryScreen(hs);
 					
+					later.setEnabled(find_result.hasAfter());
+					earlier.setEnabled(find_result.hasBefore());
 				}
 				
 				
@@ -212,8 +214,10 @@ public class HistoryViewer extends JPanel {
 		browseBtn.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//loadHistoryScreensMostRecent();
-				//selectHistoryScreen(0);
+				
+				current_mode = Mode.BROWSE;
+				repaint();
+				
 			}			
 		});
 		
@@ -241,7 +245,8 @@ public class HistoryViewer extends JPanel {
 	}
 	
 	private void setHistoryScreen(HistoryScreen hs){
-		time.setText(hs.getTimeString());
+		//time.setText(hs.getTimeString());
+		time.setText("" + hs.getId());
 		current_screen = hs;
 		repaint();
 	}
@@ -252,7 +257,7 @@ public class HistoryViewer extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
 
         
-        current_screen.paintHelper(g);
+        current_screen.paintHelper(g, current_mode);
         
     }
 	

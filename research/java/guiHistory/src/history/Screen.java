@@ -3,6 +3,8 @@
  */
 package history;
 
+import history.HistoryViewer.Mode;
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -36,7 +38,7 @@ public class Screen {
 		}
 	}
 	
-	public void paintHelper(Graphics g){
+	public void paintHelper(Graphics g, Mode current_mode){
 		
 		loadImage();
 		
