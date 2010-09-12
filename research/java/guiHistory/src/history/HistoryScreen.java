@@ -21,17 +21,25 @@ public class HistoryScreen extends Screen{
 		
 		this.id = id;
 		
-		// Darken the image by 10% 
-		float scaleFactor = .6f; 
-		RescaleOp op = new RescaleOp(scaleFactor, 0, null); 
-		image_darken = op.filter(image, null); 
-        
+	
 	}
 	
-	private Rectangle highlightRectangle;
+	private Rectangles highlightRectangles = new Rectangles();
 	private BufferedImage image_darken;
 	
-	
+	protected void loadImage(){
+		
+		super.loadImage();
+		
+		if (image_darken == null){
+		
+			// Darken the image by 10% 
+			float scaleFactor = .6f; 
+			RescaleOp op = new RescaleOp(scaleFactor, 0, null); 
+			image_darken = op.filter(image, null); 
+		}
+   
+	}
 	
 	public HistoryScreen getBefore(){
 		return HistoryScreenDatabase.find(id + 1);
@@ -53,7 +61,17 @@ public class HistoryScreen extends Screen{
 	}
 
 	public void setHighlightRectangle(Rectangle highlightRectangle) {
-		this.highlightRectangle = highlightRectangle;
+		//this.highlightRectangle = highlightRectangles
+	}
+	
+	String highlightedWord;
+	public void setHighlightedWord(String word){
+		highlightedWord = word;
+		highlightRectangles = HistoryScreenDatabase.findRectangles(id, highlightedWord);
+	}
+	
+	public Rectangles getHighlightRectangles(){
+		return highlightRectangles;
 	}
 	
 	public String getTimeString(){
@@ -62,28 +80,31 @@ public class HistoryScreen extends Screen{
 	
 	public void paintHelper(Graphics g){
 		
+		loadImage();
+		
 		Graphics2D g2d = (Graphics2D) g;
-	        
-	    if (highlightRectangle != null){
-	    	
-	    	g2d.drawImage(image_darken, 0, 0, null);
-	    	
-	        Rectangle r = highlightRectangle;
-	        BufferedImage subimage;
-	        subimage = image.getSubimage(r.x,r.y,r.width,r.height);
-	        g2d.drawImage(subimage, r.x, r.y, null);
-	        
-	        Stroke old_pen = g2d.getStroke();
-	        Stroke Pen = new BasicStroke (3.0F);
-	        g2d.setStroke (Pen);
-	        g2d.setColor(Color.yellow);
-	        g2d.drawRect(r.x,r.y,r.width,r.height);
-	        g2d.setStroke(old_pen);
-	        
-	    }else{
-	    	
-	    	g2d.drawImage(image, 0, 0, null);
+
+	    g2d.drawImage(image_darken, 0, 0, null);
+	    
+	    if (highlightRectangles == null)
+	    	return;
+	    
+	    for (Rectangle r : highlightRectangles){
+
+
+	    	BufferedImage subimage;
+	    	subimage = image.getSubimage(r.x,r.y,r.width,r.height);
+	    	g2d.drawImage(subimage, r.x, r.y, null);
+
+	    	Stroke old_pen = g2d.getStroke();
+	    	Stroke Pen = new BasicStroke (3.0F);
+	    	g2d.setStroke (Pen);
+	    	g2d.setColor(Color.yellow);
+	    	g2d.drawRect(r.x,r.y,r.width,r.height);
+	    	g2d.setStroke(old_pen);
 	    }
+	        
+	    
 	}
 	
 	

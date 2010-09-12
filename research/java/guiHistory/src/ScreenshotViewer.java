@@ -1,3 +1,5 @@
+import history.FileDocument;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -180,7 +182,7 @@ public class ScreenshotViewer extends JPanel {
       } else {
         System.out.println("adding " + file);
         try {
-          writer.addDocument(FileDocument.Document(file));
+          writer.addDocument(FileDocument.Document(file,0));
         }
         // at least on windows, some temporary files raise this exception with an "access denied" message
         // checking if the file can be read doesn't help

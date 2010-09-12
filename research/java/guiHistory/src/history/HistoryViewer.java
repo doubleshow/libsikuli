@@ -46,18 +46,8 @@ public class HistoryViewer extends JPanel {
 		ArrayList<HistoryScreen> history_screens = new ArrayList<HistoryScreen>();
 		int current_index;
 		
-		public FindResult(){
-			HistoryScreen hs;
-			hs = HistoryScreenDatabase.find(0);
-			hs.setHighlightRectangle(new Rectangle(300, 250, 74, 25));		
-			hs.setTimeString("8 min. ago");
-			history_screens.add(hs);
-			
-			hs = HistoryScreenDatabase.find(3);
-	        hs.setHighlightRectangle(new Rectangle(405, 382, 50, 18));
-	        hs.setTimeString("15 min. ago");
-			history_screens.add(hs);
-			
+		public FindResult(String query_string){
+			history_screens = HistoryScreenDatabase.find(query_string);
 			current_index = 0;
 		}
 		
@@ -94,7 +84,8 @@ public class HistoryViewer extends JPanel {
 	
 	JButton later;
 	JButton earlier;
-	 
+	JTextField input_query_string;
+	
 	Screen present_screen;
 	
 	FindResult find_result;
@@ -116,7 +107,7 @@ public class HistoryViewer extends JPanel {
 		
 		controls.setBounds(0,640,1152,80);
 		
-		JTextField searchTerm = new JTextField(10);		
+		input_query_string = new JTextField(10);		
 		
 		JButton closeBtn = new JButton("X");
 		closeBtn.setPreferredSize(new Dimension(20,20));
@@ -127,12 +118,17 @@ public class HistoryViewer extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				find_result = new FindResult();
-				
 				current_mode = Mode.FIND;
+				
+				String query_string = input_query_string.getText();
+				
+				find_result = new FindResult(query_string);
+				HistoryScreen hs = find_result.getMostRecent();
+				hs.setHighlightedWord(query_string);		
 				setHistoryScreen(find_result.getMostRecent());
 				
-			
+				later.setEnabled(true);
+				repaint();
 			}
 
 		
@@ -151,7 +147,7 @@ public class HistoryViewer extends JPanel {
 		
 		
 		controls.add(closeBtn);
-		controls.add(searchTerm);
+		controls.add(input_query_string);
 		controls.add(searchBtn);
 		controls.add(exitBtn);
 		
@@ -182,6 +178,7 @@ public class HistoryViewer extends JPanel {
 					}else if (current_mode == Mode.FIND) {
 						
 						HistoryScreen hs = find_result.getBefore();
+						hs.setHighlightedWord(input_query_string.getText());
 						setHistoryScreen(hs);
 						
 					}
@@ -201,6 +198,7 @@ public class HistoryViewer extends JPanel {
 				}else if (current_mode == Mode.FIND) {
 					
 					HistoryScreen hs = find_result.getAfter();
+					hs.setHighlightedWord(input_query_string.getText());
 					setHistoryScreen(hs);
 					
 				}
