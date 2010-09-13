@@ -12,6 +12,10 @@
 
 using namespace sikuli;
 
+ScreenImage::ScreenImage(const char* filename){
+   _image = cv::imread(filename,3);
+}
+
 void
 ScreenImage::show(int seconds){
    cv::namedWindow("sikuli",CV_WINDOW_AUTOSIZE);

@@ -800,6 +800,60 @@ Robot::getScreenSize(int screen, int& w, int& h){
    h = s.height;
 }
 
+
+void 
+Robot::getTopWindowBounds(int& x, int& y, int& w, int& h){
+   // TODO: get the top window of the specified application and lock onto it
+   // e.g., Window("AppName") creates a Region object that allows all 
+   // sikuli operations. The Window is always brought to the front before
+   // any operation is made.
+   
+   CFArrayRef windowList;
+   windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly | 
+                                           kCGWindowListExcludeDesktopElements, 
+                                           kCGNullWindowID);
+ 
+   CFIndex n = CFArrayGetCount(windowList);
+   for (CFIndex i = 0; i < n; ++i ){
+
+   
+      CFDictionaryRef dicRef = (CFDictionaryRef) CFArrayGetValueAtIndex(windowList,i);
+              
+      CFStringRef str = (CFStringRef) CFDictionaryGetValue(dicRef, kCGWindowOwnerName);
+      CFShow(str);
+
+      CFDictionaryRef dr = (CFDictionaryRef)  CFDictionaryGetValue(dicRef, kCGWindowBounds);
+      CGRect r;
+      CGRectMakeWithDictionaryRepresentation(dr,&r);
+      cout << r.origin.x << "," << r.origin.y << "," << r.size.width << "," << r.size.height << endl;
+   
+      
+      CFNumberRef nref = (CFNumberRef) CFDictionaryGetValue(dicRef, kCGWindowOwnerPID);
+      CFShow(nref);
+      
+      
+      cout << endl;
+   }
+   
+   CFRelease(windowList);
+      
+   
+   
+   // Get the process with the top window
+   
+   ProcessSerialNumber psn = { 0L, 0L };
+   OSStatus err = GetFrontProcess(&psn);
+   /*error check*/
+   
+   CFStringRef processName = NULL;
+   err = CopyProcessName(&psn, &processName);
+   /*error check*/
+   
+   CFShow(processName);
+   
+   CFRelease(processName);   
+}
+
 using namespace cv;
 
 #include "glgrab.h"
@@ -854,13 +908,151 @@ Robot::capture(int screen, int x, int y, int w, int h){
    return bgr;
 }
 
+
+void
+indent(int depth){
+   for (int i=0; i<depth; ++i)
+   cout << '\t';
+}
+
+void
+inspect(AXUIElementRef elementRef, int depth){
+   
+   AXError err;
+   
+   if (depth <  20){
+      
+      CFArrayRef names;
+      AXUIElementCopyAttributeNames((AXUIElementRef)elementRef, &names);
+
+      
+      
+      //indent(depth); cout << "NODE" << endl;
+      
+      CFStringRef role;
+      err = AXUIElementCopyAttributeValue((AXUIElementRef)elementRef,
+                                          (CFStringRef)kAXRoleAttribute,(CFTypeRef*)&role);
+      //if (err == kAXErrorSuccess){
+      //indent(depth); cout << "*"; CFShow(role);
+      if (CFStringCompare(role,kAXStaticTextRole,0) == kCFCompareEqualTo){
+         CFIndex n = CFArrayGetCount(names);
+         for (CFIndex i = 0; i < n; ++i ){
+            CFStringRef str = (CFStringRef) CFArrayGetValueAtIndex(names,i);
+            //CFShow(str);
+         }
+      }
+         
+         CFTypeRef value;
+         err = AXUIElementCopyAttributeValue((AXUIElementRef)elementRef,
+                                             (CFStringRef)kAXValueAttribute,(CFTypeRef*)&value);
+         if (err == kAXErrorSuccess){
+            indent(depth); CFShow(value);
+         }
+         
+         
+         
+      //}
+      
+      CFTypeRef title;
+      err = AXUIElementCopyAttributeValue((AXUIElementRef)elementRef,
+                                    (CFStringRef)kAXTitleAttribute,(CFTypeRef*)&title);
+      if (err == kAXErrorSuccess){
+         indent(depth); CFShow(title);
+      }
+      
+//      CFTypeRef selText;
+//      err = AXUIElementCopyAttributeValue((AXUIElementRef)elementRef,
+//                                          (CFStringRef)kAXTitleUIElementAttribute ,(CFTypeRef*)&selText);
+//      if (err == kAXErrorSuccess){
+//         indent(depth); CFShow(selText);
+//      }
+      
+      
+      CFBooleanRef enabled;
+      err = AXUIElementCopyAttributeValue((AXUIElementRef)elementRef,
+                                          (CFStringRef)kAXEnabledAttribute,(CFTypeRef*)&enabled);
+      //Boolean bval = CFBooleanGetValue(enabled);
+      
+      if (err == kAXErrorSuccess){
+         indent(depth); cout << "enabled? " << (CFBooleanGetValue(enabled) ? '1' : '0') << endl;
+      }
+      
+      
+      
+
+      CFArrayRef children;
+      err = AXUIElementCopyAttributeValue((AXUIElementRef)elementRef,
+                                    (CFStringRef)kAXChildrenAttribute,(CFTypeRef*)&children);
+                 //          (CFStringRef)kAXVisibleChildrenAttribute,(CFTypeRef*)&children);
+      
+      if (err == kAXErrorSuccess){
+      
+      for (CFIndex i = 0; i < CFArrayGetCount(children); ++i){
+         AXUIElementRef child = (AXUIElementRef) CFArrayGetValueAtIndex(children,i);
+         inspect(child, depth + 1);
+      }
+           
+      }
+   
+   }
+}
+
 void
 Robot::openApp(const char* appname){
-   OSStatus err;
-   FSRef appRef;
+   
+   AXUIElementRef _systemWideElement;
+   if(!AXAPIEnabled()){
+      //exit
+   }
+   AXUIElementRef _focusedApp;
+//   CFTypeRef _focusedWindow;
+//   _systemWideElement = AXUIElementCreateSystemWide();
+//   AXError err0 = AXUIElementCopyAttributeValue(_systemWideElement,
+//                                 (CFStringRef)kAXFocusedApplicationAttribute,(CFTypeRef*)&_focusedApp);
+//   CFShow(_focusedApp);
+//   AXUIElementCopyAttributeValue((AXUIElementRef)_focusedApp,
+//                                 (CFStringRef)kAXFocusedWindowAttribute,(CFTypeRef*)&_focusedWindow);
+
+   //AXUIElementRef elementRef = AXUIElementCreateApplication(52230);
+   AXUIElementRef elementRef = AXUIElementCreateApplication(19358);
+
+   
+   
+   inspect(elementRef, 0);
+//   
+//   AXError err0;
+//   
+//   CFTypeRef _focusedWindow;
+//   err0 = AXUIElementCopyAttributeValue((AXUIElementRef)elementRef,
+//                                    (CFStringRef)kAXFocusedWindowAttribute,(CFTypeRef*)&_focusedWindow);
+//   
+//   
+//   CFShow(_focusedWindow);
+//   cout << err0;
+//   
+//   CFTypeRef _position;
+//   AXUIElementCopyAttributeValue((AXUIElementRef)_focusedWindow,
+//                                 (CFStringRef)kAXPositionAttribute,
+//                                 (CFTypeRef*)&_position);
+//   CFShow(_position);
+//   
+//   CFTypeRef children;
+//   AXUIElementCopyAttributeValue((AXUIElementRef)elementRef,
+//                                 (CFStringRef)kAXChildrenAttribute,(CFTypeRef*)&children);
+//   CFShow(children);
+//
+//   
+//   CFTypeRef title;
+//   AXUIElementCopyAttributeValue((AXUIElementRef)elementRef,
+//                                 (CFStringRef)kAXTitleAttribute,(CFTypeRef*)&title);
+//   CFShow(title);
+   
    
 
-   // Convert c string to CFStringRef
+   
+   OSStatus err;
+   FSRef appRef;
+      // Convert c string to CFStringRef
    // http://www.carbondev.com/site/?page=CStrings+
    CFStringRef 
    str = CFStringCreateWithCString(kCFAllocatorDefault,

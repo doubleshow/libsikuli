@@ -44,7 +44,7 @@ SikuliUI::handleMatchFound(Region region, Pattern target, vector<Match> matches)
    
    int n = matches.size();
    cout << endl;
-   cout << target.toString() << ": " << n << " match(es)" << endl;
+   cout << target.tostring() << ": " << n << " match(es)" << endl;
    for (int i=0;i <n; ++i){ 
       Match& match = matches[i];
       if (i<5)
@@ -59,7 +59,7 @@ SikuliUI::handleMatchFound(Region region, Pattern target, vector<Match> matches)
 int 
 SikuliUI::handleFindFailedException(Region region, 
                                     Pattern target){
-   cout << target.toString() << " can not be found!!" << endl;
+   cout << target.tostring() << " can not be found!!" << endl;
    
    while (true){
       char ret = 0;

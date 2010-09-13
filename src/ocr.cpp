@@ -26,6 +26,34 @@ enum{
 	UPPER_ONLY
 };
 
+bool
+WordRect::isText(){
+
+   int ymin = 10000;
+   int ymax = 0;
+
+   // find the lowest and highest baseline of each character rectangle
+   for (int i=0; i < charRects.size(); ++i){
+      Rect& charRect = charRects[i];
+      
+      int baseline = charRect.y + charRect.height;
+      ymin = min(baseline, ymin);
+      ymax = max(baseline, ymax);
+   }
+   
+   cout << ymin << "-" << ymax << endl;
+   
+   // if the difference between the highest and lowest baseline
+   // is too large, it means the characters are not alginged horizontally,
+   // Then, it's likely the wordrect does not contain a valid word
+   if (ymax - ymin > 10){
+      return false;
+   }
+   
+   return true;
+}
+
+
 
 
 vector<Mat> letterImages;
@@ -141,13 +169,11 @@ vector<Rect> segment_image(Mat color){
    
 // TODO: clean this up
 	Mat im1 = gray;
-	//Mat im2 = im1.clone();
 	
    Mat im2 = remove_horizontal_lines(im1,6,0);
    Mat im1T;
    transpose(im2,im1T);
    Mat im4 = remove_horizontal_lines(im1T,30,0);
-   //Mat im4 = im1T;
    Mat im4T;
    transpose(im4,im4T);
    bitwise_and(im2,im4T,im4T);
@@ -155,8 +181,8 @@ vector<Rect> segment_image(Mat color){
 #if DISPLAY_SEGMENT_IMAGE
 	Mat im3;
    threshold(im4T,im3,0,255,THRESH_BINARY);
-	namedWindow("segment:binary", CV_WINDOW_AUTOSIZE);			
-	imshow("segment:binary",im3);			
+//	namedWindow("segment:binary", CV_WINDOW_AUTOSIZE);			
+//	imshow("segment:binary",im3);			
 #endif
    
    im2 = im4T;		
@@ -250,8 +276,8 @@ vector<Rect> segment_image(Mat color){
 	namedWindow("segment:gray", CV_WINDOW_AUTOSIZE);			
 	imshow("segment:gray",resultImage);			
 	
-	namedWindow("segment:color", CV_WINDOW_AUTOSIZE);			
-	imshow("segment:color",color);			
+//	namedWindow("segment:color", CV_WINDOW_AUTOSIZE);			
+//	imshow("segment:color",color);			
 	
 	waitKey();
 #endif		
@@ -1481,6 +1507,89 @@ recognize_word(const Mat& inputImage, const WordRect& wordRect){
    return result;
 }
 
+#include "myocr.h"
+
+bool
+recognize_word_by_tesseract(const Mat& inputImageGray, 
+                            const WordRect& wordRect,
+                            string &result){
+   result = "";
+   
+   Mat wordImage(inputImageGray, wordRect);
+   
+   
+   
+   Mat ocrImage;  // the image passed to tesseract
+   
+   bool upsampled = false;
+   if (wordRect.height < 20){
+      upsampled = true;
+      resize(wordImage, ocrImage, Size(wordImage.cols*2,wordImage.rows*2));
+   }else{
+      ocrImage = wordImage.clone();
+   }  
+   
+   OCRResult ocr_result = OCR::recognize((unsigned char*)ocrImage.data,
+                                         ocrImage.cols,
+                                         ocrImage.rows,
+                                         8); 
+   
+   for (OCRResult::Iterator iter = ocr_result.begin(); iter != ocr_result.end(); iter++){
+
+      if (upsampled){
+         // scale back the coordinates in the OCR result
+
+         iter->x0 = iter->x0/2;
+         iter->y0 = iter->y0/2;
+         iter->x1 = iter->x1/2;
+         iter->y1 = iter->y1/2;
+      }
+      
+      result += iter->ch;
+   }
+
+   return ocr_result.isValidWord();
+}
+
+Mat visualize_ocr_result(const Mat& inputImage, 
+                         vector<WordRect> wordRects,
+                         vector<string> words){
+   
+   Mat resultImage = inputImage.clone();
+   
+   for (int i=0; i < wordRects.size(); ++i){
+      
+      Rect& r = wordRects[i];
+      string word = words[i];
+      draw_rectangle(resultImage, r);
+      
+      char buf[50];
+      sprintf(buf, "%s", word.c_str());
+      
+      Point loc(r.x,r.y+25);
+      //      Scalar black(0,0,0);
+      //      Scalar red(0,0,255);
+      //      
+      Scalar textColor(255,255,255);
+      //      Scalar bgColor;
+      //      
+      //      if (m.score < 0.5){
+      //         bgColor = black;
+      //      }else{
+      //         bgColor = red;
+      //      }
+      
+      Scalar red(0,0,255);
+      Scalar black(0,0,0);
+      Scalar bgColor = black;
+      putTextWithBackground(bgColor,resultImage,buf,loc,FONT_HERSHEY_SIMPLEX, 0.4, textColor);      
+      
+   }
+   
+   return resultImage;
+}
+
+
 vector<string>
 recognize_helper(const Mat& inputImageColor,
                    bool flipContrast = false){
@@ -1492,7 +1601,9 @@ recognize_helper(const Mat& inputImageColor,
    if (flipContrast)
       absdiff(inputImageGray, 255, inputImageGray);
    
+   
    vector<string> words;
+   vector<WordRect> resultWordRects;
    
   	vector<Rect> linesRects = segment_image(inputImageColor);
    
@@ -1518,14 +1629,36 @@ recognize_helper(const Mat& inputImageColor,
       
       for (int j=0; j < wordRects.size(); ++j){
          string word;
-         word = recognize_word(inputImageGray, wordRects[j]);
-         words.push_back(word);
+         
+         WordRect& wordRect = wordRects[j];
+         if (wordRect.width < 5 || wordRect.height < 5)
+            continue;
+         
+         add_margin(wordRect, 2, Size(inputImageGray.cols,inputImageGray.rows));
+         
+         if (wordRect.charRects.size()<2)
+            continue;
+         
+         bool is_word_valid = recognize_word_by_tesseract(inputImageGray, wordRect, word);
+         
+         if (true || is_word_valid){
+            words.push_back(word);     
+            resultWordRects.push_back(wordRect);
+            cout << word << endl;
+         }
       }
       
    }
    
+   Mat output = visualize_ocr_result(inputImageColor, resultWordRects, words);
+   //namedWindow("ocr result",1);
+   //imshow("ocr result", output);
+   imwrite("/tmp/ocr_output.png",output);
+   
    return words;
 }
+
+
 
 vector<string>
 recognize_words(const Mat& inputImageColor){

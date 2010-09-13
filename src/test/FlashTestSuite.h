@@ -18,21 +18,21 @@ void play_rome_puzzle();
 
 
 void appear_callback(Event event){
-   cout << event.pattern.getImageURL() << " appeared in " << event.region.toString() << endl;
+   cout << event.pattern.getImageURL() << " appeared in " << event.region.tostring() << endl;
    event.region.hover(event.match);
 }
 
 void vanish_callback(Event event){
-   cout << event.pattern.getImageURL() << " vanished from " << event.region.toString() << endl;
+   cout << event.pattern.getImageURL() << " vanished from " << event.region.tostring() << endl;
 }
 
 void change_callback(Event event){
-   cout << "change observed in " << event.region.toString() << endl;
+   cout << "change observed in " << event.region.tostring() << endl;
 }
 
 
 void appear_and_stop_callback(Event event){
-   cout << event.pattern.getImageURL() << " appeared in " << event.region.toString() << endl;
+   cout << event.pattern.getImageURL() << " appeared in " << event.region.tostring() << endl;
    EventManager::stop();
    cout << "stopping event manager.." << endl;
 }
@@ -41,12 +41,12 @@ class VanishEventHandler : public SikuliEventHandler{
   
 public:
    virtual void handle(Event event){
-      cout << event.pattern.getImageURL() << " vanished from " << event.region.toString() << endl;  
+      cout << event.pattern.getImageURL() << " vanished from " << event.region.tostring() << endl;  
    }
 };
 
 void wack(Event event){
-   cout << event.pattern.getImageURL() << " appeared in " << event.region.toString() << endl;
+   cout << event.pattern.getImageURL() << " appeared in " << event.region.tostring() << endl;
    event.region.click(event.match);
 }
 

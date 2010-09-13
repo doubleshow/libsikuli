@@ -67,7 +67,7 @@ public:
    
    Pattern order(int ordering);
    
-   string toString() const;
+   string tostring() const;
    
    const char* getText();
    const char* getImageURL();

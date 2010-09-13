@@ -19,7 +19,7 @@ class FindFailed : public exception {
 public:
    FindFailed(string _msg) : msg(_msg) {};
    FindFailed(Pattern _ptn) : ptn(_ptn) {
-      msg = ptn.toString() + " can not be found";
+      msg = ptn.tostring() + " can not be found";
    };
    
    virtual const char* what() const throw(){

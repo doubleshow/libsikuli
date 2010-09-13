@@ -222,6 +222,8 @@ public:
    static void getScreenBounds(int screen, int& x, int& y, int& w, int& h);
    static void getScreenSize(int screen, int& w, int& h);
    
+   static void getTopWindowBounds(int& x, int& y, int& w, int& h);
+   
    
    // get the location of the mouse cursor in the desktop coordinate system
    static void getMouseLocation(int& x_out, int& y_out);

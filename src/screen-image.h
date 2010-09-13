@@ -20,6 +20,7 @@ class ScreenImage{
 public:
    
    ScreenImage(){};
+   ScreenImage(const char* filename);
    ScreenImage(cv::Mat image) : _image(image){};
    
    std::string getFilename(){

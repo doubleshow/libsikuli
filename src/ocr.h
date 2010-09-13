@@ -16,7 +16,13 @@ using namespace cv;
 struct WordRect : public Rect{	
 	WordRect(Rect& r) : Rect(r) {};
 	vector<Rect> charRects;
+   
+   
+   bool isText();
+   
 };
+
+
 
 void train_by_image(const Mat& trainingImage);
 vector<FindResult> find_word_by_image(const Mat& inputImage, const char word[]);
@@ -25,6 +31,9 @@ vector<FindResult> find_phrase(const Mat& inputImage, vector<string> targetWords
 vector<string> recognize_words(const Mat& inputImageColor);   
 
 void test_segment(const Mat& inputImage, const char word[]);
+
+vector<Rect> segment_image(Mat color);
+
 
 #define DISPLAY_SEGMENT_IMAGE 0
 #define DISPLAY_SEGMENT_LINEIMAGE_STEP 0

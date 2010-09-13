@@ -7,14 +7,6 @@ Dependencies
       A computer vision library the Sikuli's visual technology is
       based upon.
 
- * libcurl   
-      
-      A URL transfer library used by Sikuli to load a target image from
-      a web location so that we can do something like 
-
-          click("http://www.sikuli.org/images/some-button.png")
-
-
 Build and install Sikuli Python module
 --------------------------------------
 

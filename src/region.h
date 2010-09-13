@@ -46,7 +46,7 @@ public:
       return Rectangle(x1,y1,x2-x1,y2-y1);
    };
    
-   const char* toString(){
+   const char* tostring(){
       stringstream ss;
       ss << x << "," << y << "," << w << "," << h;
       repr = ss.str();

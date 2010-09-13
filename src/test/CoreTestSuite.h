@@ -10,6 +10,11 @@
 #include <cxxtest/TestSuite.h>
 
 #include "sikuli.h"
+#include "vision.h"
+
+#include "myocr.h"
+#include "ocr.h"
+
 
 using namespace cv;
 using namespace sikuli;
@@ -51,9 +56,102 @@ public:
    
    void testPageUpDown(void)
    {
+      
+      int x,y,w,h;
+      Robot::getTopWindowBounds(x,y,w,h);
+      return;
+      
       switchApp("firefox.app");
       s.press(PAGE_DOWN);
       s.press(PAGE_DOWN);
+      ScreenImage after, before;
+      before = s.capture();
+      
+      
+      bool can_scroll = true;  
+      while (can_scroll){
+         
+         s.press(PAGE_DOWN);
+         wait(0.5);
+         
+         after = s.capture();         
+         double diff;
+         diff = Vision::compare(before.getMat(), after.getMat());
+         cout << diff << endl;
+         
+         can_scroll = diff > 0.001;
+         
+         before = after;
+         //cout << same << endl;
+         
+         //simg = s.capture();
+         //after = simg;
+      }
+   }
+   
+   void testAXAPI(void)
+   {
+      
+      for (int i=0;i<=17;++i){
+         char filename[50];
+         sprintf(filename, "research/captured/screen%d.png",i);
+         OCRText text = OCR::recognize_screenshot(filename);
+         
+         
+         char buf[50];
+         sprintf(buf,"%s.ocr.txt", filename);
+         text.save(buf);
+
+         sprintf(buf,"%s.ocr.loc", filename);
+         text.save_with_location(buf);sik
+         
+      }
+      
+      
+     // for (int i=1;i<=2;++i){
+//         char filename[50];
+//         sprintf(filename, "test/screenshots/finder%d.png",i);
+//         OCRText text = OCR::recognize_screenshot(filename);
+//         
+//         
+//         char buf[50];
+//         sprintf(buf,"%s.ocr.txt", filename);
+//         text.save(buf);
+//         
+//      }
+//      
+     // for (int i=1;i<=6;++i){
+//         char filename[50];
+//         sprintf(filename, "test/screenshots/amazon%d.png",i);
+//         OCRText text = OCR::recognize_screenshot(filename);
+//         
+//         
+//         char buf[50];
+//         sprintf(buf,"%s.ocr.txt", filename);
+//         text.save(buf);
+//      
+//      }
+//      
+//      for (int i=1;i<=4;++i){
+//         char filename[50];
+//         sprintf(filename, "test/screenshots/chi%d.png",i);
+//         OCRText text = OCR::recognize_screenshot(filename);
+//         
+//         
+//         char buf[50];
+//         sprintf(buf,"%s.ocr.txt", filename);
+//         text.save(buf);
+//         
+//      }
+
+//      for (OCRText::iterator it = text.begin();
+//           it != text.end(); ++it){
+//         
+//       
+//         cout << it->str() << endl;
+//         
+//      }
+      
    }
    
    void testGetMouseLocation(void)

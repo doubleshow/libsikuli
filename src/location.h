@@ -30,10 +30,7 @@ public:
    int x;
    int y;
    int screen;
-   
-   //      public String toString(){
-   //         return "(" + x + "," + y + ")";
-   //      }
+
 };
 
 };
