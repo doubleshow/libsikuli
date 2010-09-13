@@ -9,14 +9,17 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.awt.image.RescaleOp;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import javax.imageio.ImageIO;
 
@@ -33,13 +36,51 @@ public class Screen {
 	protected BufferedImage image_darken;
 
 	String highlightedWord;
+	Image highlightedImage;
 	
 	public Screen(String filename){
 		this.filename = filename;
+	}
+	
+	public Rectangle find(BufferedImage target_image){
 		
+		//loadImage();
 		
+		try{
+			File f;
+			String line;
+
+			f = File.createTempFile("target", ".png");
+			f.deleteOnExit(); 
+
+			ImageIO.write(target_image, "png", f);
+
+			String command = "./ocr MATCH " + filename + " " + f.getPath();
+			//System.out.println(command);
+			Process p = Runtime.getRuntime().exec(command);
+
+			BufferedReader input = new BufferedReader
+			(new InputStreamReader(p.getInputStream()));
 		
+			int x=-1,y=-1;
+			while ((line = input.readLine()) != null) {
+				System.out.println(line);
+				String[] xy = line.split(" ");
+				x = Integer.parseInt(xy[0]);
+				y = Integer.parseInt(xy[1]);
+			}
+			input.close();
 		
+			if (x>=0 && y>=0)
+				return new Rectangle(x,y,target_image.getWidth(),target_image.getHeight());
+			
+			
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	protected void loadImage(){
@@ -86,11 +127,11 @@ public class Screen {
 
 			for (Rectangle r : highlightRectangles){
 
-				int m = 2;
-				r.x = r.x - m;
-				r.y = r.y - m;
-				r.width = r.width + 2*m;
-				r.height = r.height + 2*m;
+//				int m = 2;
+//				r.x = r.x - m;
+//				r.y = r.y - m;
+//				r.width = r.width + 2*m;
+//				r.height = r.height + 2*m;
 				
 				BufferedImage subimage;
 				subimage = image.getSubimage(r.x,r.y,r.width,r.height);
@@ -146,6 +187,14 @@ public class Screen {
 		highlightedWord = word;
 	}
 
+	public void setHighlightedImage(BufferedImage image) {
+		Rectangle m = find(image);
+		// TODO: handle multiple matches
+		highlightRectangles.clear();
+		if (m != null)
+			highlightRectangles.add(m);
+	}
+	
 	public Rectangles getHighlightRectangles() {
 		return highlightRectangles;
 	}
@@ -167,6 +216,24 @@ public class Screen {
 		}
 		crop_g2d.dispose();
 		return crop;
+	}
+	
+	public static void main(String[] args) throws Exception {
+
+		Screen s = new Screen("screen.png");
+		BufferedImage image = null;
+		try {
+			File sourceimage = new File("apple.png");
+			image = ImageIO.read(sourceimage);    
+			Rectangle r = s.find(image);
+			System.out.println(r);
+			
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		
+		
+		
 	}
 	
 }

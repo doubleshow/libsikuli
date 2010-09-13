@@ -61,6 +61,8 @@ public class HistoryScreen extends Screen
 		highlightedWord = word;
 		highlightRectangles = HistoryScreenDatabase.findRectangles(id, highlightedWord);
 	}
+	
+
 
 	
 }

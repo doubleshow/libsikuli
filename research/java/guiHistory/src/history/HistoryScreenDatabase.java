@@ -46,9 +46,15 @@ public class HistoryScreenDatabase{
 	}
 
 	static public Rectangles findRectangles(int id, String word){
+		
+		
+		
 		String file = "testdata/images/screens/screen" + (17-id) + ".png.ocr.loc";
 		OCRDocument doc = new OCRDocument(file);
-		return doc.find(word);	
+		
+		
+		String ws[] = word.split(" ");
+		return doc.find(ws[0]);	
 	}
 
 	static public HistoryScreen find(int id){
@@ -145,7 +151,7 @@ public class HistoryScreenDatabase{
 
 		HistoryScreenDatabase.indexOcrFiles();
 		
-		HistoryScreenDatabase.find("deadline");
+		HistoryScreenDatabase.find("attendees && vancouver && conference");
 	    
 	}
 }

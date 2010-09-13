@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Scanner;
@@ -15,29 +16,43 @@ public class OCRDocument {
 	public OCRDocument(BufferedImage image){
 		
 		try{
-			//File tmp = File.createTempFile("sikulihistory", "selected_image")
-	        File  f = new File("tmpocr.png");
+			File f;
+			
+			f = File.createTempFile("ocrimage", ".png");
+			f.deleteOnExit(); 
+	        
+			//File  f = new File("tmpocr.png");
 			ImageIO.write(image, "png", f);
+			
+			 String command = "./ocr OCR " + f.getPath();
+	    	 System.out.println(command);
+			 Process child = Runtime.getRuntime().exec(command);
+			
+			 
+			 try {
+				 child.waitFor();
+		//		Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	 parseFile(f.getPath() + ".ocr.loc");
+	    	 
+			
 	      }
 	      catch(IOException e){
 	    	  
 	      }
 		
-	      try {
-	    	    // Execute a command without arguments
-	    	    String command = "./ocr tmpocr.png";
-	    	    Process child = Runtime.getRuntime().exec(command);
-	    	    
-	    	} catch (IOException e) {
-	    	}
-		
+	     
 	}
 	
-	public OCRDocument(String input){
+	private void parseFile(String filename){
+		
 		word_to_rectangles = new Hashtable<String,Rectangles>();
 		
-		File fFile = new File(input);  
-
+		File fFile = new File(filename);  
+		
 		Scanner scanner;
 	    try {
 	    	 scanner = new Scanner(fFile);
@@ -57,7 +72,11 @@ public class OCRDocument {
 	    } catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		    		
+	}
+	
+	public OCRDocument(String filename){
+		
+		parseFile(filename);
 	}
 	
 	String normalize(String in){
@@ -92,12 +111,17 @@ public class OCRDocument {
 			 Rectangles rects = new Rectangles();
 			 rects.add(new Rectangle(x,y,w,h));
 			 word_to_rectangles.put(word, rects);
-			 
+			 words.add(word);
 		 }
 	    	
 	}
 
 	Map<String,Rectangles> word_to_rectangles;
+	ArrayList<String> words = new ArrayList<String>();
+
+	public ArrayList<String> getWords() {
+		return words;
+	}
 
 	public Rectangles find(String word){
 		return word_to_rectangles.get(word);

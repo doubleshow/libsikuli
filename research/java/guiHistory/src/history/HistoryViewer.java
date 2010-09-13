@@ -45,7 +45,8 @@ public class HistoryViewer extends JPanel {
 		FIND,
 		SELECT
 	};
-	 
+	
+	
 	
 	class FindResult {
 		
@@ -121,9 +122,8 @@ public class HistoryViewer extends JPanel {
 		closeBtn.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				sikuli.Screen scr = new sikuli.Screen();
-				sikuli.ScreenImage img = scr.userCapture();
+//				sikuli.Screen scr = new sikuli.Screen();
+//				sikuli.ScreenImage img = scr.userCapture();
 			}
 		});
 		
@@ -132,21 +132,9 @@ public class HistoryViewer extends JPanel {
 		searchBtn.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				current_mode = Mode.FIND;
-				
 				String query_string = input_query_string.getText();
-				
-				find_result = new FindResult(query_string);
-				Screen hs = find_result.getMostRecent();
-				hs.setHighlightedWord(query_string);		
-				setHistoryScreen(find_result.getMostRecent());
-				
-				later.setEnabled(true);
-				repaint();
+				doFind(query_string);
 			}
-
-		
 		});
 		
 		JButton exitBtn = new JButton("Exit");
@@ -181,8 +169,7 @@ public class HistoryViewer extends JPanel {
 						HistoryScreen hs = HistoryScreenDatabase.getMostRecent();
 						setHistoryScreen(hs);
 						
-						current_mode = Mode.BROWSE;
-						
+						current_mode = Mode.BROWSE;					
 						later.setEnabled(true);
 						
 					}else if (current_mode == Mode.BROWSE) {
@@ -192,7 +179,6 @@ public class HistoryViewer extends JPanel {
 					}else if (current_mode == Mode.FIND) {
 						
 						HistoryScreen hs = find_result.getBefore();
-						hs.setHighlightedWord(input_query_string.getText());
 						setHistoryScreen(hs);
 						
 						later.setEnabled(find_result.hasAfter());
@@ -213,8 +199,7 @@ public class HistoryViewer extends JPanel {
 					setHistoryScreen(hs);
 				}else if (current_mode == Mode.FIND) {
 					
-					HistoryScreen hs = find_result.getAfter();
-					hs.setHighlightedWord(input_query_string.getText());
+					HistoryScreen hs = find_result.getAfter();				
 					setHistoryScreen(hs);
 					
 					later.setEnabled(find_result.hasAfter());
@@ -287,6 +272,18 @@ public class HistoryViewer extends JPanel {
 	        	
 	            OCRDocument doc = new OCRDocument(selected_image);
 	            
+	            String query_string = null;
+	            for (String word : doc.getWords()){
+	            	System.out.println(word);
+	            	
+	            	if (query_string == null)
+	            		query_string = word;
+	            	else
+	            		query_string = query_string + " && " + word;
+	            }
+	            
+	            doFind(query_string);
+	            
 	        	repaint();
 
 	         }
@@ -315,11 +312,28 @@ public class HistoryViewer extends JPanel {
 	
 	}
 	
+	private void doFind(String query_string){
+		current_mode = Mode.FIND;
+		
+		find_result = new FindResult(query_string);	
+		setHistoryScreen(find_result.getMostRecent());
+		
+		later.setEnabled(true);
+		repaint();
+	}
+	
 	BufferedImage selected_image;
 	int srcx, srcy, destx, desty;
 	
 	private void setHistoryScreen(HistoryScreen hs){
 		//time.setText(hs.getTimeString());
+		
+		hs.setHighlightedWord(input_query_string.getText());
+				
+		if (selected_image != null)
+			hs.setHighlightedImage(selected_image);
+		
+		
 		time.setText("" + hs.getId());
 		current_screen = hs;
 		repaint();
@@ -336,6 +350,15 @@ public class HistoryViewer extends JPanel {
         if (selected_image != null){
         	
         	g2d.drawImage(selected_image, 0, 0, null);
+        	
+//        	
+//        	Rectangle m;
+//        	
+//        	if (m != null){
+//        		g2d.drawRect(m.x,m.y,m.width,m.height);
+//        	}
+        		
+        	
         }
     }
 	
