@@ -7,6 +7,10 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -16,6 +20,8 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
+
+import sikuli.UnionScreen;
 
 
 public class HistoryViewer extends JPanel {
@@ -36,9 +42,10 @@ public class HistoryViewer extends JPanel {
 	enum Mode{
 		PRESENT,
 		BROWSE,
-		FIND
+		FIND,
+		SELECT
 	};
-	
+	 
 	
 	class FindResult {
 		
@@ -111,6 +118,14 @@ public class HistoryViewer extends JPanel {
 		
 		JButton closeBtn = new JButton("X");
 		closeBtn.setPreferredSize(new Dimension(20,20));
+		closeBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				sikuli.Screen scr = new sikuli.Screen();
+				sikuli.ScreenImage img = scr.userCapture();
+			}
+		});
 		
 		
 		JButton searchBtn = new JButton("Find");
@@ -123,7 +138,7 @@ public class HistoryViewer extends JPanel {
 				String query_string = input_query_string.getText();
 				
 				find_result = new FindResult(query_string);
-				HistoryScreen hs = find_result.getMostRecent();
+				Screen hs = find_result.getMostRecent();
 				hs.setHighlightedWord(query_string);		
 				setHistoryScreen(find_result.getMostRecent());
 				
@@ -138,7 +153,8 @@ public class HistoryViewer extends JPanel {
 		exitBtn.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				current_screen = present_screen;
+				current_screen = present_screen;				
+				current_mode = Mode.PRESENT;
 				repaint();
 			}
 
@@ -241,8 +257,66 @@ public class HistoryViewer extends JPanel {
 		controls.add(navigationControl);
 		
 		layeredPane.add(controls,new Integer(2));
+		
+		
+		addMouseListener(new MouseAdapter(){
+	         public void mousePressed(java.awt.event.MouseEvent e){
+	        	 
+	        	 current_mode = Mode.SELECT;
+	        	 
+	            destx = srcx = e.getX();
+	            desty = srcy = e.getY();
+	            System.out.println("pressed " + srcx + "," + srcy);
+	            
+	            current_screen.setHighlightRectangle(new Rectangle(srcx,srcy,2,2));
+	            
+	            repaint();
+	         }
+
+	         public void mouseReleased(java.awt.event.MouseEvent e){
+	        	 
+	        	 current_mode = Mode.PRESENT;
+	        	 
+	        	System.out.println("selected " + srcx + "," + srcy
+	        			+" - "+desty + "," + destx);
+	        	
+	        	Rectangle selected_rectangle = new Rectangle(srcx,srcy,
+	            		destx-srcx,desty-srcy);
+	        	
+	            selected_image = current_screen.crop(selected_rectangle);
+	        	
+	            OCRDocument doc = new OCRDocument(selected_image);
+	            
+	        	repaint();
+
+	         }
+		});
+		
+		addMouseMotionListener( new MouseMotionAdapter(){
+	          public void mouseDragged(java.awt.event.MouseEvent e) {
+
+	        	 destx = e.getX();
+	             desty = e.getY();
+	             
+	             System.out.println("moved " + desty + "," + destx);
+	             
+
+	             	Rectangle selected_rectangle = new Rectangle(srcx,srcy,
+		            		destx-srcx,desty-srcy);
+	             
+		            current_screen.setHighlightRectangle(selected_rectangle);
+		            
+		            
+		        
+	             
+	            repaint(); 
+	          }
+	       });
 	
 	}
+	
+	BufferedImage selected_image;
+	int srcx, srcy, destx, desty;
 	
 	private void setHistoryScreen(HistoryScreen hs){
 		//time.setText(hs.getTimeString());
@@ -250,7 +324,7 @@ public class HistoryViewer extends JPanel {
 		current_screen = hs;
 		repaint();
 	}
-	
+		
 	public void paintComponent(Graphics g) {
 		
 		super.paintComponent(g);
@@ -259,6 +333,10 @@ public class HistoryViewer extends JPanel {
         
         current_screen.paintHelper(g, current_mode);
         
+        if (selected_image != null){
+        	
+        	g2d.drawImage(selected_image, 0, 0, null);
+        }
     }
 	
     public static void main(String[] args) {

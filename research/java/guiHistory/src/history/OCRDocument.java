@@ -1,12 +1,37 @@
 package history;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Scanner;
 
+import javax.imageio.ImageIO;
+
 public class OCRDocument {
+	
+	public OCRDocument(BufferedImage image){
+		
+		try{
+			//File tmp = File.createTempFile("sikulihistory", "selected_image")
+	        File  f = new File("tmpocr.png");
+			ImageIO.write(image, "png", f);
+	      }
+	      catch(IOException e){
+	    	  
+	      }
+		
+	      try {
+	    	    // Execute a command without arguments
+	    	    String command = "./ocr tmpocr.png";
+	    	    Process child = Runtime.getRuntime().exec(command);
+	    	    
+	    	} catch (IOException e) {
+	    	}
+		
+	}
 	
 	public OCRDocument(String input){
 		word_to_rectangles = new Hashtable<String,Rectangles>();
@@ -30,7 +55,6 @@ public class OCRDocument {
 		      scanner.close();
 		      
 	    } catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		    		
