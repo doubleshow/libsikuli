@@ -94,6 +94,8 @@
 		A0A8F6FD123EA2A30090BD3C /* cvgui_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0A8F6FA123EA2A30090BD3C /* cvgui_test.cpp */; };
 		A0A8F6FE123EA2A30090BD3C /* main_cxxtest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0A8F6FC123EA2A30090BD3C /* main_cxxtest.cpp */; };
 		A0A8F708123EA3530090BD3C /* cvgui_test.h in Sources */ = {isa = PBXBuildFile; fileRef = A0A8F6FB123EA2A30090BD3C /* cvgui_test.h */; };
+		A0A8F87B123EB8280090BD3C /* vision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A06B995A120834B5000C73A3 /* vision.cpp */; };
+		A0A8F881123EB84A0090BD3C /* cvgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0A8F6F0123EA0EA0090BD3C /* cvgui.cpp */; };
 		A0DB4B16121EBBFE00BF48E5 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0454E7F11FF19570018D949 /* ApplicationServices.framework */; };
 		A0DB4B17121EBBFE00BF48E5 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A045505F11FF44440018D949 /* OpenGL.framework */; };
 		A0DB4B35121EBCD000BF48E5 /* FlashTestSuite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0DB4B34121EBCD000BF48E5 /* FlashTestSuite.cpp */; };
@@ -266,7 +268,7 @@
 		A06BA2D5120AE886000C73A3 /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = settings.h; path = src/settings.h; sourceTree = "<group>"; };
 		A06BA2D6120AE886000C73A3 /* sikuli.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sikuli.cpp; path = src/sikuli.cpp; sourceTree = "<group>"; };
 		A06BA2D7120AE886000C73A3 /* sikuli.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sikuli.h; path = src/sikuli.h; sourceTree = "<group>"; };
-		A0A8F633123DAAE10090BD3C /* ocr */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ocr; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0A8F633123DAAE10090BD3C /* sikulicmd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sikulicmd; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0A8F63A123DAB2B0090BD3C /* sikulicmd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sikulicmd.cpp; path = examples/cpp/sikulicmd.cpp; sourceTree = "<group>"; };
 		A0A8F6F0123EA0EA0090BD3C /* cvgui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cvgui.cpp; path = research/src/main/cpp/cvgui.cpp; sourceTree = "<group>"; };
 		A0A8F6F1123EA0EA0090BD3C /* cvgui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cvgui.h; path = research/src/main/cpp/cvgui.h; sourceTree = "<group>"; };
@@ -443,7 +445,7 @@
 				A024C8CF1222898000E21C0C /* sikuli */,
 				A024CA7C122332D600E21C0C /* play-bejeweled */,
 				A039A8671237E162005EC9D9 /* play-bejeweled */,
-				A0A8F633123DAAE10090BD3C /* ocr */,
+				A0A8F633123DAAE10090BD3C /* sikulicmd */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -671,9 +673,9 @@
 			productReference = A039A8671237E162005EC9D9 /* play-bejeweled */;
 			productType = "com.apple.product-type.tool";
 		};
-		A0A8F61A123DAAE10090BD3C /* run-ocr */ = {
+		A0A8F61A123DAAE10090BD3C /* sikulicmd */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A0A8F630123DAAE10090BD3C /* Build configuration list for PBXNativeTarget "run-ocr" */;
+			buildConfigurationList = A0A8F630123DAAE10090BD3C /* Build configuration list for PBXNativeTarget "sikulicmd" */;
 			buildPhases = (
 				A0A8F61D123DAAE10090BD3C /* Sources */,
 				A0A8F622123DAAE10090BD3C /* Frameworks */,
@@ -684,10 +686,10 @@
 			dependencies = (
 				A0A8F61B123DAAE10090BD3C /* PBXTargetDependency */,
 			);
-			name = "run-ocr";
+			name = sikulicmd;
 			productInstallPath = "$(HOME)/bin";
 			productName = Untitled;
-			productReference = A0A8F633123DAAE10090BD3C /* ocr */;
+			productReference = A0A8F633123DAAE10090BD3C /* sikulicmd */;
 			productType = "com.apple.product-type.tool";
 		};
 		A0DB4898121D40C300BF48E5 /* play-bejeweled */ = {
@@ -765,7 +767,7 @@
 				A0DB4FF6121FF3B500BF48E5 /* libsikuli */,
 				A024CA65122332D600E21C0C /* play-whackamole */,
 				A039A84D1237E162005EC9D9 /* test-cvgui */,
-				A0A8F61A123DAAE10090BD3C /* run-ocr */,
+				A0A8F61A123DAAE10090BD3C /* sikulicmd */,
 			);
 		};
 /* End PBXProject section */
@@ -797,6 +799,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0A8F881123EB84A0090BD3C /* cvgui.cpp in Sources */,
+				A0A8F87B123EB8280090BD3C /* vision.cpp in Sources */,
 				A0A8F65F123DAC7C0090BD3C /* sikulicmd.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1034,7 +1038,7 @@
 					"\\\"$(SRCROOT)/lib/opencv\\\"",
 					"\"$(SRCROOT)/lib/opencv\"",
 				);
-				PRODUCT_NAME = ocr;
+				PRODUCT_NAME = sikulicmd;
 			};
 			name = Debug;
 		};
@@ -1059,7 +1063,7 @@
 					"\\\"$(SRCROOT)/lib/opencv\\\"",
 					"\"$(SRCROOT)/lib/opencv\"",
 				);
-				PRODUCT_NAME = ocr;
+				PRODUCT_NAME = sikulicmd;
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
@@ -1257,7 +1261,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A0A8F630123DAAE10090BD3C /* Build configuration list for PBXNativeTarget "run-ocr" */ = {
+		A0A8F630123DAAE10090BD3C /* Build configuration list for PBXNativeTarget "sikulicmd" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A0A8F631123DAAE10090BD3C /* Debug */,

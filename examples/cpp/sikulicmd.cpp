@@ -47,9 +47,25 @@ int match_main(int argc, const char* argv[]){
    return 1;
 }
 
+#include "cvgui.h"
+int index_main(int argc, const char* argv[]){
+   
+   Database db;
+   db.insert_file("research/testdata/amazon.png",1);
+   
+      
+   ofstream out("test.bin", ios::binary);
+   db.write(out);
+   out.close();
+   
+   return 1;
+}
+
 
 int main(int argc, const char* argv[]){
    
+   if (argc < 2)
+      return 0;
    
    const char* command = argv[1];
    
@@ -58,6 +74,9 @@ int main(int argc, const char* argv[]){
 
    else if (strcmp(command, "MATCH") == 0)
       return match_main(argc-1, argv+1);
+
+   else if (strcmp(command, "INDEX") == 0)
+      return index_main(argc-1, argv+1);
    
    
    return 0;
