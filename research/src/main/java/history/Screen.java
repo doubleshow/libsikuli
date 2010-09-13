@@ -23,8 +23,6 @@ import java.io.InputStreamReader;
 
 import javax.imageio.ImageIO;
 
-import sikuli.UnionScreen;
-
 public class Screen {
 	
 	protected BufferedImage image;

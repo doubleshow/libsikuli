@@ -21,9 +21,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 
-import sikuli.UnionScreen;
-
-
 public class HistoryViewer extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
