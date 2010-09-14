@@ -262,24 +262,27 @@ public class HistoryViewer extends JPanel {
 	        	System.out.println("selected " + srcx + "," + srcy
 	        			+" - "+desty + "," + destx);
 	        	
-	        	Rectangle selected_rectangle = new Rectangle(srcx,srcy,
-	            		destx-srcx,desty-srcy);
+	        	if (destx > srcx + 2 && desty > srcy + 2){
 	        	
-	            selected_image = current_screen.crop(selected_rectangle);
+	        		Rectangle selected_rectangle = new Rectangle(srcx,srcy,
+	        				destx-srcx,desty-srcy);
 	        	
-	            OCRDocument doc = new OCRDocument(selected_image);
-	            
-	            String query_string = null;
-	            for (String word : doc.getWords()){
-	            	System.out.println(word);
-	            	
-	            	if (query_string == null)
-	            		query_string = word;
-	            	else
-	            		query_string = query_string + " && " + word;
-	            }
-	            
-	            doFind(query_string);
+	        	
+	        	
+	            	selected_image = current_screen.crop(selected_rectangle);
+	        	}
+//	            OCRDocument doc = new OCRDocument(selected_image);
+//	            
+//	            String query_string = null;
+//	            for (String word : doc.getWords()){
+//	            	System.out.println(word);
+//	            	
+//	            	if (query_string == null)
+//	            		query_string = word;
+//	            	else
+//	            		query_string = query_string + " && " + word;
+//	            }
+	           
 	            
 	        	repaint();
 
@@ -294,13 +297,13 @@ public class HistoryViewer extends JPanel {
 	             
 	             System.out.println("moved " + desty + "," + destx);
 	             
-
+	             if (destx > srcx + 2 && desty > srcy + 2){
 	             	Rectangle selected_rectangle = new Rectangle(srcx,srcy,
 		            		destx-srcx,desty-srcy);
 	             
 		            current_screen.setHighlightRectangle(selected_rectangle);
 		            
-		            
+	             }
 		        
 	             
 	            repaint(); 
@@ -311,6 +314,10 @@ public class HistoryViewer extends JPanel {
 	
 	private void doFind(String query_string){
 		current_mode = Mode.FIND;
+		
+		
+        String ui_query_string = Sikuli.find_ui(selected_image); 
+        query_string = query_string + " " + ui_query_string;
 		
 		find_result = new FindResult(query_string);	
 		setHistoryScreen(find_result.getMostRecent());
@@ -325,12 +332,12 @@ public class HistoryViewer extends JPanel {
 	private void setHistoryScreen(HistoryScreen hs){
 		//time.setText(hs.getTimeString());
 		
-		hs.setHighlightedWord(input_query_string.getText());
-				
-		if (selected_image != null)
-			hs.setHighlightedImage(selected_image);
-		
-		
+		if (current_mode == Mode.FIND){
+			hs.clearHighlightedRectangles();
+			hs.addHighlightedWord(input_query_string.getText());
+			hs.addHighlightedImage(selected_image);
+		}
+						
 		time.setText("" + hs.getId());
 		current_screen = hs;
 		repaint();

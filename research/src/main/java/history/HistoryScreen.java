@@ -56,12 +56,21 @@ public class HistoryScreen extends Screen
 		return this.id - hs.id;    
 	}
 	
-	@Override
-	public void setHighlightedWord(String word) {
-		highlightedWord = word;
-		highlightRectangles = HistoryScreenDatabase.findRectangles(id, highlightedWord);
+	public void addHighlightedWord(String word){
+		Rectangles rects = HistoryScreenDatabase.findRectangles(id, word);
+		addHighlightedRectangles(rects);		
 	}
 	
+	
+	public void addHighlightedImage(BufferedImage image){
+		if (image == null)
+		return;
+	
+		Rectangles rects = new Rectangles(find(image));
+		addHighlightedRectangles(rects);
+	}
+
+
 
 
 	

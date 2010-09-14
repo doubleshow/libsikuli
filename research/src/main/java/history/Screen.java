@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -29,7 +30,7 @@ public class Screen {
 	
 	String filename;
 
-	protected Rectangles highlightRectangles = new Rectangles();
+	private Rectangles highlightRectangles = new Rectangles();
 
 	protected BufferedImage image_darken;
 
@@ -40,45 +41,8 @@ public class Screen {
 		this.filename = filename;
 	}
 	
-	public Rectangle find(BufferedImage target_image){
-		
-		//loadImage();
-		
-		try{
-			File f;
-			String line;
-
-			f = File.createTempFile("target", ".png");
-			f.deleteOnExit(); 
-
-			ImageIO.write(target_image, "png", f);
-
-			String command = "./ocr MATCH " + filename + " " + f.getPath();
-			//System.out.println(command);
-			Process p = Runtime.getRuntime().exec(command);
-
-			BufferedReader input = new BufferedReader
-			(new InputStreamReader(p.getInputStream()));
-		
-			int x=-1,y=-1;
-			while ((line = input.readLine()) != null) {
-				System.out.println(line);
-				String[] xy = line.split(" ");
-				x = Integer.parseInt(xy[0]);
-				y = Integer.parseInt(xy[1]);
-			}
-			input.close();
-		
-			if (x>=0 && y>=0)
-				return new Rectangle(x,y,target_image.getWidth(),target_image.getHeight());
-			
-			
-		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
-		
-		return null;
+	public ArrayList<Rectangle> find(BufferedImage target_image){
+		return Sikuli.find(filename, target_image);
 	}
 	
 	protected void loadImage(){
@@ -181,16 +145,14 @@ public class Screen {
 	        
 	}
 
-	public void setHighlightedWord(String word) {
-		highlightedWord = word;
-	}
-
-	public void setHighlightedImage(BufferedImage image) {
-		Rectangle m = find(image);
-		// TODO: handle multiple matches
+	
+	public void clearHighlightedRectangles() {
 		highlightRectangles.clear();
-		if (m != null)
-			highlightRectangles.add(m);
+	}
+	
+	public void addHighlightedRectangles(Rectangles rects){
+		if (rects != null)
+			highlightRectangles.addAll(rects);
 	}
 	
 	public Rectangles getHighlightRectangles() {
@@ -223,7 +185,7 @@ public class Screen {
 		try {
 			File sourceimage = new File("apple.png");
 			image = ImageIO.read(sourceimage);    
-			Rectangle r = s.find(image);
+			Rectangle r = s.find(image).get(0);
 			System.out.println(r);
 			
 		} catch (IOException ioe) {

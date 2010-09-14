@@ -15,35 +15,8 @@ public class OCRDocument {
 	
 	public OCRDocument(BufferedImage image){
 		
-		try{
-			File f;
-			
-			f = File.createTempFile("ocrimage", ".png");
-			f.deleteOnExit(); 
-	        
-			//File  f = new File("tmpocr.png");
-			ImageIO.write(image, "png", f);
-			
-			 String command = "./ocr OCR " + f.getPath();
-	    	 System.out.println(command);
-			 Process child = Runtime.getRuntime().exec(command);
-			
-			 
-			 try {
-				 child.waitFor();
-		//		Thread.sleep(1);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	    	 parseFile(f.getPath() + ".ocr.loc");
-	    	 
-			
-	      }
-	      catch(IOException e){
-	    	  
-	      }
-		
+		String outputname = Sikuli.ocr(image);
+		parseFile(outputname);
 	     
 	}
 	

@@ -30,11 +30,14 @@ public class HistoryScreenDatabase{
 	private static final File INDEX_DIR =  new File("index");
 	static ArrayList<HistoryScreen> history_screens = new ArrayList<HistoryScreen>();
 
+	
+	static final String ROOT_DIR = "captured/facebook";
+	
 	static ArrayList<String> filenames = new ArrayList<String>();
 	static {
 
 		for (int i=17; i >= 0 ; --i){
-			String file = "testdata/images/screens/screen" + i + ".png";
+			String file = ROOT_DIR + "/screen" + i + ".png";
 			filenames.add(file);
 		}
 
@@ -47,11 +50,8 @@ public class HistoryScreenDatabase{
 
 	static public Rectangles findRectangles(int id, String word){
 		
-		
-		
-		String file = "testdata/images/screens/screen" + (17-id) + ".png.ocr.loc";
+		String file = filenames.get(id) + ".ocr.loc";
 		OCRDocument doc = new OCRDocument(file);
-		
 		
 		String ws[] = word.split(" ");
 		return doc.find(ws[0]);	
@@ -79,7 +79,8 @@ public class HistoryScreenDatabase{
 				
 				String filename = filenames.get(i);
 
-				String ocr_filename = filename + ".ocr.txt";
+				//String ocr_filename = filename + ".ocr.txt";
+				String ocr_filename = filename + ".ui.txt";
 
 				File ocr_file = new File(ocr_filename);
 				
@@ -151,7 +152,8 @@ public class HistoryScreenDatabase{
 
 		HistoryScreenDatabase.indexOcrFiles();
 		
-		HistoryScreenDatabase.find("attendees && vancouver && conference");
+		//HistoryScreenDatabase.find("attendees && vancouver && conference");
+		HistoryScreenDatabase.find("ui64");
 	    
 	}
 }
