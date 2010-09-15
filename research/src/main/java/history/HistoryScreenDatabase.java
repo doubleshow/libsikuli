@@ -31,18 +31,24 @@ public class HistoryScreenDatabase{
 	static ArrayList<HistoryScreen> history_screens = new ArrayList<HistoryScreen>();
 
 	
-	static final String ROOT_DIR = "captured/facebook";
+	//static final String ROOT_DIR = "captured/facebook";
+	static final String[] ROOT_DIRS = new String[]{"captured/mail", "captured/chi"};
+	static final int[] NS = new int[]{1, 30};
 	
 	static final int TIME_OFFSET = 5;
 	
 	static ArrayList<String> filenames = new ArrayList<String>();
 	static {
 
-		for (int i=17; i >= 0 ; --i){
-			String file = ROOT_DIR + "/screen" + i + ".png";
-			filenames.add(file);
+		for (int j=0; j<ROOT_DIRS.length; j++){
+			String root = ROOT_DIRS[j];
+			
+			for (int i=NS[j]-1; i >= 0 ; --i){
+				String file = root + "/screen" + i + ".png";
+				filenames.add(file);
+			}
 		}
-
+		
 		for (int i=0; i < filenames.size() ; ++i){
 			HistoryScreen hs = new HistoryScreen(filenames.get(i), i);
 			hs.setTimeString("" + (i + TIME_OFFSET) + " minutes ago");
@@ -82,8 +88,8 @@ public class HistoryScreenDatabase{
 				
 				String filename = filenames.get(i);
 
-				//String ocr_filename = filename + ".ocr.txt";
-				String ocr_filename = filename + ".ui.txt";
+				String ocr_filename = filename + ".ocr.txt";
+				//String ocr_filename = filename + ".ui.txt";
 
 				File ocr_file = new File(ocr_filename);
 				
@@ -154,9 +160,9 @@ public class HistoryScreenDatabase{
 	public static void main(String[] args) throws Exception {
 
 		HistoryScreenDatabase.indexOcrFiles();
-		
-		//HistoryScreenDatabase.find("attendees && vancouver && conference");
-		HistoryScreenDatabase.find("ui64");
+		HistoryScreenDatabase.find("deadline");
+		//HistoryScreenDatabase.find("vancouver && conference");
+		//HistoryScreenDatabase.find("ui64");
 	    
 	}
 }

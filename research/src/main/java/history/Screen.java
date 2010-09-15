@@ -164,22 +164,43 @@ public class Screen {
 		return highlightRectangles;
 	}
 	
+	
+	
+	private void paintRectangle(Graphics2D g2d, Rectangle r, float width, Color color){
+		Stroke old_pen = g2d.getStroke();
+		Stroke Pen = new BasicStroke(width);
+		g2d.setStroke (Pen);
+		g2d.setColor(color);
+		g2d.drawRect(r.x,r.y,r.width,r.height);
+		g2d.setStroke(old_pen);
+	}
+	
+	
 	public BufferedImage crop(Rectangle rectSelection){
+		return crop(rectSelection, null);
+	}
+	
+	public BufferedImage crop(Rectangle rectSelection, Rectangle highlight){
 		int w = rectSelection.width, h = rectSelection.height;
 		if(w<=0 || h<=0)
 			return null;
 		BufferedImage crop  = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-		Graphics2D crop_g2d = crop.createGraphics();
+		Graphics2D g2d = crop.createGraphics();
 		try {
-			crop_g2d.drawImage(
+			g2d.drawImage(
 					image.getSubimage(rectSelection.x, rectSelection.y, w, h),
 					null, 0, 0
 			);
+			
+			if (highlight != null){
+				paintRectangle(g2d, highlight, 2.0f, Color.red);
+			}
+			
 		}
 		catch (RasterFormatException e) {
 			e.printStackTrace();
 		}
-		crop_g2d.dispose();
+		g2d.dispose();
 		return crop;
 	}
 	

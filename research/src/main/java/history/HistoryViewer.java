@@ -79,6 +79,10 @@ public class HistoryViewer extends JPanel {
 			return history_screens.get(0);
 		}
 		
+		public ArrayList<HistoryScreen> getAll(){
+			return history_screens;
+		}
+		
 		
 	};
 	
@@ -90,7 +94,6 @@ public class HistoryViewer extends JPanel {
 	JButton later;
 	JButton earlier;
 	JTextField input_query_string;
-	MatchViewer mv;
 	
 	Screen present_screen;
 	
@@ -236,12 +239,7 @@ public class HistoryViewer extends JPanel {
 		controls.add(navigationControl);
 		
 		layeredPane.add(controls,new Integer(2));
-		
-		mv = new MatchViewer();
-		mv.setBounds(500,10,500,700);
-		layeredPane.add(mv, new Integer(1));
-		
-		
+				
 		addMouseListener(new MouseAdapter(){
 	         public void mousePressed(java.awt.event.MouseEvent e){
 	        	 
@@ -312,31 +310,46 @@ public class HistoryViewer extends JPanel {
 	       });
 	
 	}
-	
+
 	private void showMatchViewer(FindResult find_result){
 		
 		MatchViewer mv = new MatchViewer();
 		
-		HistoryScreen hs1 = find_result.getMostRecent();
-		HistoryScreen hs2 = find_result.getBefore();
+		ArrayList<HistoryScreen> hss = find_result.getAll();
+		int is[] = new int[]{0,1,6};
 		
-		HistoryScreen[] hss = new HistoryScreen[]{hs1, hs2};
-		
-		for (HistoryScreen hs : hss){
+		//for (HistoryScreen hs : hss){
+		for (int i : is){
+			HistoryScreen hs = hss.get(i);
 		
 			BufferedImage screen = hs.getImage();
 			
 			hs.clearHighlightedRectangles();
 			hs.addHighlightedImage(selected_image);
+			hs.addHighlightedWord(input_query_string.getText());
 			Rectangles rects = hs.getHighlightRectangles();
 						
 			ArrayList<BufferedImage> match_images = new ArrayList<BufferedImage>();
 			for (Rectangle rect : rects){
 
 				Rectangle r = new Rectangle(rect);
-				r.width += 300;
-				r.height += 20;
-				BufferedImage im = hs.crop(r);
+				//r.width += 300;
+				//r.height += 20;
+				
+				int dh = 20;
+				int dw = 100;
+				r.x -= dw;
+				r.y -= dh;
+				r.width += 2*dw;
+				r.height += 2*dh;
+				
+				Rectangle hl = new Rectangle(dw,dh,rect.width,rect.height);
+				hl.x -=2;
+				hl.y -=2;
+				hl.width += 4;
+				hl.height += 4;
+				
+				BufferedImage im = hs.crop(r,hl);
 				match_images.add(im);
 			}
 			mv.addMatchGroup(screen, match_images, hs.getTimeString());
@@ -356,9 +369,10 @@ public class HistoryViewer extends JPanel {
 	private void doFind(String query_string){
 		current_mode = Mode.FIND;
 		
-		
-        String ui_query_string = Sikuli.find_ui(selected_image); 
-        query_string = query_string + " " + ui_query_string;
+		if (selected_image != null){
+			String ui_query_string = Sikuli.find_ui(selected_image); 
+			query_string = query_string + " " + ui_query_string;
+		}
 		
 		find_result = new FindResult(query_string);	
 		setHistoryScreen(find_result.getMostRecent());
