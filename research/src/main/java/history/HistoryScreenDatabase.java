@@ -33,6 +33,8 @@ public class HistoryScreenDatabase{
 	
 	static final String ROOT_DIR = "captured/facebook";
 	
+	static final int TIME_OFFSET = 5;
+	
 	static ArrayList<String> filenames = new ArrayList<String>();
 	static {
 
@@ -43,6 +45,7 @@ public class HistoryScreenDatabase{
 
 		for (int i=0; i < filenames.size() ; ++i){
 			HistoryScreen hs = new HistoryScreen(filenames.get(i), i);
+			hs.setTimeString("" + (i + TIME_OFFSET) + " minutes ago");
 			history_screens.add(hs);
 		}
 

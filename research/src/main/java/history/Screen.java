@@ -45,6 +45,11 @@ public class Screen {
 		return Sikuli.find(filename, target_image);
 	}
 	
+	public BufferedImage getImage(){
+		loadImage();
+		return image;
+	}
+	
 	protected void loadImage(){
 		
 		if (image == null){

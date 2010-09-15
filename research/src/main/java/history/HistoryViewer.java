@@ -90,6 +90,7 @@ public class HistoryViewer extends JPanel {
 	JButton later;
 	JButton earlier;
 	JTextField input_query_string;
+	MatchViewer mv;
 	
 	Screen present_screen;
 	
@@ -231,14 +232,14 @@ public class HistoryViewer extends JPanel {
 		navigationControl.add(time);
 		navigationControl.add(browseBtn);
 		
-		
-		//navigationControl.setVisible(false);
-		//navigationControl.setOpaque(false);
-		
 
 		controls.add(navigationControl);
 		
 		layeredPane.add(controls,new Integer(2));
+		
+		mv = new MatchViewer();
+		mv.setBounds(500,10,500,700);
+		layeredPane.add(mv, new Integer(1));
 		
 		
 		addMouseListener(new MouseAdapter(){
@@ -312,6 +313,46 @@ public class HistoryViewer extends JPanel {
 	
 	}
 	
+	private void showMatchViewer(FindResult find_result){
+		
+		MatchViewer mv = new MatchViewer();
+		
+		HistoryScreen hs1 = find_result.getMostRecent();
+		HistoryScreen hs2 = find_result.getBefore();
+		
+		HistoryScreen[] hss = new HistoryScreen[]{hs1, hs2};
+		
+		for (HistoryScreen hs : hss){
+		
+			BufferedImage screen = hs.getImage();
+			
+			hs.clearHighlightedRectangles();
+			hs.addHighlightedImage(selected_image);
+			Rectangles rects = hs.getHighlightRectangles();
+						
+			ArrayList<BufferedImage> match_images = new ArrayList<BufferedImage>();
+			for (Rectangle rect : rects){
+
+				Rectangle r = new Rectangle(rect);
+				r.width += 300;
+				r.height += 20;
+				BufferedImage im = hs.crop(r);
+				match_images.add(im);
+			}
+			mv.addMatchGroup(screen, match_images, hs.getTimeString());
+		}
+	
+		
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(mv);        
+		frame.setSize(1000,600);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+		
+		//mv.updateUI();
+	}
+	
 	private void doFind(String query_string){
 		current_mode = Mode.FIND;
 		
@@ -321,6 +362,14 @@ public class HistoryViewer extends JPanel {
 		
 		find_result = new FindResult(query_string);	
 		setHistoryScreen(find_result.getMostRecent());
+		
+		
+		
+		
+		showMatchViewer(find_result);
+		
+		
+		
 		
 		later.setEnabled(true);
 		repaint();
@@ -334,7 +383,7 @@ public class HistoryViewer extends JPanel {
 		
 		if (current_mode == Mode.FIND){
 			hs.clearHighlightedRectangles();
-			hs.addHighlightedWord(input_query_string.getText());
+			//hs.addHighlightedWord(input_query_string.getText());
 			hs.addHighlightedImage(selected_image);
 		}
 						
@@ -354,14 +403,6 @@ public class HistoryViewer extends JPanel {
         if (selected_image != null){
         	
         	g2d.drawImage(selected_image, 0, 0, null);
-        	
-//        	
-//        	Rectangle m;
-//        	
-//        	if (m != null){
-//        		g2d.drawRect(m.x,m.y,m.width,m.height);
-//        	}
-        		
         	
         }
     }
