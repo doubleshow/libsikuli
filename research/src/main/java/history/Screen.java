@@ -85,7 +85,7 @@ public class Screen {
 		
 			g2d.drawImage(image, 0, 0, null);
 			
-		}else if (mode == Mode.FIND){
+		}else if (mode == Mode.FIND || mode == Mode.READ){
 		
 			g2d.drawImage(image_darken, 0, 0, null);
 

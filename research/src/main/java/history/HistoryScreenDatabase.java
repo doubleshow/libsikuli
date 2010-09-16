@@ -32,8 +32,8 @@ public class HistoryScreenDatabase{
 
 	
 	//static final String ROOT_DIR = "captured/facebook";
-	static final String[] ROOT_DIRS = new String[]{"captured/mail", "captured/chi"};
-	static final int[] NS = new int[]{1, 30};
+	static final String[] ROOT_DIRS = new String[]{"captured/login","captured/mail", "captured/chi"};
+	static final int[] NS = new int[]{10, 1, 30};
 	
 	static final int TIME_OFFSET = 5;
 	
