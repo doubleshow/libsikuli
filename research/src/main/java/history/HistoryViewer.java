@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -34,7 +36,9 @@ public class HistoryViewer extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 
-	Screen current_screen;
+	HistoryScreenImage screen;
+	
+	//Screen history_screen;
 	
 	JLayeredPane layeredPane;
 	
@@ -55,58 +59,13 @@ public class HistoryViewer extends JPanel {
 	
 	
 	
-	class FindResult {
-		
-		// a reversed chronologically ordered list of history screens
-		ArrayList<HistoryScreen> history_screens = new ArrayList<HistoryScreen>();
-		int current_index;
-		
-		public FindResult(String query_string){
-			history_screens = HistoryScreenDatabase.find(query_string);
-			current_index = 0;
-		}
-		
-		public boolean hasBefore(){
-			return current_index < history_screens.size() - 1;
-		}
-		
-		public boolean hasAfter(){
-			return current_index > 0;
-		}
-		
-	
-		public HistoryScreen getBefore(){
-			current_index = current_index + 1;
-			return history_screens.get(current_index);				
-		}
-		
-		public HistoryScreen getAfter(){
-			current_index = current_index - 1;
-			return history_screens.get(current_index);	
-		}
-		
-		public HistoryScreen getMostRecent(){
-			return history_screens.get(0);
-		}
-		
-		public ArrayList<HistoryScreen> getAll(){
-			return history_screens;
-		}
-		
-		
-	};
-	
-	
-	
-	
 	int history_screen_index = -1;
 	
-	JButton later;
-	JButton earlier;
+
 	JTextField input_query_string;
 	Lense virtualPage;
 	
-	Screen present_screen;
+	ScreenImage present_screen;
 	TriggerEditor trigger_editor;
 	
 	FindResult find_result;
@@ -119,142 +78,18 @@ public class HistoryViewer extends JPanel {
 		layeredPane.setPreferredSize(new Dimension(1152, 720));
 		add(layeredPane);
 	
-		present_screen = new Screen("testdata/images/scenario-deadline-word.png"); 
-		current_screen = present_screen;
-		
-		// create find control
-		controls = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		controls.setBorder(new LineBorder(Color.black, 1));		
-		controls.setBounds(20,645,1112,40);
-		
-		input_query_string = new JTextField(10);		
-		
-		JButton closeBtn = new JButton("X");
-		closeBtn.setPreferredSize(new Dimension(20,20));
-		closeBtn.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-//				sikuli.Screen scr = new sikuli.Screen();
-//				sikuli.ScreenImage img = scr.userCapture();
-			}
-		});	
-		
-		JButton searchBtn = new JButton("Find");
-		searchBtn.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String query_string = input_query_string.getText();
-				doFind(query_string);
-			}
-		});
-		
-		JButton exitBtn = new JButton("Exit");
-		exitBtn.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				current_screen = present_screen;				
-				current_mode = Mode.PRESENT;
-				repaint();
-			}
+		present_screen = new ScreenImage("testdata/images/scenario-deadline-word.png"); 
 
-		
-		});
-		
-		JButton browseBtn = new JButton("Browse");
-		browseBtn.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				current_mode = Mode.BROWSE;
-				repaint();
-				
-			}			
-		});
-		
-		JButton readBtn = new JButton("Read");
-		readBtn.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-								
-				if (virtualPage.isVisible()){				
-					virtualPage.setVisible(false);
-				}else{
-					current_mode = Mode.READ;
-					
-					BufferedImage tracked = current_screen.crop(new Rectangle(370,200,200,100));
-					ArrayList<Rectangle> rects = Sikuli.find("long.png", tracked);
-					if (!rects.isEmpty()){
-						
-						Rectangle top = rects.get(0);
-						virtualPage.move(top.x-370+20,top.y-200+96+5);
-					}
-				
-					virtualPage.setVisible(true);
-					virtualPage.requestFocus();
-					
-					Rectangle r = virtualPage.getBounds();
-					r.grow(2,2);
-					r.translate(0,4);
-					current_screen.setHighlightRectangle(r);
-				//updateUI();
-				}
-				
-				repaint();
-			}			
-		});
-		
-		
-		JButton scriptBtn = new JButton("Script");
-		scriptBtn.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				if (selected_image != null)
-					trigger_editor = new TriggerEditor(selected_image);
-				
-			}			
-		});
-		
-		
-		earlier = new NavigationButton("Earlier", NavigationButton.LEFT);
-		later   = new NavigationButton("Later", NavigationButton.RIGHT);
-
-		
-
-		
-		
-		time = new JLabel("-15:20");
-		time.setOpaque(true);
-		//Font font = new Font("sansserif", Font.BOLD, 32);
-		//time.setFont(font);
-		//time.setForeground(Color.red);
-				
-		controls.add(exitBtn);
-		controls.add(input_query_string);
-		controls.add(searchBtn);
-		controls.add(new JSeparator(SwingConstants.HORIZONTAL));
-		controls.add(earlier);
-		controls.add(later);
-		controls.add(time);
-		controls.add(browseBtn);
-		controls.add(readBtn);
-		controls.add(scriptBtn);
-		
-
-		//controls.add(navigationControl);
-		
+		createControls();
+			
 		virtualPage = new Lense(new Dimension(963,518), "long.png");
-		virtualPage.setBounds(20,96,963,518);
+		virtualPage.setBounds(20,96,959,512);
 		virtualPage.setVisible(false);
 		virtualPage.setFocusable(true);
 		virtualPage.addKeyListener(virtualPage);
-		//virtualPage.setBorder(BorderFactory.createEtchedBorder());
-		//virtualPage.setBorder(BorderFactory.createEtchedBorder());
-		
-		
+
 		
 		layeredPane.add(virtualPage, new Integer(3));	
-		layeredPane.add(controls,new Integer(2));
 				
 		addMouseListener(new MouseAdapter(){
 	         public void mousePressed(java.awt.event.MouseEvent e){
@@ -265,7 +100,7 @@ public class HistoryViewer extends JPanel {
 	            desty = srcy = e.getY();
 	            System.out.println("pressed " + srcx + "," + srcy);
 	            
-	            current_screen.setHighlightRectangle(new Rectangle(srcx,srcy,2,2));
+	            screen.setHighlightRectangle(new Rectangle(srcx,srcy,2,2));
 	            
 	            repaint();
 	         }
@@ -282,7 +117,7 @@ public class HistoryViewer extends JPanel {
 	        		Rectangle selected_rectangle = new Rectangle(srcx,srcy,
 	        				destx-srcx,desty-srcy);
 	        	
-	        		selected_image = current_screen.crop(selected_rectangle);
+	        		selected_image = screen.crop(selected_rectangle);
 	            	
 	            	if (trigger_editor != null && selected_image != null){
 	            		trigger_editor.insertImage(selected_image);	   
@@ -319,7 +154,7 @@ public class HistoryViewer extends JPanel {
 	             	Rectangle selected_rectangle = new Rectangle(srcx,srcy,
 		            		destx-srcx,desty-srcy);
 	             
-		            current_screen.setHighlightRectangle(selected_rectangle);
+		            screen.setHighlightRectangle(selected_rectangle);
 		            
 	             }
 		        
@@ -329,112 +164,309 @@ public class HistoryViewer extends JPanel {
 	       });
 		
 		
-
-
-	
+		
+		//testDiff();
+		//testMove();
+		//testPilyoung();
+		
+		current_mode = Mode.FIND;
+		input_query_string.setText("deadline");
+		
+		//find_result = new FindResult("deadline");
+		
+		find_result = FindResult.createMockResult();
+		
+		setHistoryScreen(find_result.getMostRecent());
+		
+		navigator.setList(find_result);
+//		earlier.setList(find_result);
+//		later.setList(find_result);
+		
+		
 	}
 	
+	interface NavigationList{
+		boolean hasBefore();
+		boolean hasAfter();	
+		Object getBefore();
+		Object getAfter();
+	}
 
-	
-	class NavigationButton extends JButton implements ActionListener {
+	NavigationControl navigator;
+	class NavigationControl extends JPanel {
 		
 		static public final int LEFT = 1;
 		static public final int RIGHT = 2;
 		
-		int direction;
 		
-		public NavigationButton(String s, int direction){
-			super(s);
-			this.direction = direction;
-			addActionListener(this);
+		NavigationList list;
+		public void setList(NavigationList list){
+			this.list = list;
+			
+			updateButtons();
 		}
-
 		
-		public void actionPerformed(ActionEvent e) {
-
-
-			if (current_mode == Mode.PRESENT) {
-				HistoryScreen hs = HistoryScreenDatabase.getMostRecent();
-				setHistoryScreen(hs);
-
-				current_mode = Mode.BROWSE;					
-				later.setEnabled(true);
-
-			}else if (current_mode == Mode.BROWSE) {
-				
-				HistoryScreen hs;
-				if (direction == LEFT){
-					hs = ((HistoryScreen)current_screen).getBefore();
-				}else{
-					hs = ((HistoryScreen)current_screen).getAfter();
-				}
-				
-				setHistoryScreen(hs);	
-				
-
-			}else if (current_mode == Mode.FIND) {
-				
-				HistoryScreen hs;
-				if (direction == LEFT){
-					hs = find_result.getBefore();
-				}else{
-					hs = find_result.getAfter();
-				}
-				
-				setHistoryScreen(hs);
-
-				later.setEnabled(find_result.hasAfter());
-				earlier.setEnabled(find_result.hasBefore());
-
+		private void updateButtons(){
+			before.setEnabled(list.hasBefore());
+			after.setEnabled(list.hasAfter());
+		}
+		
+		JButton before;
+		JButton after;		
+		public NavigationControl(){
+			
+			before = new JButton("before");
+			before.addActionListener(new NavigationActionListener(LEFT));
+			
+			after = new JButton("after");
+			after.addActionListener(new NavigationActionListener(RIGHT));
+			
+			add(before);
+			add(after);
+		}
+			
+			
+		class NavigationActionListener implements ActionListener{
+			
+			int direction;
+			
+			public NavigationActionListener(int direction){
+				super();
+				this.direction = direction;
 			}
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
-		}	
+				HistoryScreen hs;
+				if (direction == LEFT){
+					hs = (HistoryScreen) list.getBefore();
+				}else{
+					hs = (HistoryScreen) list.getAfter();
+				}
+				
+				setHistoryScreen(hs);
+			
+				
+				updateButtons();
+			}
+						
+		}
 		
 		
 	}
+	
 
+	
+	private void createControls(){
+		
+		// create find control
+
+		//controls.setBorder(new LineBorder(Color.black, 1));		
+		//controls.setBounds(20,645,1112,40);
+		//controls.setBounds(20,645,500,40);
+
+		input_query_string = new JTextField(10);		
+
+		JButton closeBtn = new JButton("X");
+		closeBtn.setPreferredSize(new Dimension(20,20));
+		closeBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//		sikuli.Screen scr = new sikuli.Screen();
+				//		sikuli.ScreenImage img = scr.userCapture();
+			}
+		});	
+
+		JButton searchBtn = new JButton("Find");
+		searchBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String query_string = input_query_string.getText();
+				doFind(query_string);
+
+			}
+		});
+
+		JButton exitBtn = new JButton("Exit");
+		exitBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//current_screen = present_screen;				
+				current_mode = Mode.PRESENT;
+				repaint();
+			}
+
+
+		});
+
+		JButton browseBtn = new JButton("Browse");
+		browseBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				current_mode = Mode.BROWSE;
+
+//				if (! (current_screen instanceof HistoryScreen)){
+//					current_screen = HistoryScreenDatabase.getMostRecent();
+//				}
+
+//				earlier.setEnabled(true);
+//				later.setEnabled(true);				
+
+				repaint();
+
+			}			
+		});
+
+
+
+
+		JButton readBtn = new JButton("Read");
+		readBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				if (virtualPage.isVisible()){				
+					virtualPage.setVisible(false);
+				}else{
+					current_mode = Mode.READ;
+
+					BufferedImage tracked = screen.crop(new Rectangle(370,200,200,100));
+					ArrayList<Rectangle> rects = Sikuli.find("long.png", tracked);
+					if (!rects.isEmpty()){
+
+						Rectangle top = rects.get(0);
+						virtualPage.move(top.x-370+20,top.y-200+96+5);
+					}
+
+					virtualPage.setVisible(true);
+					virtualPage.requestFocus();
+
+					Rectangle r = virtualPage.getBounds();
+					r.grow(2,2);
+					r.translate(0,4);
+					screen.setHighlightRectangle(r);
+					//updateUI();
+				}
+
+				repaint();
+			}			
+		});
+
+
+		JButton scriptBtn = new JButton("Script");
+		scriptBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				if (selected_image != null)
+					trigger_editor = new TriggerEditor(selected_image);
+
+			}			
+		});
+
+		navigator = new NavigationControl();
+
+
+		time = new JLabel("-15:20");
+		time.setOpaque(true);
+		//Font font = new Font("sansserif", Font.BOLD, 32);
+		//time.setFont(font);
+		//time.setForeground(Color.red);
+
+		boolean search_only = true;
+
+		controls = new JPanel();
+		controls.setLayout(new BoxLayout(controls, BoxLayout.X_AXIS));
+
+		//controls.add(exitBtn);
+		controls.add(input_query_string);
+		controls.add(searchBtn);
+		controls.add(new JSeparator(SwingConstants.VERTICAL));
+		controls.add(navigator);
+//		controls.add(new JSeparator(SwingConstants.VERTICAL));		
+//		controls.add(scriptBtn);
+		//controls.add(readBtn);
+		//controls.add(browseBtn);
+
+		if (! search_only){
+
+			controls.add(time);
+			controls.add(browseBtn);
+
+			controls.add(scriptBtn);
+		}
+		controls.setPreferredSize(new Dimension(500,60));
+
+	}
+
+
+
+	public void displayControls(){
+		JFrame controlsFrame = new JFrame();
+		controlsFrame.add(controls);
+		controlsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		controlsFrame.setMinimumSize(new Dimension(480,50));
+		controlsFrame.setLocationRelativeTo(this);
+		controlsFrame.setVisible(true);
+		//controlsFrame.setLocation(10,10);
+		controlsFrame.toFront();
+	}
+	
+	
 	private void showMatchViewer(FindResult find_result){
+		if (true){
+			return;
+		}
 		
 		MatchViewer mv = new MatchViewer();
 		
 		ArrayList<HistoryScreen> hss = find_result.getAll();
-		int is[] = new int[]{0,1,6};
+		int is[] = new int[]{0,1,6,7,8};
+		//int is[] = new int[]{0,3,5,6};//,6,7,8};
 		
 		//for (HistoryScreen hs : hss){
 		for (int i : is){
 			HistoryScreen hs = hss.get(i);
 		
-			BufferedImage screen = hs.getImage();
 			
-			hs.clearHighlightedRectangles();
-			hs.addHighlightedImage(selected_image);
-			hs.addHighlightedWord(input_query_string.getText());
-			Rectangles rects = hs.getHighlightRectangles();
+			HistoryScreenImage im = hs.createImage();
+			BufferedImage screen_image = im.getImage();
+			
+			im.clearHighlightedRectangles();
+			//hs.addHighlightedImage(selected_image);
+			im.addHighlightedWord(input_query_string.getText());
+			Rectangles rects = im.getHighlightRectangles();
 						
 			ArrayList<BufferedImage> match_images = new ArrayList<BufferedImage>();
 			for (Rectangle rect : rects){
 
 				Rectangle r = new Rectangle(rect);
-				//r.width += 300;
-				//r.height += 20;
-				
+				int dw = 300;
 				int dh = 20;
-				int dw = 100;
-				r.x -= dw;
-				r.y -= dh;
-				r.width += 2*dw;
-				r.height += 2*dh;
+				r.width += dw;
+				r.height += dh;
+				r.x -= 4;
+				r.y -= 4;
+				Rectangle hl = new Rectangle(4,4,rect.width,rect.height);
+//				int dh = 20;
+//				int dw = 100;
+//				r.x -= dw;
+//				r.y -= dh;
+//				r.width += 2*dw;
+//				r.height += 2*dh;
 				
-				Rectangle hl = new Rectangle(dw,dh,rect.width,rect.height);
+				//Rectangle hl = new Rectangle(dw,dh,rect.width,rect.height);
 				hl.x -=2;
 				hl.y -=2;
 				hl.width += 4;
 				hl.height += 4;
 				
-				BufferedImage im = hs.crop(r,hl);
-				match_images.add(im);
+				BufferedImage cim = im.crop(r,hl);
+				match_images.add(cim);
 			}
-			mv.addMatchGroup(screen, match_images, hs.getTimeString());
+			mv.addMatchGroup(screen_image, match_images, hs.getTimeString());
 		}
 	
 		
@@ -445,7 +477,51 @@ public class HistoryViewer extends JPanel {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		
+		
+		
+		
+	
 		//mv.updateUI();
+	}
+	
+	
+	private void testPilyoung(){
+		current_mode = Mode.BROWSE;
+		HistoryScreen h1 = HistoryScreenDatabase.getMostRecent();
+	//	this.setHistoryScreen(h1);
+		displayControls();
+	}
+	
+	
+	private void testMove(){
+		current_mode = Mode.READ;
+		HistoryScreen h1 = HistoryScreenDatabase.getMostRecent();
+		//HistoryScreen h2 = h1.getBefore();
+		//HistoryScreen h3 = h2.getBefore();
+		
+//		h2.setHighlightRectanglePadding(3);
+//		h2.setHighlightRectangleBorder(false);
+//		//h2.highlightAllWords();
+		
+		//h1.highlightSameWords(h3,h2);
+	//	h2.highlightSameWords(h3,null);//,h2);
+		
+		
+		//this.setHistoryScreen(h2);
+	}
+	
+	private void testDiff(){
+		current_mode = Mode.READ;
+		HistoryScreen h1 = HistoryScreenDatabase.getMostRecent();
+//		HistoryScreen h2 = h1.getBefore();
+		
+//		h2.setHighlightRectanglePadding(3);
+//		h2.setHighlightRectangleBorder(false);
+//		//h2.highlightAllWords();
+//		
+//		h2.highlightNewWords(h1);
+//		
+		//this.setHistoryScreen(h2);
 	}
 	
 	private void doFind(String query_string){
@@ -453,11 +529,11 @@ public class HistoryViewer extends JPanel {
 		
 		if (selected_image != null){
 			String ui_query_string = Sikuli.find_ui(selected_image); 
-			query_string = query_string + " " + ui_query_string;
+			query_string = ui_query_string;
 		}
 		
 		find_result = new FindResult(query_string);	
-		setHistoryScreen(find_result.getMostRecent());
+		//setHistoryScreen(find_result.getMostRecent());
 		
 		
 		
@@ -466,8 +542,7 @@ public class HistoryViewer extends JPanel {
 		
 		
 		
-		
-		later.setEnabled(true);
+
 		repaint();
 	}
 	
@@ -475,16 +550,25 @@ public class HistoryViewer extends JPanel {
 	int srcx, srcy, destx, desty;
 	
 	private void setHistoryScreen(HistoryScreen hs){
-		//time.setText(hs.getTimeString());
 		
-		if (current_mode == Mode.FIND){
-			hs.clearHighlightedRectangles();
-			hs.addHighlightedWord(input_query_string.getText());
-			hs.addHighlightedImage(selected_image);
+		screen = hs.createImage();
+		
+		//if (current_mode == Mode.FIND){
+		//hs.clearHighlightedRectangles();
+		
+		String query_text = input_query_string.getText();
+		String words[] = query_text.split(" ");
+
+		for (String word : words){
+			screen.addHighlightedWord(word);
 		}
-						
-		time.setText("" + hs.getId());
-		current_screen = hs;
+
+		//hs.addHighlightedImage(selected_image);
+		//}
+
+
+		screen.addAnnotationArrow(new Point(10,10), new Point(10,500), Color.red);
+
 		repaint();
 	}
 		
@@ -493,12 +577,13 @@ public class HistoryViewer extends JPanel {
 		super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
+        if (screen != null)
         
-        current_screen.paintHelper(g, current_mode);
+        	screen.paintHelper(g, current_mode);
         
         if (selected_image != null){
         	
-        	g2d.drawImage(selected_image, 0, 0, null);
+        //	g2d.drawImage(selected_image, 0, 0, null);
         	
         }
     }
@@ -509,8 +594,9 @@ public class HistoryViewer extends JPanel {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(main);        
-        frame.setSize(1152,720);
+        frame.setSize(1152,740);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        main.displayControls();
     }
 }

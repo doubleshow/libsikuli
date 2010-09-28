@@ -32,8 +32,29 @@ public class HistoryScreenDatabase{
 
 	
 	//static final String ROOT_DIR = "captured/facebook";
-	static final String[] ROOT_DIRS = new String[]{"captured/login","captured/mail", "captured/chi"};
-	static final int[] NS = new int[]{10, 1, 30};
+	//static final String[] ROOT_DIRS = new String[]{"captured/spam"};
+//	static final String[] ROOT_DIRS = new String[]{"captured/deadline"};
+//	static final int[] NS = new int[]{2};
+
+//	static final String[] ROOT_DIRS = new String[]{"captured/video"};
+//	static final int[] NS = new int[]{15};
+
+
+	//static final String[] ROOT_DIRS = new String[]{"captured/move"};
+//	static final String[] ROOT_DIRS = new String[]{"captured/scroll"};
+//	static final int[] NS = new int[]{3};
+	
+//	static final String[] ROOT_DIRS = new String[]{"captured/pilyoung"};
+//	static final int[] NS = new int[]{1000};
+
+
+	//	static final String[] ROOT_DIRS = new String[]{"captured/login","captured/mail", "captured/chi"};
+//	static final int[] NS = new int[]{10, 1, 30};
+	static final String[] ROOT_DIRS = new String[]{"captured/mail", "captured/chi"};
+	static final int[] NS = new int[]{1, 30};
+//	static final String[] ROOT_DIRS = new String[]{"captured/facebook"};
+//	static final int[] NS = new int[]{19};
+	
 	
 	static final int TIME_OFFSET = 5;
 	
@@ -50,7 +71,7 @@ public class HistoryScreenDatabase{
 		}
 		
 		for (int i=0; i < filenames.size() ; ++i){
-			HistoryScreen hs = new HistoryScreen(filenames.get(i), i);
+			HistoryScreen hs = new HistoryScreen(i, filenames.get(i));
 			hs.setTimeString("" + (i + TIME_OFFSET) + " minutes ago");
 			history_screens.add(hs);
 		}
@@ -59,11 +80,15 @@ public class HistoryScreenDatabase{
 
 	static public Rectangles findRectangles(int id, String word){
 		
-		String file = filenames.get(id) + ".ocr.loc";
-		OCRDocument doc = new OCRDocument(file);
+		OCRDocument doc = getOCRDocument(id);
 		
 		String ws[] = word.split(" ");
 		return doc.find(ws[0]);	
+	}
+	
+	static public OCRDocument getOCRDocument(int id){
+		String file = filenames.get(id) + ".ocr.loc";
+		return new OCRDocument(file);
 	}
 
 	static public HistoryScreen find(int id){
@@ -111,6 +136,10 @@ public class HistoryScreenDatabase{
 
 	}
 
+	
+	static public String getImageFilename(int id){
+		return filenames.get(id);
+	}
 	
 	static public ArrayList<HistoryScreen> find(String query_string){
 		
@@ -160,9 +189,9 @@ public class HistoryScreenDatabase{
 	public static void main(String[] args) throws Exception {
 
 		HistoryScreenDatabase.indexOcrFiles();
-		HistoryScreenDatabase.find("deadline");
+		//HistoryScreenDatabase.find("deadline");
 		//HistoryScreenDatabase.find("vancouver && conference");
-		//HistoryScreenDatabase.find("ui64");
+		HistoryScreenDatabase.find("ui64");
 	    
 	}
 }

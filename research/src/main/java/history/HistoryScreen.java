@@ -3,45 +3,42 @@
  */
 package history;
 
-import history.HistoryViewer.Mode;
+public class HistoryScreen 
+implements Comparable{
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.awt.image.RescaleOp;
-
-public class HistoryScreen extends Screen
-	implements Comparable{
-			
+	String filename;
 	
-	public HistoryScreen(String filename, int id){
-		super(filename);
-		     
-		
+
+	public HistoryScreen(int id, String filename){
 		this.id = id;
+		this.filename = filename;
+	}
+	
+	public HistoryScreen(){
+	}
+
+//	public HistoryScreen getBefore(){
+//		return HistoryScreenDatabase.find(id + 1);
+//	}
+//
+//	public HistoryScreen getAfter(){
+//		return HistoryScreenDatabase.find(id - 1);
+//	}
+	
+	
+	public HistoryScreenImage createImage(){
 		
-	
+		return new HistoryScreenImage(id,filename);
+		
 	}
-	
-	public HistoryScreen getBefore(){
-		return HistoryScreenDatabase.find(id + 1);
-	}
-	
-	public HistoryScreen getAfter(){
-		return HistoryScreenDatabase.find(id - 1);
-	}
-	
+
 	int id;
 	public int getId() {
 		return id;
 	}
 
 	String timeString;
-	
+
 	public void setTimeString(String timeString) {
 		this.timeString = timeString;
 	}
@@ -55,23 +52,5 @@ public class HistoryScreen extends Screen
 		HistoryScreen hs = (HistoryScreen) o;
 		return this.id - hs.id;    
 	}
-	
-	public void addHighlightedWord(String word){
-		Rectangles rects = HistoryScreenDatabase.findRectangles(id, word);
-		addHighlightedRectangles(rects);		
-	}
-	
-	
-	public void addHighlightedImage(BufferedImage image){
-		if (image == null)
-		return;
-	
-		Rectangles rects = new Rectangles(find(image));
-		addHighlightedRectangles(rects);
-	}
 
-
-
-
-	
 }

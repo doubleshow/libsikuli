@@ -85,6 +85,25 @@ public class Sikuli {
 		return result;
 	}
 	
+	public static ArrayList<Rectangle> find(BufferedImage screen_image, BufferedImage target_image){
+		try{
+			File f;
+			
+			f = File.createTempFile("screen", ".png");
+			f.deleteOnExit();
+			ImageIO.write(screen_image, "png", f);
+			
+			return find(f.getPath(), target_image);
+		}	
+		catch(IOException e){
+			e.printStackTrace();
+			return null;
+		}
+		
+		
+	}
+
+	
 	
 	public static ArrayList<Rectangle> find(String screen_image, BufferedImage target_image){
 	
@@ -108,7 +127,7 @@ public class Sikuli {
 		
 			int x=-1,y=-1;
 			while ((line = input.readLine()) != null) {
-				System.out.println(line);
+				//System.out.println(line);
 				String[] xy = line.split(" ");
 				x = Integer.parseInt(xy[0]);
 				y = Integer.parseInt(xy[1]);

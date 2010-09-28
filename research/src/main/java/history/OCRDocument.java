@@ -13,6 +13,33 @@ import javax.imageio.ImageIO;
 
 public class OCRDocument {
 	
+	class OCRWord {
+		
+		OCRWord(String word, Rectangle rectangle){
+			this.word = word;
+			this.rectangle = rectangle;
+		}
+		
+		private String word;
+		private Rectangle rectangle;
+		public void setWord(String word) {
+			this.word = word;
+		}
+		public String getWord() {
+			return word;
+		}
+		public void setRectangle(Rectangle rectangle) {
+			this.rectangle = rectangle;
+		}
+		public Rectangle getRectangle() {
+			return rectangle;
+		}
+	}
+	
+
+	Map<String,Rectangles> word_to_rectangles;
+	ArrayList<OCRWord> words = new ArrayList<OCRWord>();
+	
 	public OCRDocument(BufferedImage image){
 		
 		String outputname = Sikuli.ocr(image);
@@ -57,6 +84,8 @@ public class OCRDocument {
 		//String out;
 		in = in.replace('.',' ');
 		in = in.replace(':',' ');
+		in = in.replace('?',' ');	
+		in = in.replace(')',' ');	
 		in = in.toLowerCase();
 		in = in.trim();
 		return in;
@@ -75,30 +104,45 @@ public class OCRDocument {
 		 word = normalize(word);
 		 //System.out.println("("+word+")");
 		 
+
+		 Rectangle rect = new Rectangle(x,y,w,h);
 		 
+		  
 		 if (word_to_rectangles.containsKey(word)){
 			 Rectangles rects = word_to_rectangles.get(word);
-			 rects.add(new Rectangle(x,y,w,h));
+			 rects.add(rect);
+			 
 		 }else{
 
 			 Rectangles rects = new Rectangles();
-			 rects.add(new Rectangle(x,y,w,h));
-			 word_to_rectangles.put(word, rects);
-			 words.add(word);
+			 rects.add(rect);
+			 word_to_rectangles.put(word, rects);		 
 		 }
+		 
+		 words.add(new OCRWord(word, rect));
 	    	
 	}
 
-	Map<String,Rectangles> word_to_rectangles;
-	ArrayList<String> words = new ArrayList<String>();
 
-	public ArrayList<String> getWords() {
+	public ArrayList<OCRWord> getWords() {
 		return words;
 	}
 
 	public Rectangles find(String word){
 		return word_to_rectangles.get(word);
 	}
+	
+	public OCRWord find(Rectangle rect){
+		
+		for (OCRWord word : words){
+			
+			if (word.getRectangle().intersects(rect))
+				return word;
+		}
+		
+		return null;
+	}
+	
 	
 	public static void main(String[] args) {
 		
