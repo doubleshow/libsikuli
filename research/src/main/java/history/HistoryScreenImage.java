@@ -13,4 +13,5 @@ public class HistoryScreenImage extends ScreenImage {
 		Rectangles rects = HistoryScreenDatabase.findRectangles(id, word);
 		addHighlightedRectangles(rects);		
 	}
+
 }

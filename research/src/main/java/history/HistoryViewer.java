@@ -1,15 +1,24 @@
 package history;
+import history.HistoryScreenDatabase.HistoryScreenIterator;
+import history.OCRDocument.OCRWord;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
@@ -19,6 +28,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,6 +39,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
+import sikuli.Clipboard;
 import sikuli.SikuliPane;
 import sikuli.ImageButton;
 
@@ -42,7 +53,7 @@ public class HistoryViewer extends JPanel {
 	
 	JLayeredPane layeredPane;
 	
-	JPanel navigationControl;
+
 	JPanel controls;
 	JLabel time;
 	
@@ -62,7 +73,6 @@ public class HistoryViewer extends JPanel {
 	int history_screen_index = -1;
 	
 
-	JTextField input_query_string;
 	Lense virtualPage;
 	
 	ScreenImage present_screen;
@@ -91,105 +101,186 @@ public class HistoryViewer extends JPanel {
 		
 		layeredPane.add(virtualPage, new Integer(3));	
 				
-		addMouseListener(new MouseAdapter(){
-	         public void mousePressed(java.awt.event.MouseEvent e){
-	        	 
-	        	 current_mode = Mode.SELECT;
-	        	 
-	            destx = srcx = e.getX();
-	            desty = srcy = e.getY();
-	            System.out.println("pressed " + srcx + "," + srcy);
-	            
-	            screen.setHighlightRectangle(new Rectangle(srcx,srcy,2,2));
-	            
-	            repaint();
-	         }
-
-	         public void mouseReleased(java.awt.event.MouseEvent e){
-	        	 
-	        	 current_mode = Mode.PRESENT;
-	        	 
-	        	System.out.println("selected " + srcx + "," + srcy
-	        			+" - "+desty + "," + destx);
-	        	
-	        	if (destx > srcx + 2 && desty > srcy + 2){
-	        	
-	        		Rectangle selected_rectangle = new Rectangle(srcx,srcy,
-	        				destx-srcx,desty-srcy);
-	        	
-	        		selected_image = screen.crop(selected_rectangle);
-	            	
-	            	if (trigger_editor != null && selected_image != null){
-	            		trigger_editor.insertImage(selected_image);	   
-	            	}
-	            	
-	        	}
-//	            OCRDocument doc = new OCRDocument(selected_image);
-//	            
-//	            String query_string = null;
-//	            for (String word : doc.getWords()){
-//	            	System.out.println(word);
-//	            	
-//	            	if (query_string == null)
-//	            		query_string = word;
-//	            	else
-//	            		query_string = query_string + " && " + word;
-//	            }
-	           
-	            
-	        	repaint();
-
-	         }
-		});
-		
-		addMouseMotionListener( new MouseMotionAdapter(){
-	          public void mouseDragged(java.awt.event.MouseEvent e) {
-
-	        	 destx = e.getX();
-	             desty = e.getY();
-	             
-	             System.out.println("moved " + desty + "," + destx);
-	             
-	             if (destx > srcx + 2 && desty > srcy + 2){
-	             	Rectangle selected_rectangle = new Rectangle(srcx,srcy,
-		            		destx-srcx,desty-srcy);
-	             
-		            screen.setHighlightRectangle(selected_rectangle);
-		            
-	             }
-		        
-	             
-	            repaint(); 
-	          }
-	       });
-		
-		
-		
+	
 		//testDiff();
 		//testMove();
 		//testPilyoung();
 		
-		current_mode = Mode.FIND;
-		input_query_string.setText("deadline");
 		
-		//find_result = new FindResult("deadline");
+		current_mode = Mode.BROWSE;
+		setHistoryScreen(HistoryScreenDatabase.getMostRecent());
+		//NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
+		NavigationIterator iter = HistoryScreenDatabase.getIterator(10);
+		navigator.setIterator(iter);
+		navigator.setListener(new HistoryScreenNavigationListener());
 		
-		find_result = FindResult.createMockResult();
 		
-		setHistoryScreen(find_result.getMostRecent());
+		navigator.play();
 		
-		navigator.setList(find_result);
-//		earlier.setList(find_result);
-//		later.setList(find_result);
+		
+		
+//		
+//		
+//		if (false){
+		
+//		current_mode = Mode.FIND;
+//		//input_query_string.setText("deadline");
+//		//find_result = new FindResult("deadline");		
+//		find_result = FindResult.createMockResult();
+//		setHistoryScreen(find_result.getMostRecent());	
+//		navigator.setIterator(find_result);
+		
+		//}
+		
+		
+	
+		selector = new RegionSelector();
 		
 		
 	}
 	
-	interface NavigationList{
+	RegionSelector selector;
+	
+	
+	interface RegionSelectorListener{
+		public void rectangleSelected(Rectangle rectangle);
+	}
+	
+	BufferedImage selected_image;
+	class RegionSelector implements MouseListener, MouseMotionListener{
+
+		
+		int srcx, srcy, destx, desty;
+
+		Rectangle selected_rectangle;
+		
+		RegionSelectorListener listener;
+		
+		public void setListener(RegionSelectorListener listener) {
+			this.listener = listener;
+		}
+
+		public Rectangle getSelectedRectangle(){
+			return selected_rectangle;
+		}
+		
+		public void mousePressed(java.awt.event.MouseEvent e){
+
+			current_mode = Mode.SELECT;
+
+			destx = srcx = e.getX();
+			desty = srcy = e.getY();
+	//		System.out.println("pressed " + srcx + "," + srcy);
+
+			screen.addHighlight(new Rectangle(srcx,srcy,2,2));
+			repaint();
+		}
+
+		public void mouseReleased(java.awt.event.MouseEvent e){
+
+			current_mode = Mode.PRESENT;
+
+			System.out.println("selected " + srcx + "," + srcy
+					+" - "+desty + "," + destx);
+
+			if (destx > srcx + 2 && desty > srcy + 2){
+
+				selected_rectangle = new Rectangle(srcx,srcy,
+						destx-srcx,desty-srcy);
+
+//				selected_image = screen.crop(selected_rectangle);
+
+//				if (trigger_editor != null && selected_image != null){
+//					trigger_editor.insertImage(selected_image);	   
+//				}
+
+				removeMouseListener(selector);
+				removeMouseMotionListener(selector);
+				controlsFrame.setVisible(true);
+				repaint();
+				listener.rectangleSelected(selected_rectangle);
+			}
+			//	            OCRDocument doc = new OCRDocument(selected_image);
+			//	            
+			//	            String query_string = null;
+			//	            for (String word : doc.getWords()){
+			//	            	System.out.println(word);
+			//	            	
+			//	            	if (query_string == null)
+			//	            		query_string = word;
+			//	            	else
+			//	            		query_string = query_string + " && " + word;
+			//	            }
+
+
+			//repaint();
+
+		}
+
+		public void mouseDragged(java.awt.event.MouseEvent e) {
+
+			destx = e.getX();
+			desty = e.getY();
+
+			System.out.println("moved " + desty + "," + destx);
+
+			if (destx > srcx + 2 && desty > srcy + 2){
+				Rectangle selected_rectangle = new Rectangle(srcx,srcy,
+						destx-srcx,desty-srcy);
+
+				screen.clear();
+				screen.addHighlight(selected_rectangle);
+
+			}
+
+
+			repaint(); 
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+		}
+
+		public void start() {
+			current_mode = Mode.SELECT;
+			addMouseListener(selector);
+			addMouseMotionListener(selector);
+			controlsFrame.setVisible(false);
+			screen.clear();
+			repaint();
+		}
+	}
+	
+	class HistoryScreenNavigationListener implements NavigationListener{
+		@Override
+		public void itemSelected(Object item) {
+			HistoryScreen hs = (HistoryScreen) item;
+			setHistoryScreen(hs);	
+		}
+	}
+	
+	
+	interface NavigationIterator{
 		boolean hasBefore();
 		boolean hasAfter();	
 		Object getBefore();
 		Object getAfter();
+	}
+	
+	interface NavigationListener{
+		public void itemSelected(Object item);
 	}
 
 	NavigationControl navigator;
@@ -199,20 +290,34 @@ public class HistoryViewer extends JPanel {
 		static public final int RIGHT = 2;
 		
 		
-		NavigationList list;
-		public void setList(NavigationList list){
-			this.list = list;
+		NavigationIterator iterator;
+		NavigationListener listener;
+		
+		public void setIterator(NavigationIterator list){
+			this.iterator = list;
 			
 			updateButtons();
 		}
 		
+		public void setListener(NavigationListener listener){
+			this.listener = listener;
+		}
+		
 		private void updateButtons(){
-			before.setEnabled(list.hasBefore());
-			after.setEnabled(list.hasAfter());
+			before.setEnabled(iterator.hasBefore());
+			after.setEnabled(iterator.hasAfter());
+			
+			if (playing){
+				play.setText("Stop");
+			}else{
+				play.setText("Play");
+				play.setEnabled(iterator.hasAfter());
+			}
 		}
 		
 		JButton before;
 		JButton after;		
+		JButton play;
 		public NavigationControl(){
 			
 			before = new JButton("before");
@@ -221,15 +326,72 @@ public class HistoryViewer extends JPanel {
 			after = new JButton("after");
 			after.addActionListener(new NavigationActionListener(RIGHT));
 			
+			play = new JButton("play");
+			play.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (playing)
+						navigator.stop();
+					else
+						navigator.play();
+					updateButtons();		
+				}			
+			});
+			
 			add(before);
 			add(after);
+			add(play);
 		}
+		
+		
+		boolean playing = false;
+		public void play(){
 			
+			Thread autoplayThread = new Thread(){
+				public void run() {
+					
+					playing = true;
+					while (playing){
+						try {
+
+							if (iterator.hasAfter()){
+								stepForward();
+								Thread.sleep(100);
+							}else{
+								playing = false;
+							}							
+					
+						} catch (InterruptedException e) {
+						}
+					}
+					
+					updateButtons();
+				}
+			};
+			
+			autoplayThread.start();
+		}
+		
+		
+		public void stop() {
+			playing = false;
+		}
+		
+		public void stepForward(){
+			Object item = iterator.getAfter();
+			listener.itemSelected(item);
+			updateButtons();
+		}
+		
+		public void stepBackward(){
+			Object item = iterator.getBefore();
+			listener.itemSelected(item);
+			updateButtons();			
+		}
 			
 		class NavigationActionListener implements ActionListener{
 			
-			int direction;
-			
+			int direction;			
 			public NavigationActionListener(int direction){
 				super();
 				this.direction = direction;
@@ -237,56 +399,169 @@ public class HistoryViewer extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
-				HistoryScreen hs;
 				if (direction == LEFT){
-					hs = (HistoryScreen) list.getBefore();
+					stepBackward();
 				}else{
-					hs = (HistoryScreen) list.getAfter();
+					stepForward();
 				}
-				
-				setHistoryScreen(hs);
-			
-				
-				updateButtons();
-			}
-						
+			}	
 		}
+
+
+	}
+	
+	public void doCaptureScriptPatternImage(){
+		
+		selector.start();
+		selector.setListener(new RegionSelectorListener(){
+
+			@Override
+			public void rectangleSelected(Rectangle rectangle) {
+				
+				BufferedImage selected_image = screen.crop(rectangle);
+				trigger_editor.insertImage(selected_image);
+				trigger_editor.setVisible(true);
+			}
+			
+		});	
 		
 		
 	}
 	
+	private void doCaptureScriptTargetImage(){
+		final HistoryViewer viewer = this;
+		
+		selector.start();
+		selector.setListener(new RegionSelectorListener(){
 
+			@Override
+			public void rectangleSelected(Rectangle rectangle) {
+				
+				BufferedImage selected_image = screen.crop(rectangle);
+				trigger_editor = new TriggerEditor(viewer,selected_image);
+				
+			}
+			
+		});	
+	}
+	
+	private void doCaptureQueryImage(){
+
+		selector.start();
+		selector.setListener(new RegionSelectorListener(){
+			
+			@Override
+			public void rectangleSelected(Rectangle rectangle) {
+				BufferedImage newimg = screen.crop(rectangle);
+				findBox.setImage(newimg);			
+				current_mode = Mode.BROWSE;
+			}			
+			
+		});
+	}
+	
+	private void doCaptureCopyText(){
+		
+		selector.start();
+		selector.setListener(new RegionSelectorListener(){
+
+			@Override
+			public void rectangleSelected(Rectangle rectangle) {
+				BufferedImage image = screen.crop(rectangle);
+				String ocr_string = Sikuli.ocr(image);
+				
+				OCRDocument ocr = new OCRDocument(image);
+				
+				
+				String ocr_text = "";
+				for (OCRWord ocrword : ocr.getWords()){			
+					ocr_text = ocr_text + ocrword.getString() + " ";
+				}
+				
+				 Clipboard.putText(Clipboard.PLAIN, Clipboard.UTF8, 
+                         Clipboard.BYTE_BUFFER, ocr_text);
+
+			}
+			
+		});
+	}
+
+//	private void endRegionSelection(){
+//
+//		Rectangle selected_rectangle = selector.getSelectedRectangle();
+//		BufferedImage newimg = screen.crop(selected_rectangle);
+//		
+//		findBox.setImage(newimg);
+//		
+//		current_mode = Mode.BROWSE;
+//		
+//	}
+	
+	
+	
+	class FindBox extends JPanel{
+		
+		JTextField queryTextField;
+		JButton searchBtn;
+		JButton captureBtn;
+		
+		AutoResize imagePanel;
+		
+		public void setImage(BufferedImage image){
+			imagePanel.setImage(image);
+			updateUI();
+		}
+		
+		public FindBox(){
+			super();
+			
+			queryTextField = new JTextField(10);		
+
+			captureBtn = new JButton("Capture");
+			captureBtn.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {					
+					doCaptureQueryImage();
+				}	
+			});
+			
+			searchBtn = new JButton("Find");
+			searchBtn.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String query_string = queryTextField.getText();
+					doFind(query_string);
+				}
+			});
+			
+			add(queryTextField);
+			add(searchBtn);
+			add(captureBtn);
+			
+			imagePanel = new AutoResize(null);
+			imagePanel.setMinimumSize(new Dimension(200,50));
+			imagePanel.setPreferredSize(new Dimension(200,50));
+			
+			add(imagePanel);
+			
+			
+			queryTextField.setText("deadline");
+			
+		}
+		
+		
+		public String getQueryString(){
+			return queryTextField.getText();
+		}
+		
+		
+	}
+
+	FindBox findBox;
 	
 	private void createControls(){
 		
-		// create find control
-
-		//controls.setBorder(new LineBorder(Color.black, 1));		
-		//controls.setBounds(20,645,1112,40);
-		//controls.setBounds(20,645,500,40);
-
-		input_query_string = new JTextField(10);		
-
-		JButton closeBtn = new JButton("X");
-		closeBtn.setPreferredSize(new Dimension(20,20));
-		closeBtn.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//		sikuli.Screen scr = new sikuli.Screen();
-				//		sikuli.ScreenImage img = scr.userCapture();
-			}
-		});	
-
-		JButton searchBtn = new JButton("Find");
-		searchBtn.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String query_string = input_query_string.getText();
-				doFind(query_string);
-
-			}
-		});
+		findBox = new FindBox();
 
 		JButton exitBtn = new JButton("Exit");
 		exitBtn.addActionListener(new ActionListener(){
@@ -304,26 +579,28 @@ public class HistoryViewer extends JPanel {
 		browseBtn.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
 				current_mode = Mode.BROWSE;
-
-//				if (! (current_screen instanceof HistoryScreen)){
-//					current_screen = HistoryScreenDatabase.getMostRecent();
-//				}
-
-//				earlier.setEnabled(true);
-//				later.setEnabled(true);				
-
+				int id = history_screen.getId();
+				HistoryScreenIterator iter = HistoryScreenDatabase.getIterator(id);
+				navigator.setIterator(iter);
 				repaint();
-
 			}			
 		});
 
 
 
-
+		
 		JButton readBtn = new JButton("Read");
 		readBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				current_mode = Mode.READ;
+				repaint();
+			}			
+		});
+		
+		JButton vreadBtn = new JButton("Read");
+		vreadBtn.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
@@ -360,11 +637,20 @@ public class HistoryViewer extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				if (selected_image != null)
-					trigger_editor = new TriggerEditor(selected_image);
-
+				doCaptureScriptTargetImage();
 			}			
 		});
+		
+		
+		JButton copyBtn = new JButton("Copy");
+		copyBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doCaptureCopyText();
+			}			
+		});
+		
+
 
 		navigator = new NavigationControl();
 
@@ -375,98 +661,94 @@ public class HistoryViewer extends JPanel {
 		//time.setFont(font);
 		//time.setForeground(Color.red);
 
-		boolean search_only = true;
-
 		controls = new JPanel();
-		controls.setLayout(new BoxLayout(controls, BoxLayout.X_AXIS));
-
-		//controls.add(exitBtn);
-		controls.add(input_query_string);
-		controls.add(searchBtn);
-		controls.add(new JSeparator(SwingConstants.VERTICAL));
-		controls.add(navigator);
-//		controls.add(new JSeparator(SwingConstants.VERTICAL));		
-//		controls.add(scriptBtn);
-		//controls.add(readBtn);
-		//controls.add(browseBtn);
-
-		if (! search_only){
-
-			controls.add(time);
-			controls.add(browseBtn);
-
-			controls.add(scriptBtn);
-		}
-		controls.setPreferredSize(new Dimension(500,60));
-
+		controls.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 4;
+		controls.add(findBox,c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 6;
+		c.gridy = 0;
+		c.gridwidth = 1;
+		controls.add(navigator,c);
+		
+		
+		c.gridx = 0;
+		c.gridy = 1;
+		controls.add(scriptBtn,c);
+		c.gridx = 1;
+		c.gridy = 1;
+		controls.add(readBtn,c);
+		c.gridx = 2;
+		c.gridy = 1;
+		controls.add(browseBtn,c);
+		c.gridx = 3;
+		c.gridy = 1;
+		controls.add(copyBtn,c);	
+		c.gridx = 4;
+		c.gridy = 1;
+		controls.add(copyBtn,c);
 	}
 
 
-
+	JFrame controlsFrame;
 	public void displayControls(){
-		JFrame controlsFrame = new JFrame();
+		controlsFrame = new JFrame();
 		controlsFrame.add(controls);
 		controlsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		controlsFrame.setMinimumSize(new Dimension(480,50));
+		controlsFrame.setMinimumSize(new Dimension(800,120));
 		controlsFrame.setLocationRelativeTo(this);
 		controlsFrame.setVisible(true);
-		//controlsFrame.setLocation(10,10);
 		controlsFrame.toFront();
 	}
 	
 	
 	private void showMatchViewer(FindResult find_result){
-		if (true){
-			return;
-		}
-		
+
 		MatchViewer mv = new MatchViewer();
 		
-		ArrayList<HistoryScreen> hss = find_result.getAll();
-		int is[] = new int[]{0,1,6,7,8};
-		//int is[] = new int[]{0,3,5,6};//,6,7,8};
+		// define the context around each match to display
+		// TODO: allow this to be specified by users
+		Rectangle context_rectangle = new Rectangle(-100,-20,200,40);
+
 		
-		//for (HistoryScreen hs : hss){
+		ArrayList<HistoryScreen> hss = find_result.getAll();
+		int is[] = new int[]{0,1,2,3};
+		
 		for (int i : is){
 			HistoryScreen hs = hss.get(i);
-		
-			
-			HistoryScreenImage im = hs.createImage();
-			BufferedImage screen_image = im.getImage();
-			
-			im.clearHighlightedRectangles();
-			//hs.addHighlightedImage(selected_image);
-			im.addHighlightedWord(input_query_string.getText());
-			Rectangles rects = im.getHighlightRectangles();
+			HistoryScreenImage hs_image = hs.createImage();
+					
+			// extract a context image for each matched word
+			String word = findBox.getQueryString();
+			Rectangles rects = HistoryScreenDatabase.findRectangles(hs.getId(), word);
+
 						
 			ArrayList<BufferedImage> match_images = new ArrayList<BufferedImage>();
 			for (Rectangle rect : rects){
 
-				Rectangle r = new Rectangle(rect);
-				int dw = 300;
-				int dh = 20;
-				r.width += dw;
-				r.height += dh;
-				r.x -= 4;
-				r.y -= 4;
-				Rectangle hl = new Rectangle(4,4,rect.width,rect.height);
-//				int dh = 20;
-//				int dw = 100;
-//				r.x -= dw;
-//				r.y -= dh;
-//				r.width += 2*dw;
-//				r.height += 2*dh;
+				// calculate the rectangle to crop from the screen image
+				Rectangle rect_to_crop = new Rectangle(context_rectangle);
+				rect_to_crop.translate(rect.x, rect.y);
+
+				// calculate the location of the highlight within the context image
+				Rectangle hl = new Rectangle(rect.getSize());
+				hl.setLocation(-context_rectangle.x, -context_rectangle.y);
 				
-				//Rectangle hl = new Rectangle(dw,dh,rect.width,rect.height);
-				hl.x -=2;
-				hl.y -=2;
-				hl.width += 4;
-				hl.height += 4;
+				ScreenImage context_image = hs_image.crop0(rect_to_crop);
+				context_image.addHighlight(hl);
 				
-				BufferedImage cim = im.crop(r,hl);
-				match_images.add(cim);
+				BufferedImage match_image = context_image.createRenderedImage(Mode.FIND);
+				
+				match_images.add(match_image);
 			}
-			mv.addMatchGroup(screen_image, match_images, hs.getTimeString());
+			
+			mv.addMatchGroup(hs_image.getImage(), match_images, hs.getTimeString());
 		}
 	
 		
@@ -476,12 +758,6 @@ public class HistoryViewer extends JPanel {
 		frame.setSize(1000,600);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		
-		
-		
-		
-	
-		//mv.updateUI();
 	}
 	
 	
@@ -527,44 +803,43 @@ public class HistoryViewer extends JPanel {
 	private void doFind(String query_string){
 		current_mode = Mode.FIND;
 		
-		if (selected_image != null){
-			String ui_query_string = Sikuli.find_ui(selected_image); 
-			query_string = ui_query_string;
-		}
 		
-		find_result = new FindResult(query_string);	
-		//setHistoryScreen(find_result.getMostRecent());
-		
-		
-		
-		
-		//showMatchViewer(find_result);
-		
-		
-		
+		find_result = new FindResult(query_string);
 
+		setHistoryScreen(find_result.getMostRecent());	
+		
+		navigator.setIterator(find_result);
+				
+//		if (selected_image != null){
+//			String ui_query_string = Sikuli.find_ui(selected_image); 
+//			query_string = ui_query_string;
+//		}
+		
+		showMatchViewer(find_result);
+		
 		repaint();
 	}
 	
-	BufferedImage selected_image;
-	int srcx, srcy, destx, desty;
+
+
+	private HistoryScreen history_screen;
 	
 	private void setHistoryScreen(HistoryScreen hs){
 		
+		history_screen = hs;
 		screen = hs.createImage();
 		
-		//if (current_mode == Mode.FIND){
-		//hs.clearHighlightedRectangles();
+		if (current_mode == Mode.FIND){
 		
-		String query_text = input_query_string.getText();
-		String words[] = query_text.split(" ");
+			String query_text = findBox.getQueryString();
+			String words[] = query_text.split(" ");
 
-		for (String word : words){
-			screen.addHighlightedWord(word);
+			for (String word : words){
+				screen.addHighlightedWord(word);
+			}
+
+			//hs.addHighlightedImage(selected_image);
 		}
-
-		//hs.addHighlightedImage(selected_image);
-		//}
 
 
 		screen.addAnnotationArrow(new Point(10,10), new Point(10,500), Color.red);
@@ -597,6 +872,7 @@ public class HistoryViewer extends JPanel {
         frame.setSize(1152,740);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        frame.setResizable(false);
         main.displayControls();
     }
 }

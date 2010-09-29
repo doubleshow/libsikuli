@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
@@ -37,44 +35,16 @@ public class TriggerEditor extends JFrame{
 	
 	SikuliPane sikuli_pane;
 	
-	public class AutoResize extends JPanel {
-	    BufferedImage image;
-
-	    public AutoResize(BufferedImage image) {
-	        this.image = image;
-	    }
-
-	    protected void paintComponent(Graphics g) {
-	        super.paintComponent(g);
-	        Graphics2D g2 = (Graphics2D)g;
-	        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-	                            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-	        int w = getWidth();
-	        int h = getHeight();
-	        int iw = image.getWidth();
-	        int ih = image.getHeight();
-	        double xScale = (double)w/iw;
-	        double yScale = (double)h/ih;
-	        double scale = Math.min(xScale, yScale);    // scale to fit
-	                       //Math.max(xScale, yScale);  // scale to fill
-	        int width = (int)(scale*iw);
-	        int height = (int)(scale*ih);
-	        int x = (w - width)/2;
-	        int y = 0;//(h - height)/2;
-	        g2.drawImage(image, x, y, width, height, this);
-	        g2.drawRect(x,y,width-1,height-1);
-	    }
-
-	 
-	}
-	
-	public TriggerEditor(BufferedImage target_image){
+	HistoryViewer viewer;
+	TriggerEditor editor;
+	public TriggerEditor(final HistoryViewer viewer, BufferedImage target_image){
 		
+		editor = this;
 		//JPanel panel = new JPanel();
 		//panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		//panel.setLayout(new BorderLayout());
 		
-		
+		this.viewer = viewer;
 		
 		
 		
@@ -137,6 +107,17 @@ public class TriggerEditor extends JFrame{
 			}
 		});
 		
+		JButton captureBtn = new JButton("Capture");
+		captureBtn.	addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//dispose();
+				editor.setVisible(false);
+				viewer.doCaptureScriptPatternImage();
+			}
+		});
+		
+		buttons.add(captureBtn);
 		buttons.add(cancelBtn);
 		buttons.add(saveBtn);
 
@@ -185,7 +166,7 @@ public class TriggerEditor extends JFrame{
 	 public static void main(String[] args) {
 		   	   	
 		 try {
-			TriggerEditor te = new TriggerEditor(ImageIO.read(new File("screen.png")));
+			TriggerEditor te = new TriggerEditor(null,ImageIO.read(new File("screen.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -31,6 +31,11 @@ import javax.imageio.ImageIO;
 
 public class ScreenImage {
 	
+	
+	
+	
+	
+	
 	private static final Set<String> STOPLIST = new HashSet<String>(Arrays.asList(
 				new String[] {"iyiote,","iâlilâihâiâ","it'li'=ii|","[]","ihhjm1","ytiotb",
 						"whq","37l","bamelson","windows","http //hiqi vâ","fulâif\\âf",
@@ -83,32 +88,39 @@ public class ScreenImage {
 		setImage(filename);
 	}
 	
+	public ScreenImage(BufferedImage image){
+		setImage(image);
+	}
+	
 	public ArrayList<Rectangle> find(BufferedImage target_image){
 		return Sikuli.find(filename, target_image);
 	}
 	
 	public BufferedImage getImage(){
-		//loadImage();
 		return image;
 	}
 	
-	public void setImage(String filename){
-		if (image == null){
-			
-			try {
-				File sourceimage = new File(filename);
-				image = ImageIO.read(sourceimage);    
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-			}
-		}
+	public void setImage(BufferedImage image){
 		
+		this.image = image;
 		if (image_darken == null){
 			
 			// Darken the image by 10% 
 			float scaleFactor = .6f; 
 			RescaleOp op = new RescaleOp(scaleFactor, 0, null); 
 			image_darken = op.filter(image, null); 
+		}
+		
+	}
+	
+	public void setImage(String filename){
+		if (image == null){			
+			try {
+				File sourceimage = new File(filename);				
+				setImage(ImageIO.read(sourceimage));  
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
 		}
 	}
 	
@@ -134,8 +146,9 @@ public class ScreenImage {
 //	}
 	
 	public void setHighlightRectangle(Rectangle highlightRectangle) {
-		highlightRectangles.clear();
-		highlightRectangles.add(highlightRectangle);
+		//highlightRectangles.clear();
+		//highlightRectangles.add(highlightRectangle);
+		//
 	}
 
 	int padding = 0;
@@ -157,7 +170,11 @@ public class ScreenImage {
 		
 			g2d.drawImage(image, 0, 0, null);
 			
-		}else if (mode == Mode.FIND || mode == Mode.READ){
+		}else if (mode == Mode.READ){
+		
+			g2d.drawImage(image, 0, 0, null);			
+			
+		}else if (mode == Mode.FIND){
 		
 			g2d.drawImage(image_darken, 0, 0, null);
 			//g2d.drawImage(image, 0, 0, null);
@@ -229,21 +246,21 @@ public class ScreenImage {
 			
 			g2d.drawImage(image_darken, 0, 0, null);
 			
-			if (highlightRectangles == null)
-				return;
-			
-			Rectangle r = highlightRectangles.get(0);
-			
-			BufferedImage subimage;
-			subimage = image.getSubimage(r.x,r.y,r.width,r.height);
-			g2d.drawImage(subimage, r.x, r.y, null);
-
-			Stroke old_pen = g2d.getStroke();
-			Stroke Pen = new BasicStroke(3.0F);
-			g2d.setStroke (Pen);
-			g2d.setColor(Color.yellow);
-			g2d.drawRect(r.x,r.y,r.width,r.height);
-			g2d.setStroke(old_pen);
+			//if (highlightRectangles == null)
+//				return;
+//			
+////			Rectangle r = highlightRectangles.get(0);
+//			
+//			BufferedImage subimage;
+//			subimage = image.getSubimage(r.x,r.y,r.width,r.height);
+//			g2d.drawImage(subimage, r.x, r.y, null);
+//
+//			Stroke old_pen = g2d.getStroke();
+//			Stroke Pen = new BasicStroke(3.0F);
+//			g2d.setStroke (Pen);
+//			g2d.setColor(Color.yellow);
+//			g2d.drawRect(r.x,r.y,r.width,r.height);
+//			g2d.setStroke(old_pen);
 		}
 		
 		
@@ -275,13 +292,17 @@ public class ScreenImage {
 		//annotation_highlights.clear();
 	}
 	
+	public void clear(){
+		annotations.clear();
+	}
+	
 	public void addHighlightedRectangles(Rectangles rects){
 		for (Rectangle rect : rects){
 			annotations.add(new AnnotationHighlight(this,rect));
 		}
 	}
 	
-	public void addHighlightedRectangles(Rectangle rect){
+	public void addHighlight(Rectangle rect){
 		annotations.add(new AnnotationHighlight(this,rect));
 	}
 	
@@ -312,6 +333,23 @@ public class ScreenImage {
 	
 	public BufferedImage crop(Rectangle rectSelection){
 		return crop(rectSelection, null);
+	}
+	
+	public BufferedImage createRenderedImage(Mode mode){
+		int w = image.getWidth();
+		int h = image.getHeight();
+		
+		BufferedImage rendered  = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g2d = rendered.createGraphics();
+		paintHelper(g2d, mode);
+		g2d.dispose();
+		return rendered;
+	}
+	
+	public ScreenImage crop0(Rectangle rectSelection){		
+		BufferedImage cropped_image = image.getSubimage(rectSelection.x, rectSelection.y, 
+				rectSelection.width, rectSelection.height);
+		return new ScreenImage(cropped_image);
 	}
 	
 	public BufferedImage crop(Rectangle rectSelection, Rectangle highlight){

@@ -3,6 +3,8 @@
  */
 package history;
 
+import history.HistoryViewer.NavigationIterator;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -99,6 +101,53 @@ public class HistoryScreenDatabase{
 		return history_screens.get(0);
 	}
 
+	static public FindResult getMostRecent(int n){
+		FindResult fr = new FindResult();
+		for (int i=0;i<n;++i){
+			fr.add(history_screens.get(i));
+		}
+		return fr;
+	}		
+	
+	
+	static public HistoryScreenIterator getIterator(int id){
+		return new HistoryScreenIterator(id);		
+	}
+	
+	static public class HistoryScreenIterator implements NavigationIterator {
+		
+		int current_id;
+		
+		public HistoryScreenIterator(int current_id){
+			this.current_id = current_id;
+		}
+
+		@Override
+		public Object getAfter() {
+			current_id--;
+			return history_screens.get(current_id);
+		}
+
+		@Override
+		public Object getBefore() {
+			current_id++;
+			return history_screens.get(current_id);
+		}
+
+		@Override
+		public boolean hasAfter() {
+			return current_id > 0;
+		}
+
+		@Override
+		public boolean hasBefore() {
+			return current_id < history_screens.size() - 1;
+		}
+		
+	}
+	
+	
+	
 	static void indexOcrFiles(){
 
 		try {

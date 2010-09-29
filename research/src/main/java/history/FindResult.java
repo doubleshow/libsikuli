@@ -3,11 +3,11 @@
  */
 package history;
 
-import history.HistoryViewer.NavigationList;
+import history.HistoryViewer.NavigationIterator;
 
 import java.util.ArrayList;
 
-class FindResult implements NavigationList {
+class FindResult implements NavigationIterator {
 	
 	// a reversed chronologically ordered list of history screens
 	ArrayList<HistoryScreen> history_screens = new ArrayList<HistoryScreen>();
@@ -57,6 +57,10 @@ class FindResult implements NavigationList {
 	
 	public ArrayList<HistoryScreen> getAll(){
 		return history_screens;
+	}
+
+	public void add(HistoryScreen historyScreen) {
+		history_screens.add(historyScreen);
 	}
 	
 	
