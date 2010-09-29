@@ -5,6 +5,7 @@ package history;
 
 import history.HistoryViewer.NavigationIterator;
 
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -81,7 +82,7 @@ public class HistoryScreenDatabase{
 
 	}
 
-	static public Rectangles findRectangles(int id, String word){
+	static public Rectangles findRectangles(int id, String word, Rectangle filter){
 		
 		OCRDocument doc = getOCRDocument(id);
 		
@@ -90,10 +91,18 @@ public class HistoryScreenDatabase{
 		Rectangles result;
 		result = doc.find(ws[0]);
 		
-		if (result == null)
-			result = new Rectangles();
+		Rectangles filtered_result = new Rectangles();
+		for (Rectangle rect : result){
 		
-		return result;
+			if (filter == null || filter.contains(rect)){
+				
+				filtered_result.add(rect);
+				
+			}
+			
+		}
+		
+		return filtered_result;
 	}
 	
 	static public OCRDocument getOCRDocument(int id){

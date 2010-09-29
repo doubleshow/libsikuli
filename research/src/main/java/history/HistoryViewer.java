@@ -65,7 +65,9 @@ public class HistoryViewer extends JPanel {
 		BROWSE,
 		FIND,
 		SELECT,
-		READ
+		READ,
+		ABSTRACT,
+		OCR
 	};
 	
 	
@@ -115,7 +117,7 @@ public class HistoryViewer extends JPanel {
 		navigator.setListener(new HistoryScreenNavigationListener());
 		
 		
-		navigator.play();
+		//navigator.play();
 		
 		
 		
@@ -155,6 +157,8 @@ public class HistoryViewer extends JPanel {
 		
 		RegionSelectorListener listener;
 		
+		Mode saved_mode;
+		
 		public void setListener(RegionSelectorListener listener) {
 			this.listener = listener;
 		}
@@ -165,7 +169,7 @@ public class HistoryViewer extends JPanel {
 		
 		public void mousePressed(java.awt.event.MouseEvent e){
 
-			current_mode = Mode.SELECT;
+
 
 			destx = srcx = e.getX();
 			desty = srcy = e.getY();
@@ -177,10 +181,10 @@ public class HistoryViewer extends JPanel {
 
 		public void mouseReleased(java.awt.event.MouseEvent e){
 
-			current_mode = Mode.PRESENT;
+			current_mode = saved_mode;
 
-			System.out.println("selected " + srcx + "," + srcy
-					+" - "+desty + "," + destx);
+//			System.out.println("selected " + srcx + "," + srcy
+//					+" - "+desty + "," + destx);
 
 			if (destx > srcx + 2 && desty > srcy + 2){
 
@@ -215,7 +219,7 @@ public class HistoryViewer extends JPanel {
 			destx = e.getX();
 			desty = e.getY();
 
-			System.out.println("moved " + desty + "," + destx);
+			//System.out.println("moved " + desty + "," + destx);
 
 			if (destx > srcx + 2 && desty > srcy + 2){
 				Rectangle selected_rectangle = new Rectangle(srcx,srcy,
@@ -247,6 +251,7 @@ public class HistoryViewer extends JPanel {
 		}
 
 		public void start() {
+			saved_mode = current_mode;
 			current_mode = Mode.SELECT;
 			addMouseListener(selector);
 			addMouseMotionListener(selector);
@@ -646,7 +651,22 @@ public class HistoryViewer extends JPanel {
 			}			
 		});
 		
+		JButton filterBtn = new JButton("Filter");
+		filterBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doSelectFilter();
+			}			
+		});
 
+		JButton ocrBtn = new JButton("View OCR");
+		ocrBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				current_mode = Mode.OCR;
+				setHistoryScreen(history_screen);
+			}			
+		});	
 
 		navigator = new NavigationControl();
 
@@ -688,9 +708,28 @@ public class HistoryViewer extends JPanel {
 		controls.add(copyBtn,c);	
 		c.gridx = 4;
 		c.gridy = 1;
-		controls.add(copyBtn,c);
+		controls.add(filterBtn,c);
+		c.gridx = 5;
+		c.gridy = 1;
+		controls.add(ocrBtn,c);
 	}
 
+
+	Rectangle filter_rectangle;
+	private void doSelectFilter() {
+
+		selector.start();
+		selector.setListener(new RegionSelectorListener(){
+
+			@Override
+			public void rectangleSelected(Rectangle rectangle) {
+				filter_rectangle = rectangle;
+				ScreenImage.clearGlobalAnnotations();
+				ScreenImage.addGlobalAnnotation(new AnnotationRectangle(rectangle));
+			}
+			
+		});	
+	}
 
 	JFrame controlsFrame;
 	public void displayControls(){
@@ -731,7 +770,7 @@ public class HistoryViewer extends JPanel {
 			HistoryScreenImage hs_image = hs.createImage();
 					
 			String word = findBox.getQueryString();			
-			Rectangles rects = HistoryScreenDatabase.findRectangles(hs.getId(), word);
+			Rectangles rects = HistoryScreenDatabase.findRectangles(hs.getId(), word, filter_rectangle);
 			
 			BufferedImage query_image = findBox.getQueryImage();
 			if (query_image != null){
@@ -759,7 +798,7 @@ public class HistoryViewer extends JPanel {
 				ScreenImage context_image = hs_image.crop0(context_rectangle);
 				context_image.addHighlight(hl);
 				
-				BufferedImage match_image = context_image.createRenderedImage(Mode.FIND);
+				BufferedImage match_image = context_image.createRenderedImage(Mode.ABSTRACT);
 	
 				match_images.add(match_image);
 				
@@ -872,12 +911,18 @@ public class HistoryViewer extends JPanel {
 			String words[] = query_text.split(" ");
 
 			for (String word : words){
-				screen.addHighlightedWord(word);
+				screen.highlightWord(word, filter_rectangle);
 			}
 
 			BufferedImage query_image = findBox.getQueryImage();
 			if (query_image != null)
 				screen.addHighlightedImage(query_image);
+		}
+		
+		if (current_mode == Mode.OCR){
+			
+			screen.highlightAllWords();
+			
 		}
 
 		repaint();

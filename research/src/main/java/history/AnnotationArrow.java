@@ -28,8 +28,7 @@ class AnnotationArrow extends Annotation{
 		return color;
 	}
 
-	public AnnotationArrow(ScreenImage screen, Point from, Point to, Color color){
-		super(screen);
+	public AnnotationArrow(Point from, Point to, Color color){
 		this.from = from;
 		this.to = to;
 		this.color = color;

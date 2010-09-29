@@ -10,10 +10,7 @@ import java.awt.image.BufferedImage;
 
 public class Annotation {
 
-	protected ScreenImage screen;
-
-	public Annotation(ScreenImage screen) {
-		this.screen = screen;
+	public Annotation() {
 	}
 
 	public void paintAnnotation(Graphics g) {
