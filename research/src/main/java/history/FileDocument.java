@@ -39,7 +39,7 @@ public class FileDocument {
     <li><code>contents</code>--containing the full contents of the file, as a
     Reader field;
     */
-  public static Document Document(File f, int id)
+  public static Document Document(File f1, File f2, int id)
        throws java.io.FileNotFoundException {
 	 
     // make a new, empty document
@@ -49,21 +49,24 @@ public class FileDocument {
 
     // Add the path of the file as a field named "path".  Use a field that is 
     // indexed (i.e. searchable), but don't tokenize the field into words.
-    doc.add(new Field("path", f.getPath(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+    doc.add(new Field("path", f1.getPath(), Field.Store.YES, Field.Index.NOT_ANALYZED));
 
     // Add the last modified date of the file a field named "modified".  Use 
     // a field that is indexed (i.e. searchable), but don't tokenize the field
     // into words.
     doc.add(new Field("modified",
-        DateTools.timeToString(f.lastModified(), DateTools.Resolution.MINUTE),
+        DateTools.timeToString(f1.lastModified(), DateTools.Resolution.MINUTE),
         Field.Store.YES, Field.Index.NOT_ANALYZED));
 
     // Add the contents of the file to a field named "contents".  Specify a Reader,
     // so that the text of the file is tokenized and indexed, but not stored.
     // Note that FileReader expects the file to be in the system's default encoding.
     // If that's not the case searching for special characters will fail.
-    doc.add(new Field("contents", new FileReader(f)));
+    doc.add(new Field("ocr", new FileReader(f1)));
 
+    doc.add(new Field("ui", new FileReader(f2)));
+
+    
     // return the document
     return doc;
   }

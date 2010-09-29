@@ -17,6 +17,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -52,10 +53,10 @@ public class HistoryScreenDatabase{
 
 	//	static final String[] ROOT_DIRS = new String[]{"captured/login","captured/mail", "captured/chi"};
 //	static final int[] NS = new int[]{10, 1, 30};
-	static final String[] ROOT_DIRS = new String[]{"captured/mail", "captured/chi"};
-	static final int[] NS = new int[]{1, 30};
-//	static final String[] ROOT_DIRS = new String[]{"captured/facebook"};
-//	static final int[] NS = new int[]{19};
+//	static final String[] ROOT_DIRS = new String[]{"captured/mail", "captured/chi","captured/facebook"};
+//	static final int[] NS = new int[]{1, 30, 19};
+	static final String[] ROOT_DIRS = new String[]{"captured/facebook"};
+	static final int[] NS = new int[]{19};
 	
 	
 	static final int TIME_OFFSET = 5;
@@ -85,7 +86,14 @@ public class HistoryScreenDatabase{
 		OCRDocument doc = getOCRDocument(id);
 		
 		String ws[] = word.split(" ");
-		return doc.find(ws[0]);	
+		
+		Rectangles result;
+		result = doc.find(ws[0]);
+		
+		if (result == null)
+			result = new Rectangles();
+		
+		return result;
 	}
 	
 	static public OCRDocument getOCRDocument(int id){
@@ -163,12 +171,15 @@ public class HistoryScreenDatabase{
 				String filename = filenames.get(i);
 
 				String ocr_filename = filename + ".ocr.txt";
-				//String ocr_filename = filename + ".ui.txt";
+				String ui_filename = filename + ".ui.txt";
 
 				File ocr_file = new File(ocr_filename);
+				File ui_file = new File(ui_filename);
 				
 				System.out.println("adding " + ocr_file);
-				writer.addDocument(FileDocument.Document(ocr_file,i));
+				System.out.println("adding " + ui_file);
+
+				writer.addDocument(FileDocument.Document(ocr_file,ui_file,i));
 
 			}
 
@@ -198,12 +209,18 @@ public class HistoryScreenDatabase{
 			IndexReader reader = IndexReader.open(FSDirectory.open(new File("index")), true); 
 			// only searching, so read-only=true
 
-			String field = "contents";
+			String field = "ocr";
 			Searcher searcher = new IndexSearcher(reader);
 			Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
 
-			QueryParser parser = new QueryParser(Version.LUCENE_30, field, analyzer);
+			//QueryParser parser = new QueryParser(Version.LUCENE_30, field, analyzer);
+			
+			
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LUCENE_30,
+			                                        new String[] {"ocr", "ui"},
+			                                        analyzer);
 
+		
 			Query query = parser.parse(query_string);
 
 			TopScoreDocCollector collector = TopScoreDocCollector.create(10, false);
@@ -240,7 +257,7 @@ public class HistoryScreenDatabase{
 		HistoryScreenDatabase.indexOcrFiles();
 		//HistoryScreenDatabase.find("deadline");
 		//HistoryScreenDatabase.find("vancouver && conference");
-		HistoryScreenDatabase.find("ui64");
+		HistoryScreenDatabase.find("ui64 AND volunteers");
 	    
 	}
 }

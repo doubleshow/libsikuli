@@ -8,6 +8,7 @@ import history.OCRDocument.OCRWord;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -346,9 +347,8 @@ public class ScreenImage {
 		return rendered;
 	}
 	
-	public ScreenImage crop0(Rectangle rectSelection){		
-		BufferedImage cropped_image = image.getSubimage(rectSelection.x, rectSelection.y, 
-				rectSelection.width, rectSelection.height);
+	public ScreenImage crop0(Rectangle rect){		
+		BufferedImage cropped_image = ImageUtil.getSubImageBounded(image, rect);
 		return new ScreenImage(cropped_image);
 	}
 	

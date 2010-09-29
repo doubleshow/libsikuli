@@ -22,15 +22,11 @@ class AnnotationHighlight extends Annotation {
 		Graphics2D g2d = (Graphics2D) g;
 
 		BufferedImage image = screen.getImage();
-		BufferedImage subimage;
-
-
-		subimage = image.getSubimage(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
+		BufferedImage subimage = ImageUtil.getSubImageBounded(image, rectangle);
 		g2d.drawImage(subimage, rectangle.x, rectangle.y, null);
 
 		paintRectangle(g2d, rectangle, 3.0F, Color.yellow);
 		//			g2d.setColor(Color.black);	
 		//			g2d.fillRect(r.x, r.y, r.width, r.height);
-
 	}
 }

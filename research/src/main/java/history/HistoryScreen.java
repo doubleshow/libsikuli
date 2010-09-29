@@ -53,4 +53,7 @@ implements Comparable{
 		return this.id - hs.id;    
 	}
 
+	public String toString(){
+		return "[HistoryScreen " + id + "]";
+	}
 }

@@ -62,6 +62,10 @@ class FindResult implements NavigationIterator {
 	public void add(HistoryScreen historyScreen) {
 		history_screens.add(historyScreen);
 	}
+
+	public boolean isEmpty() {
+		return history_screens.isEmpty();
+	}
 	
 	
 }

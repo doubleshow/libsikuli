@@ -31,24 +31,17 @@ import javax.swing.JSplitPane;
 import sikuli.ImageButton;
 import sikuli.SikuliPane;
 
-public class TriggerEditor extends JFrame{
+public class ScriptEditor extends JFrame{
 	
 	SikuliPane sikuli_pane;
 	
 	HistoryViewer viewer;
-	TriggerEditor editor;
-	public TriggerEditor(final HistoryViewer viewer, BufferedImage target_image){
+	ScriptEditor editor;
+	public ScriptEditor(final HistoryViewer viewer, BufferedImage target_image){
 		
 		editor = this;
-		//JPanel panel = new JPanel();
-		//panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		//panel.setLayout(new BorderLayout());
-		
 		this.viewer = viewer;
 		
-		
-		
-	
 		JPanel left = new JPanel();
 		left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
 		left.add(new JLabel("Target"));
@@ -67,7 +60,6 @@ public class TriggerEditor extends JFrame{
 		AutoResize ar = new AutoResize(target_image);
 		ar.setPreferredSize(new Dimension(200,200));
 		ar.setAlignmentX(LEFT_ALIGNMENT);		
-		//ar.setBorder(BorderFactory.createLineBorder(Color.black));
 		left.add(ar);
 		left.setAlignmentY(TOP_ALIGNMENT);
 		
@@ -166,7 +158,7 @@ public class TriggerEditor extends JFrame{
 	 public static void main(String[] args) {
 		   	   	
 		 try {
-			TriggerEditor te = new TriggerEditor(null,ImageIO.read(new File("screen.png")));
+			ScriptEditor te = new ScriptEditor(null,ImageIO.read(new File("screen.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

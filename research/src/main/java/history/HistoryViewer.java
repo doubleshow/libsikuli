@@ -76,7 +76,7 @@ public class HistoryViewer extends JPanel {
 	Lense virtualPage;
 	
 	ScreenImage present_screen;
-	TriggerEditor trigger_editor;
+	ScriptEditor trigger_editor;
 	
 	FindResult find_result;
 	
@@ -145,8 +145,7 @@ public class HistoryViewer extends JPanel {
 	interface RegionSelectorListener{
 		public void rectangleSelected(Rectangle rectangle);
 	}
-	
-	BufferedImage selected_image;
+
 	class RegionSelector implements MouseListener, MouseMotionListener{
 
 		
@@ -187,12 +186,6 @@ public class HistoryViewer extends JPanel {
 
 				selected_rectangle = new Rectangle(srcx,srcy,
 						destx-srcx,desty-srcy);
-
-//				selected_image = screen.crop(selected_rectangle);
-
-//				if (trigger_editor != null && selected_image != null){
-//					trigger_editor.insertImage(selected_image);	   
-//				}
 
 				removeMouseListener(selector);
 				removeMouseMotionListener(selector);
@@ -438,7 +431,7 @@ public class HistoryViewer extends JPanel {
 			public void rectangleSelected(Rectangle rectangle) {
 				
 				BufferedImage selected_image = screen.crop(rectangle);
-				trigger_editor = new TriggerEditor(viewer,selected_image);
+				trigger_editor = new ScriptEditor(viewer,selected_image);
 				
 			}
 			
@@ -529,8 +522,7 @@ public class HistoryViewer extends JPanel {
 			searchBtn.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					String query_string = queryTextField.getText();
-					doFind(query_string);
+					doFind();
 				}
 			});
 			
@@ -545,7 +537,8 @@ public class HistoryViewer extends JPanel {
 			add(imagePanel);
 			
 			
-			queryTextField.setText("deadline");
+			//queryTextField.setText("chi");
+			queryTextField.setText("facebook");
 			
 		}
 		
@@ -554,6 +547,9 @@ public class HistoryViewer extends JPanel {
 			return queryTextField.getText();
 		}
 		
+		public BufferedImage getQueryImage(){
+			return imagePanel.getImage();
+		}
 		
 	}
 
@@ -701,7 +697,7 @@ public class HistoryViewer extends JPanel {
 		controlsFrame = new JFrame();
 		controlsFrame.add(controls);
 		controlsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		controlsFrame.setMinimumSize(new Dimension(800,120));
+		controlsFrame.setMinimumSize(new Dimension(900,120));
 		controlsFrame.setLocationRelativeTo(this);
 		controlsFrame.setVisible(true);
 		controlsFrame.toFront();
@@ -711,44 +707,72 @@ public class HistoryViewer extends JPanel {
 	private void showMatchViewer(FindResult find_result){
 
 		MatchViewer mv = new MatchViewer();
+		mv.setListener(new NavigationListener(){
+
+			@Override
+			public void itemSelected(Object item) {
+				HistoryScreen hs = (HistoryScreen) item;
+				setHistoryScreen(hs);		
+			}
+			
+		});
 		
 		// define the context around each match to display
-		// TODO: allow this to be specified by users
-		Rectangle context_rectangle = new Rectangle(-100,-20,200,40);
-
+		
+		Dimension context_dimension = new Dimension(300,100);
+		Point context_offset = new Point(0,0);
 		
 		ArrayList<HistoryScreen> hss = find_result.getAll();
 		int is[] = new int[]{0,1,2,3};
 		
-		for (int i : is){
-			HistoryScreen hs = hss.get(i);
+		
+		int match_count = 0;
+		for (HistoryScreen hs : hss){
 			HistoryScreenImage hs_image = hs.createImage();
 					
-			// extract a context image for each matched word
-			String word = findBox.getQueryString();
+			String word = findBox.getQueryString();			
 			Rectangles rects = HistoryScreenDatabase.findRectangles(hs.getId(), word);
-
-						
+			
+			BufferedImage query_image = findBox.getQueryImage();
+			if (query_image != null){
+				ArrayList<Rectangle> image_rects = hs_image.find(query_image);
+				rects.addAll(image_rects);
+			}
+			
+			// extract a context image for each matched word
 			ArrayList<BufferedImage> match_images = new ArrayList<BufferedImage>();
 			for (Rectangle rect : rects){
 
 				// calculate the rectangle to crop from the screen image
-				Rectangle rect_to_crop = new Rectangle(context_rectangle);
-				rect_to_crop.translate(rect.x, rect.y);
-
+				// by default, centered on the matched rectangle
+				
+				int ch = (context_dimension.height - rect.height)/2;
+				int cw = (context_dimension.width - rect.width)/2;
+				Rectangle context_rectangle = new Rectangle(context_dimension);
+				context_rectangle.setLocation(rect.getLocation());
+				context_rectangle.translate(-cw,-ch);
+				
 				// calculate the location of the highlight within the context image
 				Rectangle hl = new Rectangle(rect.getSize());
-				hl.setLocation(-context_rectangle.x, -context_rectangle.y);
+				hl.setLocation(cw,ch);
 				
-				ScreenImage context_image = hs_image.crop0(rect_to_crop);
+				ScreenImage context_image = hs_image.crop0(context_rectangle);
 				context_image.addHighlight(hl);
 				
 				BufferedImage match_image = context_image.createRenderedImage(Mode.FIND);
-				
+	
 				match_images.add(match_image);
+				
+				match_count++;
+				if (match_count > 4)
+					break;		
 			}
 			
-			mv.addMatchGroup(hs_image.getImage(), match_images, hs.getTimeString());
+			mv.addMatchGroup(hs, match_images, hs.getTimeString());
+			
+
+			if (match_count > 4)
+				break;		
 		}
 	
 		
@@ -800,21 +824,34 @@ public class HistoryViewer extends JPanel {
 		//this.setHistoryScreen(h2);
 	}
 	
-	private void doFind(String query_string){
+	private void doFind(){
 		current_mode = Mode.FIND;
 		
+		String query_string = findBox.getQueryString();
+		BufferedImage query_image = findBox.getQueryImage();
+
+		if (query_image != null){
+			String ui_query_string = Sikuli.find_ui(query_image); 
+			
+			if (query_string.length()>0)
+				query_string += " AND " + ui_query_string;
+			else
+				query_string = ui_query_string;
+		}
+
+		if (query_string.length() == 0){
+			return;
+		}
 		
 		find_result = new FindResult(query_string);
 
-		setHistoryScreen(find_result.getMostRecent());	
+		if (find_result.isEmpty()){
+			return;
+		}
 		
+		
+		setHistoryScreen(find_result.getMostRecent());			
 		navigator.setIterator(find_result);
-				
-//		if (selected_image != null){
-//			String ui_query_string = Sikuli.find_ui(selected_image); 
-//			query_string = ui_query_string;
-//		}
-		
 		showMatchViewer(find_result);
 		
 		repaint();
@@ -838,11 +875,10 @@ public class HistoryViewer extends JPanel {
 				screen.addHighlightedWord(word);
 			}
 
-			//hs.addHighlightedImage(selected_image);
+			BufferedImage query_image = findBox.getQueryImage();
+			if (query_image != null)
+				screen.addHighlightedImage(query_image);
 		}
-
-
-		screen.addAnnotationArrow(new Point(10,10), new Point(10,500), Color.red);
 
 		repaint();
 	}
@@ -851,16 +887,8 @@ public class HistoryViewer extends JPanel {
 		
 		super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-
-        if (screen != null)
-        
-        	screen.paintHelper(g, current_mode);
-        
-        if (selected_image != null){
-        	
-        //	g2d.drawImage(selected_image, 0, 0, null);
-        	
-        }
+        screen.paintHelper(g, current_mode);
+       
     }
 	
     public static void main(String[] args) {
