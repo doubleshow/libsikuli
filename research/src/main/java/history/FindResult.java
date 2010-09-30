@@ -66,6 +66,17 @@ class FindResult implements NavigationIterator {
 	public boolean isEmpty() {
 		return history_screens.isEmpty();
 	}
+
+	@Override
+	public Object getCurrent() {
+		return history_screens.get(current_index);
+	}
+	
+	@Override
+	public Object get(int i){
+		current_index = i;
+		return history_screens.get(current_index);
+	}
 	
 	
 }

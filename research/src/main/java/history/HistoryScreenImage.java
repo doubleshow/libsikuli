@@ -2,6 +2,7 @@ package history;
 
 import history.OCRDocument.OCRWord;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
@@ -23,6 +24,28 @@ public class HistoryScreenImage extends ScreenImage {
 		
 	}
 	
+	public void highlightAllIcons() {
+		
+		OCRDocument doc = HistoryScreenDatabase.getUIDocument(id);			
+		ArrayList<OCRWord> words = doc.getWords();
+		for (OCRWord word : words){
+			Rectangle rect = word.getRectangle();
+			
+			// ignore really large icons (something is wrong)
+			if (rect.width>500 || rect.height>500){
+				continue;
+			}
+			
+			AnnotationHighlight highlight = new AnnotationHighlight(this,rect);
+			highlight.setBorder(false);
+
+			addAnnotation(highlight);
+			
+			addYellowText(word.getString(),rect.x,rect.y);
+		}			
+
+	}
+	
 	public void highlightAllWords() {
 		OCRDocument doc = HistoryScreenDatabase.getOCRDocument(id);			
 		ArrayList<OCRWord> words = doc.getWords();
@@ -41,6 +64,12 @@ public class HistoryScreenImage extends ScreenImage {
 
 	private void addText(String string, int x, int y) {
 		annotations.add(new AnnotationText(string,x,y));
+	}
+	
+	private void addYellowText(String string, int x, int y) {
+		AnnotationText at = new AnnotationText(string,x,y);
+		at.setColor(Color.yellow);
+		annotations.add(at);
 	}
 
 }

@@ -31,6 +31,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -114,16 +115,18 @@ public class HistoryViewer extends JPanel {
 		//testPilyoung();
 		
 		
+		
 		current_mode = Mode.BROWSE;
-		setHistoryScreen(HistoryScreenDatabase.getMostRecent());
-		//NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
-		NavigationIterator iter = HistoryScreenDatabase.getIterator(800);
-		navigator.setIterator(iter);
+		//NavigationIterator iter = HistoryScreenDatabase.getIterator(800);
+		//NavigationIterator iter = HistoryScreenDatabase.getIterator(10);
+		//navigator.setIterator(iter);
 		navigator.setListener(new HistoryScreenNavigationListener());
+		setExample("facebook");		
 		
+
 		
-		//navigator.play();
-		
+		//navigator.
+		//setHistoryScreen((HistoryScreen)iter.getCurrent());
 		
 		
 //		
@@ -255,27 +258,18 @@ public class HistoryViewer extends JPanel {
 		@Override
 		public void itemSelected(Object item) {
 			HistoryScreen hs = (HistoryScreen) item;
-			
-			
-			HistoryScreen hs0 = getHistoryScreen();
-			setHistoryScreen(hs);
-			
-			BufferedImage image1 = hs0.createImage().getImage();
-			BufferedImage image2 = hs.createImage().getImage();
-			
-			double difference = Sikuli.compare(image1,image2);
-			System.out.println(difference);
-			
+			setHistoryScreen(hs);	
 		}
-		
 	}
 	
 	
 	interface NavigationIterator{
 		boolean hasBefore();
+		Object getCurrent();
 		boolean hasAfter();	
 		Object getBefore();
 		Object getAfter();
+		Object get(int i);
 	}
 	
 	interface NavigationListener{
@@ -423,6 +417,12 @@ public class HistoryViewer extends JPanel {
 //					iterator.getAfter();
 //			}
 			Object item = iterator.getAfter();
+			listener.itemSelected(item);
+			updateButtons();
+		}
+		
+		public void jump(int id){
+			Object item = iterator.get(id);
 			listener.itemSelected(item);
 			updateButtons();
 		}
@@ -614,6 +614,20 @@ public class HistoryViewer extends JPanel {
 		
 		findBox = new FindBox();
 
+		
+        String[] exampleStrings = { "facebook", "chi", "pilyoung","video"};
+        
+        JComboBox exampleList = new JComboBox(exampleStrings);
+        exampleList.addActionListener(new ActionListener(){ 
+            public void actionPerformed(ActionEvent e) {
+                JComboBox cb = (JComboBox)e.getSource();
+                String exampleName = (String)cb.getSelectedItem();
+                setExample(exampleName);
+             }
+        });
+
+		
+		
 		JButton browseBtn = new JButton("Browse");
 		browseBtn.addActionListener(new ActionListener(){
 			@Override
@@ -706,17 +720,16 @@ public class HistoryViewer extends JPanel {
 					current_mode = Mode.BROWSE;
 				}
 				
+				refreshHistoryScreen();
 				
 			}			
 		});	
 		
 		JRadioButton frameButton = new JRadioButton("Frame");
-	    //birdButton.setMnemonic(KeyEvent.VK_B);
 	    frameButton.setActionCommand("Frame");
 	    frameButton.setSelected(true);
 
 	    JRadioButton shotButton = new JRadioButton("Shot");
-	    //shotButton.setMnemonic(KeyEvent.VK_C);
 	    shotButton.setActionCommand("Shot");
 
 	    //Group the radio buttons.
@@ -724,14 +737,13 @@ public class HistoryViewer extends JPanel {
 	    group.add(frameButton);
 	    group.add(shotButton);
 	    
-	    
 	    NavigationModeSelectionActionListener al = new NavigationModeSelectionActionListener();
 	    frameButton.addActionListener(al);
 	    shotButton.addActionListener(al);
 	    
 		navigator = new NavigationControl();
 
-
+		
 		timeLabel = new JLabel("ID");
 		//time.setOpaque(true);
 		//Font font = new Font("sansserif", Font.BOLD, 32);
@@ -747,6 +759,8 @@ public class HistoryViewer extends JPanel {
 		controls.add(row1);
 		
 		JPanel row2 = new JPanel();
+		row2.add(exampleList);
+		row2.add(new JLabel("Frame:"));
 		row2.add(timeLabel);
 		row2.add(scriptBtn);
 		row2.add(readBtn);
@@ -761,7 +775,38 @@ public class HistoryViewer extends JPanel {
 		
 	}
 
-	
+	protected void setExample(String exampleName) {
+		if (exampleName == "facebook"){
+			HistoryScreenDatabase.load(exampleName,19);
+			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
+			navigator.setIterator(iter);
+			navigator.jump(10);
+		}
+		else if (exampleName == "pilyoung"){
+			HistoryScreenDatabase.load(exampleName,1000);
+			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
+			navigator.setIterator(iter);
+			navigator.jump(800);
+		}	
+		else if (exampleName == "chi"){
+			HistoryScreenDatabase.load(exampleName,30);
+			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
+			navigator.setIterator(iter);
+			navigator.jump(15);
+		}	
+		else if (exampleName == "video"){
+			HistoryScreenDatabase.load(exampleName,15);
+			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
+			navigator.setIterator(iter);
+			navigator.jump(13);
+		}	
+
+	}
+
+	private void refreshHistoryScreen() {
+		setHistoryScreen(getHistoryScreen());
+	}
+
 	class NavigationModeSelectionActionListener implements ActionListener{
 
 		@Override
@@ -998,6 +1043,7 @@ public class HistoryViewer extends JPanel {
 		if (current_mode == Mode.OCR){
 			
 			screen.highlightAllWords();
+			screen.highlightAllIcons();
 			
 		}
 		

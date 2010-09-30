@@ -48,8 +48,8 @@ public class HistoryScreenDatabase{
 //	static final String[] ROOT_DIRS = new String[]{"captured/scroll"};
 //	static final int[] NS = new int[]{3};
 	
-	static final String[] ROOT_DIRS = new String[]{"captured/pilyoung"};
-	static final int[] NS = new int[]{1000};
+//	static final String[] ROOT_DIRS = new String[]{"captured/pilyoung"};
+//	static final int[] NS = new int[]{1000};
 
 
 	//	static final String[] ROOT_DIRS = new String[]{"captured/login","captured/mail", "captured/chi"};
@@ -58,30 +58,55 @@ public class HistoryScreenDatabase{
 //	static final int[] NS = new int[]{1, 30, 19};
 //	static final String[] ROOT_DIRS = new String[]{"captured/facebook"};
 //	static final int[] NS = new int[]{19};
+//	
 	
-	
-	static final int TIME_OFFSET = 5;
+//	static final int TIME_OFFSET = 5;
 	
 	static ArrayList<String> filenames = new ArrayList<String>();
-	static {
+//	static {
+//
+//		for (int j=0; j<ROOT_DIRS.length; j++){
+//			String root = ROOT_DIRS[j];
+//			
+//			for (int i=NS[j]-1; i >= 0 ; --i){
+//				String file = root + "/screen" + i + ".png";
+//				filenames.add(file);
+//			}
+//		}
+//		
+//		for (int i=0; i < filenames.size() ; ++i){
+//			HistoryScreen hs = new HistoryScreen(i, filenames.get(i));
+//			hs.setTimeString("" + (i + TIME_OFFSET) + " minutes ago");
+//			history_screens.add(hs);
+//		}
+//
+//	}
 
-		for (int j=0; j<ROOT_DIRS.length; j++){
-			String root = ROOT_DIRS[j];
-			
-			for (int i=NS[j]-1; i >= 0 ; --i){
-				String file = root + "/screen" + i + ".png";
-				filenames.add(file);
-			}
-		}
+	static private String index_path;
+	static public void load(String name, int n){
+		String root = "captured/" + name;
+		
+		filenames.clear();
+		history_screens.clear();
+		
+		for (int i=n-1; i >= 0 ; --i){
+			String file = root + "/screen" + i + ".png";
+			filenames.add(file);
+		}	
 		
 		for (int i=0; i < filenames.size() ; ++i){
 			HistoryScreen hs = new HistoryScreen(i, filenames.get(i));
-			hs.setTimeString("" + (i + TIME_OFFSET) + " minutes ago");
 			history_screens.add(hs);
 		}
-
+		
+		index_path = "captured/lucene.index/" + name;
+		
+		File index_file = new File(index_path);
+		if (!index_file.exists()){
+			indexOcrFiles(index_file);
+		}
 	}
-
+	
 	static public Rectangles findRectangles(int id, String word, Rectangle filter){
 		
 		OCRDocument doc = getOCRDocument(id);
@@ -90,6 +115,9 @@ public class HistoryScreenDatabase{
 		
 		Rectangles result;
 		result = doc.find(ws[0]);
+		
+		if (result == null)
+			result = new Rectangles();
 		
 		Rectangles filtered_result = new Rectangles();
 		for (Rectangle rect : result){
@@ -110,6 +138,12 @@ public class HistoryScreenDatabase{
 		return new OCRDocument(file);
 	}
 
+	static public OCRDocument getUIDocument(int id){
+		String file = filenames.get(id) + ".ui.loc";
+		return new OCRDocument(file);
+	}
+
+	
 	static public HistoryScreen find(int id){
 		return history_screens.get(id);
 	}
@@ -140,11 +174,6 @@ public class HistoryScreenDatabase{
 		public HistoryScreenShotIterator(int current_id) {
 			super(current_id);
 		}
-		
-		private void seek(){
-
-		}
-		
 		
 		@Override
 		public Object getAfter() {
@@ -213,16 +242,27 @@ public class HistoryScreenDatabase{
 		public boolean hasBefore() {
 			return current_id < history_screens.size() - 1;
 		}
+
+		@Override
+		public Object getCurrent() {
+			return history_screens.get(current_id);
+		}
+
+		@Override
+		public Object get(int i) {
+			current_id = i;
+			return history_screens.get(current_id);
+		}
 		
 	}
 	
 	
 	
-	static void indexOcrFiles(){
+	static void indexOcrFiles(File index_file){
 
 		try {
 
-			IndexWriter writer = new IndexWriter(FSDirectory.open(INDEX_DIR), 
+			IndexWriter writer = new IndexWriter(FSDirectory.open(index_file), 
 					new StandardAnalyzer(Version.LUCENE_30), true, 
 					IndexWriter.MaxFieldLength.LIMITED);
 
@@ -268,7 +308,7 @@ public class HistoryScreenDatabase{
 		ArrayList<HistoryScreen> ret = new ArrayList<HistoryScreen>();
 
 		try{
-			IndexReader reader = IndexReader.open(FSDirectory.open(new File("index")), true); 
+			IndexReader reader = IndexReader.open(FSDirectory.open(new File(index_path)), true); 
 			// only searching, so read-only=true
 
 			String field = "ocr";
@@ -316,7 +356,12 @@ public class HistoryScreenDatabase{
 
 	public static void main(String[] args) throws Exception {
 
-		HistoryScreenDatabase.indexOcrFiles();
+		//HistoryScreenDatabase.load("facebook", 19);
+		//HistoryScreenDatabase.load("pilyoung", 1000);
+		//HistoryScreenDatabase.load("chi", 30);
+		HistoryScreenDatabase.load("video", 15);
+		
+		//HistoryScreenDatabase.indexOcrFiles();
 		//HistoryScreenDatabase.find("deadline");
 		//HistoryScreenDatabase.find("vancouver && conference");
 		HistoryScreenDatabase.find("ui64 AND volunteers");
