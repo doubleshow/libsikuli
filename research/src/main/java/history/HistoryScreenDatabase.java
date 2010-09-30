@@ -48,16 +48,16 @@ public class HistoryScreenDatabase{
 //	static final String[] ROOT_DIRS = new String[]{"captured/scroll"};
 //	static final int[] NS = new int[]{3};
 	
-//	static final String[] ROOT_DIRS = new String[]{"captured/pilyoung"};
-//	static final int[] NS = new int[]{1000};
+	static final String[] ROOT_DIRS = new String[]{"captured/pilyoung"};
+	static final int[] NS = new int[]{1000};
 
 
 	//	static final String[] ROOT_DIRS = new String[]{"captured/login","captured/mail", "captured/chi"};
 //	static final int[] NS = new int[]{10, 1, 30};
 //	static final String[] ROOT_DIRS = new String[]{"captured/mail", "captured/chi","captured/facebook"};
 //	static final int[] NS = new int[]{1, 30, 19};
-	static final String[] ROOT_DIRS = new String[]{"captured/facebook"};
-	static final int[] NS = new int[]{19};
+//	static final String[] ROOT_DIRS = new String[]{"captured/facebook"};
+//	static final int[] NS = new int[]{19};
 	
 	
 	static final int TIME_OFFSET = 5;
@@ -129,6 +129,59 @@ public class HistoryScreenDatabase{
 	
 	static public HistoryScreenIterator getIterator(int id){
 		return new HistoryScreenIterator(id);		
+	}
+	
+	static public HistoryScreenIterator getShotIterator(int id){
+		return new HistoryScreenShotIterator(id);		
+	}
+
+	static public class HistoryScreenShotIterator extends HistoryScreenIterator{
+
+		public HistoryScreenShotIterator(int current_id) {
+			super(current_id);
+		}
+		
+		private void seek(){
+
+		}
+		
+		
+		@Override
+		public Object getAfter() {
+			
+			boolean same = true;
+			while (same && hasAfter()){
+				
+				int next_id = current_id-1;
+				String current_image_filename = filenames.get(current_id);
+				String next_image_filename = filenames.get(next_id);
+				
+				double difference = Sikuli.compare(current_image_filename,next_image_filename);
+				same = difference < 0.001;
+				
+				current_id = next_id;
+			}
+				
+			return history_screens.get(current_id);
+		}
+
+		@Override
+		public Object getBefore() {
+			boolean same = true;
+			while (same && hasBefore()){
+				
+				int next_id = current_id+1;
+				String current_image_filename = filenames.get(current_id);
+				String next_image_filename = filenames.get(next_id);
+				
+				double difference = Sikuli.compare(current_image_filename,next_image_filename);
+				same = difference < 0.001;
+				
+				current_id = next_id;
+			}
+			return history_screens.get(current_id);
+		}
+		
 	}
 	
 	static public class HistoryScreenIterator implements NavigationIterator {

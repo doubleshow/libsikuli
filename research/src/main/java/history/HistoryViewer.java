@@ -28,16 +28,21 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import sikuli.Clipboard;
 import sikuli.SikuliPane;
@@ -55,7 +60,7 @@ public class HistoryViewer extends JPanel {
 	
 
 	JPanel controls;
-	JLabel time;
+	JLabel timeLabel;
 	
 	boolean isBrowsing; 
 	
@@ -112,7 +117,7 @@ public class HistoryViewer extends JPanel {
 		current_mode = Mode.BROWSE;
 		setHistoryScreen(HistoryScreenDatabase.getMostRecent());
 		//NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
-		NavigationIterator iter = HistoryScreenDatabase.getIterator(10);
+		NavigationIterator iter = HistoryScreenDatabase.getIterator(800);
 		navigator.setIterator(iter);
 		navigator.setListener(new HistoryScreenNavigationListener());
 		
@@ -197,21 +202,6 @@ public class HistoryViewer extends JPanel {
 				repaint();
 				listener.rectangleSelected(selected_rectangle);
 			}
-			//	            OCRDocument doc = new OCRDocument(selected_image);
-			//	            
-			//	            String query_string = null;
-			//	            for (String word : doc.getWords()){
-			//	            	System.out.println(word);
-			//	            	
-			//	            	if (query_string == null)
-			//	            		query_string = word;
-			//	            	else
-			//	            		query_string = query_string + " && " + word;
-			//	            }
-
-
-			//repaint();
-
 		}
 
 		public void mouseDragged(java.awt.event.MouseEvent e) {
@@ -265,8 +255,19 @@ public class HistoryViewer extends JPanel {
 		@Override
 		public void itemSelected(Object item) {
 			HistoryScreen hs = (HistoryScreen) item;
-			setHistoryScreen(hs);	
+			
+			
+			HistoryScreen hs0 = getHistoryScreen();
+			setHistoryScreen(hs);
+			
+			BufferedImage image1 = hs0.createImage().getImage();
+			BufferedImage image2 = hs.createImage().getImage();
+			
+			double difference = Sikuli.compare(image1,image2);
+			System.out.println(difference);
+			
 		}
+		
 	}
 	
 	
@@ -302,47 +303,84 @@ public class HistoryViewer extends JPanel {
 		}
 		
 		private void updateButtons(){
-			before.setEnabled(iterator.hasBefore());
-			after.setEnabled(iterator.hasAfter());
+			
 			
 			if (playing){
-				play.setText("Stop");
+
+				backwardBtn.setEnabled(false);
+				forwardBtn.setEnabled(false);
+				
+				if (direction == RIGHT){
+					playBtn.setText("Stop");
+					rewindBtn.setEnabled(false);
+				
+				}else{
+					rewindBtn.setText("Stop");
+					playBtn.setEnabled(false);
+				}
+			
 			}else{
-				play.setText("Play");
-				play.setEnabled(iterator.hasAfter());
+				
+				backwardBtn.setEnabled(iterator.hasBefore());
+				forwardBtn.setEnabled(iterator.hasAfter());
+				
+				playBtn.setText("Play");
+				playBtn.setEnabled(iterator.hasAfter());
+				rewindBtn.setText("Rewind");
+				rewindBtn.setEnabled(iterator.hasBefore());
 			}
 		}
 		
-		JButton before;
-		JButton after;		
-		JButton play;
+		JButton backwardBtn;
+		JButton forwardBtn;		
+		JButton playBtn;
+		JButton rewindBtn;
 		public NavigationControl(){
 			
-			before = new JButton("before");
-			before.addActionListener(new NavigationActionListener(LEFT));
+			backwardBtn = new JButton("Back");
+			backwardBtn.addActionListener(new NavigationActionListener(LEFT));
 			
-			after = new JButton("after");
-			after.addActionListener(new NavigationActionListener(RIGHT));
+			forwardBtn = new JButton("Forward");
+			forwardBtn.addActionListener(new NavigationActionListener(RIGHT));
 			
-			play = new JButton("play");
-			play.addActionListener(new ActionListener(){
+			playBtn = new JButton("Play");
+			playBtn.addActionListener(new ActionListener(){
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e) {				
+					direction = RIGHT;
 					if (playing)
 						navigator.stop();
 					else
-						navigator.play();
-					updateButtons();		
+						navigator.play();		
+					updateButtons();
 				}			
 			});
 			
-			add(before);
-			add(after);
-			add(play);
+			rewindBtn = new JButton("Rewind");
+			rewindBtn.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					direction = LEFT;
+					if (playing)
+						navigator.stop();
+					else{
+						navigator.play();	
+					}
+					updateButtons();
+					
+				}			
+			});
+			
+			add(backwardBtn);
+			add(forwardBtn);
+			add(rewindBtn);
+			add(playBtn);
+			
 		}
 		
 		
 		boolean playing = false;
+		int direction = RIGHT;
 		public void play(){
 			
 			Thread autoplayThread = new Thread(){
@@ -352,13 +390,16 @@ public class HistoryViewer extends JPanel {
 					while (playing){
 						try {
 
-							if (iterator.hasAfter()){
+							if (direction == RIGHT && iterator.hasAfter()){
 								stepForward();
-								Thread.sleep(100);
+							}else if (direction == LEFT && iterator.hasBefore()){
+								stepBackward();
 							}else{
 								playing = false;
-							}							
-					
+							}
+
+							Thread.sleep(100);
+							
 						} catch (InterruptedException e) {
 						}
 					}
@@ -376,6 +417,11 @@ public class HistoryViewer extends JPanel {
 		}
 		
 		public void stepForward(){
+			
+//			for (int i=0;i<5;++i){
+//				if (iterator.hasAfter())
+//					iterator.getAfter();
+//			}
 			Object item = iterator.getAfter();
 			listener.itemSelected(item);
 			updateButtons();
@@ -426,6 +472,10 @@ public class HistoryViewer extends JPanel {
 		
 	}
 	
+	public HistoryScreen getHistoryScreen() {
+		return history_screen;
+	}
+
 	private void doCaptureScriptTargetImage(){
 		final HistoryViewer viewer = this;
 		
@@ -564,18 +614,6 @@ public class HistoryViewer extends JPanel {
 		
 		findBox = new FindBox();
 
-		JButton exitBtn = new JButton("Exit");
-		exitBtn.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//current_screen = present_screen;				
-				current_mode = Mode.PRESENT;
-				repaint();
-			}
-
-
-		});
-
 		JButton browseBtn = new JButton("Browse");
 		browseBtn.addActionListener(new ActionListener(){
 			@Override
@@ -587,9 +625,6 @@ public class HistoryViewer extends JPanel {
 				repaint();
 			}			
 		});
-
-
-
 		
 		JButton readBtn = new JButton("Read");
 		readBtn.addActionListener(new ActionListener(){
@@ -624,7 +659,7 @@ public class HistoryViewer extends JPanel {
 					Rectangle r = virtualPage.getBounds();
 					r.grow(2,2);
 					r.translate(0,4);
-					screen.setHighlightRectangle(r);
+					//screen.setHighlightRectangle(r);
 					//updateUI();
 				}
 
@@ -659,61 +694,95 @@ public class HistoryViewer extends JPanel {
 			}			
 		});
 
-		JButton ocrBtn = new JButton("View OCR");
-		ocrBtn.addActionListener(new ActionListener(){
+		JToggleButton ocrBtn = new JToggleButton("View OCR");
+		ocrBtn.addChangeListener(new ChangeListener(){
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				current_mode = Mode.OCR;
-				setHistoryScreen(history_screen);
+			public void stateChanged(ChangeEvent e) {
+				JToggleButton btn = (JToggleButton) e.getSource();
+				
+				if (btn.isSelected()){
+					current_mode = Mode.OCR;
+				}else{
+					current_mode = Mode.BROWSE;
+				}
+				
+				
 			}			
 		});	
+		
+		JRadioButton frameButton = new JRadioButton("Frame");
+	    //birdButton.setMnemonic(KeyEvent.VK_B);
+	    frameButton.setActionCommand("Frame");
+	    frameButton.setSelected(true);
 
+	    JRadioButton shotButton = new JRadioButton("Shot");
+	    //shotButton.setMnemonic(KeyEvent.VK_C);
+	    shotButton.setActionCommand("Shot");
+
+	    //Group the radio buttons.
+	    ButtonGroup group = new ButtonGroup();
+	    group.add(frameButton);
+	    group.add(shotButton);
+	    
+	    
+	    NavigationModeSelectionActionListener al = new NavigationModeSelectionActionListener();
+	    frameButton.addActionListener(al);
+	    shotButton.addActionListener(al);
+	    
 		navigator = new NavigationControl();
 
 
-		time = new JLabel("-15:20");
-		time.setOpaque(true);
+		timeLabel = new JLabel("ID");
+		//time.setOpaque(true);
 		//Font font = new Font("sansserif", Font.BOLD, 32);
 		//time.setFont(font);
 		//time.setForeground(Color.red);
 
 		controls = new JPanel();
-		controls.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
+		controls.setLayout(new BoxLayout(controls, BoxLayout.Y_AXIS));
 		
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.gridwidth = 4;
-		controls.add(findBox,c);
+		JPanel row1 = new JPanel();
+		row1.add(findBox);
+		row1.add(navigator);
+		controls.add(row1);
 		
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 6;
-		c.gridy = 0;
-		c.gridwidth = 1;
-		controls.add(navigator,c);
+		JPanel row2 = new JPanel();
+		row2.add(timeLabel);
+		row2.add(scriptBtn);
+		row2.add(readBtn);
+		row2.add(browseBtn);
+		row2.add(copyBtn);
+		row2.add(filterBtn);
+		row2.add(ocrBtn);
+		row2.add(frameButton);
+		row2.add(shotButton);
 		
+		controls.add(row2);
 		
-		c.gridx = 0;
-		c.gridy = 1;
-		controls.add(scriptBtn,c);
-		c.gridx = 1;
-		c.gridy = 1;
-		controls.add(readBtn,c);
-		c.gridx = 2;
-		c.gridy = 1;
-		controls.add(browseBtn,c);
-		c.gridx = 3;
-		c.gridy = 1;
-		controls.add(copyBtn,c);	
-		c.gridx = 4;
-		c.gridy = 1;
-		controls.add(filterBtn,c);
-		c.gridx = 5;
-		c.gridy = 1;
-		controls.add(ocrBtn,c);
 	}
 
+	
+	class NavigationModeSelectionActionListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			
+			int current_id = getHistoryScreen().getId();
+			HistoryScreenIterator iter;	
+			
+			if (e.getActionCommand() == "Frame"){
+				iter = HistoryScreenDatabase.getIterator(current_id);
+				navigator.setIterator(iter);
+			}
+			else if (e.getActionCommand() == "Shot"){
+				iter = HistoryScreenDatabase.getShotIterator(current_id);
+				navigator.setIterator(iter);
+			}
+			
+			
+		}
+	}
 
 	Rectangle filter_rectangle;
 	private void doSelectFilter() {
@@ -732,12 +801,13 @@ public class HistoryViewer extends JPanel {
 	}
 
 	JFrame controlsFrame;
-	public void displayControls(){
+	public void showControls(){
 		controlsFrame = new JFrame();
 		controlsFrame.add(controls);
 		controlsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		controlsFrame.setMinimumSize(new Dimension(900,120));
+		controlsFrame.setMinimumSize(new Dimension(900,140));
 		controlsFrame.setLocationRelativeTo(this);
+		controlsFrame.setLocation(new Point(0,0));
 		controlsFrame.setVisible(true);
 		controlsFrame.toFront();
 	}
@@ -769,8 +839,12 @@ public class HistoryViewer extends JPanel {
 		for (HistoryScreen hs : hss){
 			HistoryScreenImage hs_image = hs.createImage();
 					
-			String word = findBox.getQueryString();			
-			Rectangles rects = HistoryScreenDatabase.findRectangles(hs.getId(), word, filter_rectangle);
+			Rectangles rects = new Rectangles();
+			
+			String query_string = findBox.getQueryString();
+			if (query_string.length()>0){
+				rects.addAll(HistoryScreenDatabase.findRectangles(hs.getId(), query_string, filter_rectangle));			
+			}
 			
 			BufferedImage query_image = findBox.getQueryImage();
 			if (query_image != null){
@@ -828,7 +902,7 @@ public class HistoryViewer extends JPanel {
 		current_mode = Mode.BROWSE;
 		HistoryScreen h1 = HistoryScreenDatabase.getMostRecent();
 	//	this.setHistoryScreen(h1);
-		displayControls();
+		showControls();
 	}
 	
 	
@@ -907,11 +981,13 @@ public class HistoryViewer extends JPanel {
 		
 		if (current_mode == Mode.FIND){
 		
-			String query_text = findBox.getQueryString();
-			String words[] = query_text.split(" ");
+			String query_string = findBox.getQueryString();
+			if (query_string.length()>0){
+				String words[] = query_string.split(" ");
 
-			for (String word : words){
-				screen.highlightWord(word, filter_rectangle);
+				for (String word : words){
+					screen.highlightWord(word, filter_rectangle);
+				}
 			}
 
 			BufferedImage query_image = findBox.getQueryImage();
@@ -924,6 +1000,8 @@ public class HistoryViewer extends JPanel {
 			screen.highlightAllWords();
 			
 		}
+		
+		timeLabel.setText(""+hs.getId());
 
 		repaint();
 	}
@@ -946,6 +1024,6 @@ public class HistoryViewer extends JPanel {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         frame.setResizable(false);
-        main.displayControls();
+        main.showControls();
     }
 }

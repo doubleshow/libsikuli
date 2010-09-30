@@ -44,6 +44,51 @@ public class Sikuli {
 		return null;
 	}
 	
+	public static double compare(String image1, String image2){
+		String command = "./sikulicmd COMPARE " +  image1 + " " + image2;
+		String result = "";
+		System.out.println(command);
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(command);
+
+			BufferedReader input = new BufferedReader
+			(new InputStreamReader(p.getInputStream()));
+
+			String line;
+			while ((line = input.readLine()) != null) {
+				System.out.println(line);
+				result = line;
+			}
+			input.close();
+		} catch (IOException e) {
+		}
+
+		return Double.parseDouble(result);
+	}
+	
+	public static double compare(BufferedImage image1, BufferedImage image2){
+		
+		String result = "";
+		try{
+			File f1,f2;
+			File curdir = new File(".");
+			f1 = File.createTempFile("sikuli", ".png",curdir);
+			f2 = File.createTempFile("sikuli", ".png",curdir);			
+			f1.deleteOnExit(); 
+			f2.deleteOnExit(); 
+			
+			ImageIO.write(image1, "png", f1);
+			ImageIO.write(image2, "png", f2);
+
+			return compare(f1.getPath(),f2.getPath());
+						
+		} catch (IOException e){
+
+		}
+
+		return 0;
+	}
 	
 	public static String find_ui(BufferedImage ui_image){
 		String result = "";
@@ -56,7 +101,7 @@ public class Sikuli {
 			//File  f = new File("tmpocr.png");
 			ImageIO.write(ui_image, "png", f);
 
-			String command = "./sikulicmd QUERY index.bin " + f.getPath();
+			String command = "./sikulicmd QUERY pilyoung.index " + f.getPath();
 			System.out.println(command);
 			Process p = Runtime.getRuntime().exec(command);
 
@@ -150,10 +195,16 @@ public class Sikuli {
 	
 	public static void main(String[] args) {
 		
-		BufferedImage image;
+		BufferedImage image1, image2;
 		try {
-			image = ImageIO.read(new File("query.png"));
-			Sikuli.find_ui(image);
+			//image = ImageIO.read(new File("query.png"));
+			//Sikuli.find_ui(image);
+			
+			image1 = ImageIO.read(new File("screen.png"));
+			image2 = ImageIO.read(new File("screen2.png"));
+			double ret = Sikuli.compare(image1, image2);
+			System.out.println(ret);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

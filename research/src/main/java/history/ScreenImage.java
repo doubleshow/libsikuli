@@ -125,46 +125,7 @@ public class ScreenImage {
 		}
 	}
 
-	//	protected void loadImage(){
-	//		
-	//		if (image == null){
-	//		
-	//			try {
-	//				File sourceimage = new File(filename);
-	//				image = ImageIO.read(sourceimage);    
-	//			} catch (IOException ioe) {
-	//				ioe.printStackTrace();
-	//			}
-	//		}
-	//		
-	//		if (image_darken == null){
-	//			
-	//			// Darken the image by 10% 
-	//			float scaleFactor = .6f; 
-	//			RescaleOp op = new RescaleOp(scaleFactor, 0, null); 
-	//			image_darken = op.filter(image, null); 
-	//		}
-	//	}
-
-	public void setHighlightRectangle(Rectangle highlightRectangle) {
-		//highlightRectangles.clear();
-		//highlightRectangles.add(highlightRectangle);
-		//
-	}
-
-	int padding = 0;
-	public void setHighlightRectanglePadding(int p){
-		padding = p;
-	}
-
-	boolean hightlightRectangleBorder = true;
-	public void setHighlightRectangleBorder(boolean b){
-		hightlightRectangleBorder = b;
-	}
-
 	public void paintHelper(Graphics g, Mode mode){
-
-		//loadImage();
 
 		Graphics2D g2d = (Graphics2D) g;
 		if (mode == Mode.PRESENT || mode == Mode.READ){
@@ -241,12 +202,6 @@ public class ScreenImage {
 
 	static public void clearGlobalAnnotations(){
 		global_annotations.clear();
-	}
-
-
-	public void clearHighlightedRectangles() {
-		//highlightRectangles.clear();
-		//annotation_highlights.clear();
 	}
 
 	public void clear(){
