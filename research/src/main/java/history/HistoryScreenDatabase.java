@@ -8,6 +8,7 @@ import history.HistoryViewer.NavigationIterator;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,27 +41,16 @@ public class HistoryScreenDatabase{
 //	static final String[] ROOT_DIRS = new String[]{"captured/deadline"};
 //	static final int[] NS = new int[]{2};
 
-//	static final String[] ROOT_DIRS = new String[]{"captured/video"};
-//	static final int[] NS = new int[]{15};
 
 
-	//static final String[] ROOT_DIRS = new String[]{"captured/move"};
 //	static final String[] ROOT_DIRS = new String[]{"captured/scroll"};
 //	static final int[] NS = new int[]{3};
 	
-//	static final String[] ROOT_DIRS = new String[]{"captured/pilyoung"};
-//	static final int[] NS = new int[]{1000};
-
-
 	//	static final String[] ROOT_DIRS = new String[]{"captured/login","captured/mail", "captured/chi"};
 //	static final int[] NS = new int[]{10, 1, 30};
 //	static final String[] ROOT_DIRS = new String[]{"captured/mail", "captured/chi","captured/facebook"};
 //	static final int[] NS = new int[]{1, 30, 19};
-//	static final String[] ROOT_DIRS = new String[]{"captured/facebook"};
-//	static final int[] NS = new int[]{19};
-//	
-	
-//	static final int TIME_OFFSET = 5;
+
 	
 	static ArrayList<String> filenames = new ArrayList<String>();
 //	static {
@@ -83,7 +73,30 @@ public class HistoryScreenDatabase{
 //	}
 
 	static private String index_path;
+	static public void load(String name){
+		String root = "captured/" + name;
+
+		File f1=new File(root);
+		String files[]=f1.list(new FilenameFilter(){
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith("png");
+			}
+		});
+
+		int num_files = files.length;
+		
+		// skip the last file because it may not finished
+		load(name, num_files - 1, true);
+//		for (int i=0;i<files.length;i++)
+//		{System.out.println(files[i]);}
+//		System.out.println(files.length + " files");
+	}
 	static public void load(String name, int n){
+		load(name,n,false);
+	}
+	
+	static public void load(String name, int n, boolean rebuild_index){
 		String root = "captured/" + name;
 		
 		filenames.clear();
@@ -102,7 +115,7 @@ public class HistoryScreenDatabase{
 		index_path = "captured/lucene.index/" + name;
 		
 		File index_file = new File(index_path);
-		if (!index_file.exists()){
+		if (rebuild_index || !index_file.exists()){
 			indexOcrFiles(index_file);
 		}
 	}
@@ -163,6 +176,10 @@ public class HistoryScreenDatabase{
 	
 	static public HistoryScreenIterator getIterator(int id){
 		return new HistoryScreenIterator(id);		
+	}
+	
+	static public HistoryScreenIterator getIteratorFromEarliest(){
+		return new HistoryScreenIterator(history_screens.size()-1);		
 	}
 	
 	static public HistoryScreenIterator getShotIterator(int id){

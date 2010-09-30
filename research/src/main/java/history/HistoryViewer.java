@@ -3,8 +3,10 @@ import history.HistoryScreenDatabase.HistoryScreenIterator;
 import history.OCRDocument.OCRWord;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -27,11 +29,13 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -41,9 +45,11 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.FontUIResource;
 
 import sikuli.Clipboard;
 import sikuli.SikuliPane;
@@ -89,6 +95,10 @@ public class HistoryViewer extends JPanel {
 	FindResult find_result;
 	
 	public HistoryViewer(){
+		
+//		UIManager.put("Label.font", new FontUIResource("Lucida Grande", Font.PLAIN, 10));
+//		UIManager.put("Button.font", new FontUIResource("Lucida Grande", Font.PLAIN, 10));
+//		UIManager.put("ToggleButton.font", new FontUIResource("Lucida Grande", Font.PLAIN, 10));
 
 		isBrowsing = false;
 		
@@ -277,7 +287,7 @@ public class HistoryViewer extends JPanel {
 	}
 
 	NavigationControl navigator;
-	class NavigationControl extends JPanel {
+	class NavigationControl extends Box {
 		
 		static public final int LEFT = 1;
 		static public final int RIGHT = 2;
@@ -318,9 +328,9 @@ public class HistoryViewer extends JPanel {
 				backwardBtn.setEnabled(iterator.hasBefore());
 				forwardBtn.setEnabled(iterator.hasAfter());
 				
-				playBtn.setText("Play");
+				playBtn.setText("Play >>");
 				playBtn.setEnabled(iterator.hasAfter());
-				rewindBtn.setText("Rewind");
+				rewindBtn.setText("<< Rewind");
 				rewindBtn.setEnabled(iterator.hasBefore());
 			}
 		}
@@ -330,14 +340,15 @@ public class HistoryViewer extends JPanel {
 		JButton playBtn;
 		JButton rewindBtn;
 		public NavigationControl(){
+			super(BoxLayout.X_AXIS);
 			
-			backwardBtn = new JButton("Back");
+			backwardBtn = new JButton("< Back");
 			backwardBtn.addActionListener(new NavigationActionListener(LEFT));
 			
-			forwardBtn = new JButton("Forward");
+			forwardBtn = new JButton("Forward >");
 			forwardBtn.addActionListener(new NavigationActionListener(RIGHT));
 			
-			playBtn = new JButton("Play");
+			playBtn = new JButton("Play >>");
 			playBtn.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent e) {				
@@ -350,7 +361,7 @@ public class HistoryViewer extends JPanel {
 				}			
 			});
 			
-			rewindBtn = new JButton("Rewind");
+			rewindBtn = new JButton("<< Rewind");
 			rewindBtn.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -547,7 +558,7 @@ public class HistoryViewer extends JPanel {
 	
 	
 	
-	class FindBox extends JPanel{
+	class FindBox extends Box{
 		
 		JTextField queryTextField;
 		JButton searchBtn;
@@ -561,9 +572,10 @@ public class HistoryViewer extends JPanel {
 		}
 		
 		public FindBox(){
-			super();
+			super(BoxLayout.X_AXIS);
 			
-			queryTextField = new JTextField(10);		
+			queryTextField = new JTextField(15);	
+			queryTextField.setMaximumSize(new Dimension(1000,25));
 
 			captureBtn = new JButton("Capture");
 			captureBtn.addActionListener(new ActionListener(){
@@ -585,12 +597,13 @@ public class HistoryViewer extends JPanel {
 			add(searchBtn);
 			add(captureBtn);
 			
+			
 			imagePanel = new AutoResize(null);
-			imagePanel.setMinimumSize(new Dimension(200,50));
-			imagePanel.setPreferredSize(new Dimension(200,50));
+			imagePanel.setMaximumSize(new Dimension(200,20));
+			imagePanel.setPreferredSize(new Dimension(200,20));
 			
-			add(imagePanel);
-			
+			//add(imagePanel);
+			add(Box.createHorizontalGlue());
 			
 			//queryTextField.setText("chi");
 			queryTextField.setText("facebook");
@@ -615,7 +628,7 @@ public class HistoryViewer extends JPanel {
 		findBox = new FindBox();
 
 		
-        String[] exampleStrings = { "facebook", "chi", "pilyoung","video"};
+        String[] exampleStrings = { "facebook", "chi", "pilyoung","video","live"};
         
         JComboBox exampleList = new JComboBox(exampleStrings);
         exampleList.addActionListener(new ActionListener(){ 
@@ -625,8 +638,6 @@ public class HistoryViewer extends JPanel {
                 setExample(exampleName);
              }
         });
-
-		
 		
 		JButton browseBtn = new JButton("Browse");
 		browseBtn.addActionListener(new ActionListener(){
@@ -753,10 +764,13 @@ public class HistoryViewer extends JPanel {
 		controls = new JPanel();
 		controls.setLayout(new BoxLayout(controls, BoxLayout.Y_AXIS));
 		
-		JPanel row1 = new JPanel();
+		
+		Box row1 = new Box(BoxLayout.X_AXIS);
 		row1.add(findBox);
 		row1.add(navigator);
 		controls.add(row1);
+		
+		controls.add(new JSeparator());
 		
 		JPanel row2 = new JPanel();
 		row2.add(exampleList);
@@ -770,13 +784,18 @@ public class HistoryViewer extends JPanel {
 		row2.add(ocrBtn);
 		row2.add(frameButton);
 		row2.add(shotButton);
-		
 		controls.add(row2);
 		
 	}
 
 	protected void setExample(String exampleName) {
-		if (exampleName == "facebook"){
+		if (exampleName == "live"){
+			HistoryScreenDatabase.load(exampleName);
+			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
+			navigator.setIterator(iter);
+			navigator.jump(0);
+		}
+		else if (exampleName == "facebook"){
 			HistoryScreenDatabase.load(exampleName,19);
 			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
 			navigator.setIterator(iter);
@@ -848,14 +867,77 @@ public class HistoryViewer extends JPanel {
 	JFrame controlsFrame;
 	public void showControls(){
 		controlsFrame = new JFrame();
+		controlsFrame.setUndecorated(true);
 		controlsFrame.add(controls);
 		controlsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		controlsFrame.setMinimumSize(new Dimension(900,140));
-		controlsFrame.setLocationRelativeTo(this);
-		controlsFrame.setLocation(new Point(0,0));
+		//controlsFrame.setLocation(new Point(10,30));
 		controlsFrame.setVisible(true);
 		controlsFrame.toFront();
+		controlsFrame.getRootPane().putClientProperty("Window.alpha", new Float(0.8f));
+		controlsFrame.pack();
+		controlsFrame.setResizable(false);
+		controlsFrame.setLocationRelativeTo(this);
+
+	    MoveMouseListener mml = new MoveMouseListener(controls);
+	    controls.addMouseListener(mml);
+	    controls.addMouseMotionListener(mml);
 	}
+	
+	class MoveMouseListener implements MouseListener, MouseMotionListener {
+		  JComponent target;
+		  Point start_drag;
+		  Point start_loc;
+
+		  public MoveMouseListener(JComponent target) {
+		    this.target = target;
+		  }
+
+		  public JFrame getFrame(Container target) {
+		    if (target instanceof JFrame) {
+		      return (JFrame) target;
+		    }
+		    return getFrame(target.getParent());
+		  }
+
+		  Point getScreenLocation(MouseEvent e) {
+		    Point cursor = e.getPoint();
+		    Point target_location = this.target.getLocationOnScreen();
+		    return new Point((int) (target_location.getX() + cursor.getX()),
+		        (int) (target_location.getY() + cursor.getY()));
+		  }
+
+		  public void mouseClicked(MouseEvent e) {
+		  }
+
+		  public void mouseEntered(MouseEvent e) {
+		  }
+
+		  public void mouseExited(MouseEvent e) {
+		  }
+
+		  public void mousePressed(MouseEvent e) {
+		    this.start_drag = this.getScreenLocation(e);
+		    this.start_loc = this.getFrame(this.target).getLocation();
+		  }
+
+		  public void mouseReleased(MouseEvent e) {
+		  }
+
+		  public void mouseDragged(MouseEvent e) {
+		    Point current = this.getScreenLocation(e);
+		    Point offset = new Point((int) current.getX() - (int) start_drag.getX(),
+		        (int) current.getY() - (int) start_drag.getY());
+		    JFrame frame = this.getFrame(target);
+		    Point new_location = new Point(
+		        (int) (this.start_loc.getX() + offset.getX()), (int) (this.start_loc
+		            .getY() + offset.getY()));
+		    frame.setLocation(new_location);
+		  }
+
+		  public void mouseMoved(MouseEvent e) {
+		  }
+		}
+
 	
 	
 	private void showMatchViewer(FindResult find_result){
@@ -937,7 +1019,7 @@ public class HistoryViewer extends JPanel {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.add(mv);        
-		frame.setSize(1000,600);
+		frame.setSize(450,600);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
@@ -1058,6 +1140,7 @@ public class HistoryViewer extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         screen.paintHelper(g, current_mode);
        
+		controlsFrame.pack();
     }
 	
     public static void main(String[] args) {
