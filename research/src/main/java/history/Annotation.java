@@ -10,6 +10,8 @@ import java.awt.image.BufferedImage;
 
 public class Annotation {
 
+	protected Color color;
+
 	public Annotation() {
 	}
 
@@ -24,6 +26,14 @@ public class Annotation {
 		g2d.setColor(color);
 		g2d.drawRect(r.x,r.y,r.width,r.height);
 		g2d.setStroke(old_pen);
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
 	}
 
 }

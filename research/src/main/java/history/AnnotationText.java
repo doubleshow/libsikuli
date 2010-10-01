@@ -15,8 +15,6 @@ class AnnotationText extends Annotation{
 
 	String text;
 	int x,y;
-	Color color;
-
 	public AnnotationText(String text, int x, int y){
 		this.text = text;
 		this.x = x;

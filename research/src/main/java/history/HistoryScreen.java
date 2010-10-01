@@ -56,4 +56,8 @@ implements Comparable{
 	public String toString(){
 		return "[HistoryScreen " + id + "]";
 	}
+
+	public OCRDocument getOCRDocument() {
+		return HistoryScreenDatabase.getOCRDocument(id);
+	}
 }

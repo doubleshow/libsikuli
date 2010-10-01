@@ -1,6 +1,6 @@
 package sikuli;
 
-import history.Lense;
+import history.Lens;
 
 import java.io.*;
 import java.awt.*;

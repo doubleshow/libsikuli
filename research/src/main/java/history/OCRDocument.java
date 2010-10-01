@@ -132,6 +132,10 @@ public class OCRDocument {
 		return words;
 	}
 
+	public boolean hasWord(String word){
+		return word_to_rectangles.containsKey(word);
+	}
+	
 	public Rectangles find(String word){
 		return word_to_rectangles.get(word);
 	}

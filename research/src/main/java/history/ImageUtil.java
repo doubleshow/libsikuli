@@ -34,7 +34,7 @@ public class ImageUtil {
 		BufferedImage ret = new BufferedImage(region.width,region.height, BufferedImage.TYPE_INT_RGB);
 		Rectangle br = boundRectangle(region, bounds);
 		
-		System.out.println(region + " " + bounds + "->" + br);
+		//System.out.println(region + " " + bounds + "->" + br);
 		
 		BufferedImage subimage = src.getSubimage(br.x,br.y,br.width,br.height);
 

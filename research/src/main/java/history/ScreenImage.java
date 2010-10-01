@@ -128,11 +128,12 @@ public class ScreenImage {
 	public void paintHelper(Graphics g, Mode mode){
 
 		Graphics2D g2d = (Graphics2D) g;
-		if (mode == Mode.PRESENT || mode == Mode.READ){
+		if (mode == Mode.PRESENT){
 
 			g2d.drawImage(image, 0, 0, null);			
 
-		}else if (mode == Mode.FIND || mode == Mode.ABSTRACT || mode == Mode.SELECT){
+		}else if (mode == Mode.FIND || mode == Mode.ABSTRACT || 
+				mode == Mode.SELECT || mode == Mode.DIFF || mode == Mode.READ){
 
 			g2d.drawImage(image_darken, 0, 0, null);
 
@@ -190,7 +191,7 @@ public class ScreenImage {
 	}
 
 	public void addAnnotationArrow(Point from, Point to, Color color){
-		AnnotationArrow ai = new AnnotationArrow(from,to,color);
+		Annotation ai = new AnnotationArrow(from,to,color);
 		//annotation_arrows.add(ai);
 		annotations.add(ai);
 	}
@@ -427,22 +428,157 @@ public class ScreenImage {
 		//image = another.image;//id = another.id;
 	}
 
-	public void highlightNewWords(HistoryScreen another) {
+	
+	public void drawWordMovements(HistoryScreen current_screen, HistoryScreen history_screen) {
+		
+		OCRDocument doc1 = current_screen.getOCRDocument();
+		OCRDocument doc2 = history_screen.getOCRDocument();
+		
+		ScreenImage history_image = history_screen.createImage();
+		
+		
+		// find words in doc1 but not in doc2
+		ArrayList<OCRWord> words1 = doc1.getWords();
+		for (OCRWord word1 : words1){
+			
+			Rectangle word1_rect = word1.getRectangle();
+			String word1_string = word1.getString();
+			
+			if (word1_string.length() < 2)
+				continue;
+			
+			// if the word does not exist in doc2, ignore
+			if (!doc2.hasWord(word1.getString()))
+				continue;
+			
+			// if the word exists, but in the same location, ignore
+			OCRWord ocrword2 = doc2.find(word1_rect);
+			if (ocrword2 != null && ocrword2.getString().compareTo(word1_string)==0)
+				continue;
+			
+			Rectangles word2_rects = doc2.find(word1.getString());
+			
+			// ignore it if there are too many of the same words
+			if (word2_rects.size() > 5)
+				continue;
+			
+			for (Rectangle word2_rect : word2_rects){
+				
+				if (Math.abs(word2_rect.height - word1_rect.height) > 2)
+					continue;
+					
+				// if doc1 also has the same word at the location the word is on doc2
+				OCRWord ocrword1 = doc1.find(word2_rect);
+				if (ocrword1 != null && ocrword1.getString().compareTo(word1_string)==0)
+					continue;
+				
+				
+				Point word1_loc = word1_rect.getLocation();
+				Point word2_loc = word2_rect.getLocation();
+				
+				// if the movement is too large or small, ignore
+				double distance = word1_loc.distance(word2_loc);
+				if (distance > 300 || distance < 5)
+					continue;
+				
+				//addHighlight(word1_rect);
+				AnnotationRectangle ar = new AnnotationRectangle(word1_rect);
+				ar.setColor(Color.white);
+				ar.setWidth(1.0f);
+				addAnnotation(ar);
+				
+				word1_loc.translate(word1_rect.width/2, word1_rect.height/2);
+				word2_loc.translate(word1_rect.width/2, word1_rect.height/2);
+				addAnnotationArrow(word2_loc, word1_loc, Color.white);
+			}
+			
+			
+		}
+		
+	}
+	
+	public void highlightNewWords(HistoryScreen current_screen, HistoryScreen history_screen) {
 
-		//			OCRDocument doc = HistoryScreenDatabase.getOCRDocument(id);
-		//			OCRDocument doca = HistoryScreenDatabase.getOCRDocument(another.getId());
-		//	
-		//	
-		//	
-		//	
-		//			ArrayList<OCRWord> words = doc.getWords();
-		//			for (OCRWord word : words){
+		OCRDocument doc1 = current_screen.getOCRDocument();
+		OCRDocument doc2 = history_screen.getOCRDocument();
+		
+		ScreenImage history_image = history_screen.createImage();
+		
+		// find words in doc1 but not in doc2
+		ArrayList<OCRWord> words = doc1.getWords();
+		for (OCRWord word1 : words){
+			
+			Rectangle word1_rect = word1.getRectangle();
+			
+			// if the word is also in doc2
+			if (doc2.hasWord(word1.getString())){
+			
+				boolean same_and_similar_location = false;
+				
+				Rectangles word2_rects = doc2.find(word1.getString());
+				for (Rectangle word2_rect : word2_rects){
+					
+					Point word1_loc = word1_rect.getLocation();
+					Point word2_loc = word2_rect.getLocation();
+					
+					// if the distance is too far, it's unlikely the same 
+					// word that was seen
+					double distance = word1_loc.distance(word2_loc);
+					if (distance < 200){
+						same_and_similar_location = true;
+						break;
+					}
+				}
+				
+				if (same_and_similar_location)
+					continue;
+			}
+			
+			// if there is a detected word at the same location whose
+			// size is almost the same
+			OCRWord word2 = doc2.find(word1_rect);
+			if (word2 != null){
+			
+				Rectangle word2_rect = word2.getRectangle();
+				Rectangle r1 = word2_rect.union(word1_rect);
+				Rectangle r2 = word2_rect.intersection(word1_rect);
+				
+//				Rectangle word1_rect);
+				int area1 = r1.height * r1.width;
+				int area2 = r2.height * r2.width;
+//				
+				if (Math.abs(area1 - area2)==0)
+					continue;
+			}
+			
+			// if the image of a word is also in doc2
+			BufferedImage word1_image = crop0(word1_rect).getImage();
+			
+			Rectangle region2_rect = new Rectangle(word1_rect);
+			region2_rect.grow(20, 100);
+			BufferedImage region2_image = history_image.crop0(region2_rect).getImage();
+			
+			ArrayList<Rectangle> matches = Sikuli.find(region2_image, word1_image);
+			if (!matches.isEmpty())
+				continue;
+			
+			
+			word1_rect.grow(5,5);
+			
+			AnnotationHighlight hl = new AnnotationHighlight(this,word1_rect);
+			hl.setBorder(false);
+			
+			addAnnotation(hl);
+		}
+				
+		
 		//	
 		//	
 		//				//			if (word.getWord().length() < 2)
 		//				//				continue;
 		//				//			
 		//				String w = word.getWord();
+			
 		//	
 		//				Rectangle word_rect = word.getRectangle();
 		//				Rectangle word_rect2 = new Rectangle(word_rect);
@@ -534,22 +670,22 @@ public class ScreenImage {
 		addHighlightedRectangles(rects);
 	}
 
-	public static void main(String[] args) throws Exception {
-
-		ScreenImage s = new ScreenImage("screen.png");
-		BufferedImage image = null;
-		try {
-			File sourceimage = new File("apple.png");
-			image = ImageIO.read(sourceimage);    
-			Rectangle r = s.find(image).get(0);
-			System.out.println(r);
-
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-
-
-
-	}
+//	public static void main(String[] args) throws Exception {
+//
+//		ScreenImage s = new ScreenImage("screen.png");
+//		BufferedImage image = null;
+//		try {
+//			File sourceimage = new File("apple.png");
+//			image = ImageIO.read(sourceimage);    
+//			Rectangle r = s.find(image).get(0);
+//			System.out.println(r);
+//
+//		} catch (IOException ioe) {
+//			ioe.printStackTrace();
+//		}
+//
+//
+//
+//	}
 
 }

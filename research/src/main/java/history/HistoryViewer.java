@@ -3,7 +3,6 @@ import history.HistoryScreenDatabase.HistoryScreenIterator;
 import history.OCRDocument.OCRWord;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -35,7 +34,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -79,7 +77,8 @@ public class HistoryViewer extends JPanel {
 		SELECT,
 		READ,
 		ABSTRACT,
-		OCR
+		OCR,
+		DIFF
 	};
 	
 	
@@ -87,7 +86,7 @@ public class HistoryViewer extends JPanel {
 	int history_screen_index = -1;
 	
 
-	Lense virtualPage;
+	Lens virtualPage;
 	
 	ScreenImage present_screen;
 	ScriptEditor trigger_editor;
@@ -110,13 +109,11 @@ public class HistoryViewer extends JPanel {
 
 		createControls();
 			
-		virtualPage = new Lense(new Dimension(963,518), "long.png");
-		virtualPage.setBounds(20,96,959,512);
-		virtualPage.setVisible(false);
-		virtualPage.setFocusable(true);
-		virtualPage.addKeyListener(virtualPage);
 
-		
+
+		virtualPage = new Lens();
+		virtualPage.setVisible(false);
+		virtualPage.setFocusable(true);		
 		layeredPane.add(virtualPage, new Integer(3));	
 				
 	
@@ -131,7 +128,10 @@ public class HistoryViewer extends JPanel {
 		//NavigationIterator iter = HistoryScreenDatabase.getIterator(10);
 		//navigator.setIterator(iter);
 		navigator.setListener(new HistoryScreenNavigationListener());
-		setExample("facebook");		
+		//setExample("facebook");		
+		//setExample("inbox");	
+		setExample("chi");	
+		//doCompareToNow();
 		
 
 		
@@ -422,11 +422,6 @@ public class HistoryViewer extends JPanel {
 		}
 		
 		public void stepForward(){
-			
-//			for (int i=0;i<5;++i){
-//				if (iterator.hasAfter())
-//					iterator.getAfter();
-//			}
 			Object item = iterator.getAfter();
 			listener.itemSelected(item);
 			updateButtons();
@@ -623,14 +618,12 @@ public class HistoryViewer extends JPanel {
 
 	FindBox findBox;
 	
+	static String[] exampleStrings = {"facebook", "chi", "pilyoung","video","live","inbox"};
 	private void createControls(){
 		
 		findBox = new FindBox();
 
-		
-        String[] exampleStrings = { "facebook", "chi", "pilyoung","video","live"};
-        
-        JComboBox exampleList = new JComboBox(exampleStrings);
+		JComboBox exampleList = new JComboBox(exampleStrings);
         exampleList.addActionListener(new ActionListener(){ 
             public void actionPerformed(ActionEvent e) {
                 JComboBox cb = (JComboBox)e.getSource();
@@ -651,44 +644,22 @@ public class HistoryViewer extends JPanel {
 			}			
 		});
 		
-		JButton readBtn = new JButton("Read");
+//		JButton readBtn = new JButton("Read");
+//		readBtn.addActionListener(new ActionListener(){
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				current_mode = Mode.READ;
+//				repaint();
+//			}			
+//		});
+		
+		JButton readBtn = new JButton("Virtual Read");
 		readBtn.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				current_mode = Mode.READ;
-				repaint();
-			}			
-		});
-		
-		JButton vreadBtn = new JButton("Read");
-		vreadBtn.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
+				doVirtualRead();
 
-				if (virtualPage.isVisible()){				
-					virtualPage.setVisible(false);
-				}else{
-					current_mode = Mode.READ;
-
-					BufferedImage tracked = screen.crop(new Rectangle(370,200,200,100));
-					ArrayList<Rectangle> rects = Sikuli.find("long.png", tracked);
-					if (!rects.isEmpty()){
-
-						Rectangle top = rects.get(0);
-						virtualPage.move(top.x-370+20,top.y-200+96+5);
-					}
-
-					virtualPage.setVisible(true);
-					virtualPage.requestFocus();
-
-					Rectangle r = virtualPage.getBounds();
-					r.grow(2,2);
-					r.translate(0,4);
-					//screen.setHighlightRectangle(r);
-					//updateUI();
-				}
-
-				repaint();
+				
 			}			
 		});
 
@@ -736,6 +707,14 @@ public class HistoryViewer extends JPanel {
 			}			
 		});	
 		
+		JButton compareBtn = new JButton("Compare");
+		compareBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doCompareToNow();
+			}			
+		});
+		
 		JRadioButton frameButton = new JRadioButton("Frame");
 	    frameButton.setActionCommand("Frame");
 	    frameButton.setSelected(true);
@@ -778,6 +757,7 @@ public class HistoryViewer extends JPanel {
 		row2.add(timeLabel);
 		row2.add(scriptBtn);
 		row2.add(readBtn);
+		row2.add(compareBtn);
 		row2.add(browseBtn);
 		row2.add(copyBtn);
 		row2.add(filterBtn);
@@ -786,6 +766,84 @@ public class HistoryViewer extends JPanel {
 		row2.add(shotButton);
 		controls.add(row2);
 		
+	}
+
+	private void doVirtualRead() {
+		
+		if (virtualPage.isVisible()){				
+			virtualPage.setVisible(false);
+			return;
+		}
+		
+		selector.start();
+		selector.setListener(new RegionSelectorListener(){
+
+			@Override
+			public void rectangleSelected(Rectangle rectangle) {
+				
+				
+				virtualPage.show(rectangle.getSize(),"long.png");
+				virtualPage.setBounds(rectangle.x, rectangle.y-5, rectangle.width, rectangle.height);
+				
+				Rectangle tracked_rectangle = new Rectangle(150,150);
+				tracked_rectangle.translate(rectangle.x+rectangle.width/2,
+						rectangle.y+rectangle.height/2);
+				
+				current_mode = Mode.READ;
+
+				//BufferedImage tracked = screen.crop(new Rectangle(370,200,200,100));
+				BufferedImage tracked = screen.crop(tracked_rectangle);
+				
+				ArrayList<Rectangle> rects = Sikuli.find("long.png", tracked);
+				if (!rects.isEmpty()){
+
+					Rectangle top = rects.get(0);
+					
+					int vx = top.x-tracked_rectangle.x+rectangle.x;
+					int vy = top.y-tracked_rectangle.y+rectangle.y;
+					
+					//virtualPage.move(top.x-370+20,top.y-200+96+5);
+					//virtualPage.move(0,0);//vx,vy);
+					//virtualPage.move(top.x,top.y);
+					virtualPage.move(vx,vy);
+				}
+
+				virtualPage.setVisible(true);
+				virtualPage.requestFocus();
+				virtualPage.addKeyListener(virtualPage);
+
+				//Rectangle r = virtualPage.getBounds();
+				//r.grow(2,2);
+				//r.translate(0,4);
+				//screen.setHighlightRectangle(r);
+				//updateUI();
+
+
+				repaint();	
+				
+			}
+			
+		});
+		
+		
+		
+		
+		
+	}
+
+	protected void doCompareToNow() {
+		HistoryScreen current_screen = HistoryScreenDatabase.getMostRecent();
+		current_mode = Mode.DIFF;
+		
+		
+		screen = current_screen.createImage();
+		//screen.highlightAllWords();
+		
+		screen.drawWordMovements(current_screen, history_screen);
+		screen.highlightNewWords(current_screen, history_screen);
+		
+		repaint();
+		//setHistoryScreen(current_screen);
 	}
 
 	protected void setExample(String exampleName) {
@@ -811,7 +869,7 @@ public class HistoryViewer extends JPanel {
 			HistoryScreenDatabase.load(exampleName,30);
 			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
 			navigator.setIterator(iter);
-			navigator.jump(15);
+			navigator.jump(10);
 		}	
 		else if (exampleName == "video"){
 			HistoryScreenDatabase.load(exampleName,15);
@@ -819,6 +877,12 @@ public class HistoryViewer extends JPanel {
 			navigator.setIterator(iter);
 			navigator.jump(13);
 		}	
+		else if (exampleName == "inbox"){
+			HistoryScreenDatabase.load(exampleName,46);
+			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
+			navigator.setIterator(iter);
+			navigator.jump(40);
+		}
 
 	}
 
@@ -882,63 +946,6 @@ public class HistoryViewer extends JPanel {
 	    controls.addMouseListener(mml);
 	    controls.addMouseMotionListener(mml);
 	}
-	
-	class MoveMouseListener implements MouseListener, MouseMotionListener {
-		  JComponent target;
-		  Point start_drag;
-		  Point start_loc;
-
-		  public MoveMouseListener(JComponent target) {
-		    this.target = target;
-		  }
-
-		  public JFrame getFrame(Container target) {
-		    if (target instanceof JFrame) {
-		      return (JFrame) target;
-		    }
-		    return getFrame(target.getParent());
-		  }
-
-		  Point getScreenLocation(MouseEvent e) {
-		    Point cursor = e.getPoint();
-		    Point target_location = this.target.getLocationOnScreen();
-		    return new Point((int) (target_location.getX() + cursor.getX()),
-		        (int) (target_location.getY() + cursor.getY()));
-		  }
-
-		  public void mouseClicked(MouseEvent e) {
-		  }
-
-		  public void mouseEntered(MouseEvent e) {
-		  }
-
-		  public void mouseExited(MouseEvent e) {
-		  }
-
-		  public void mousePressed(MouseEvent e) {
-		    this.start_drag = this.getScreenLocation(e);
-		    this.start_loc = this.getFrame(this.target).getLocation();
-		  }
-
-		  public void mouseReleased(MouseEvent e) {
-		  }
-
-		  public void mouseDragged(MouseEvent e) {
-		    Point current = this.getScreenLocation(e);
-		    Point offset = new Point((int) current.getX() - (int) start_drag.getX(),
-		        (int) current.getY() - (int) start_drag.getY());
-		    JFrame frame = this.getFrame(target);
-		    Point new_location = new Point(
-		        (int) (this.start_loc.getX() + offset.getX()), (int) (this.start_loc
-		            .getY() + offset.getY()));
-		    frame.setLocation(new_location);
-		  }
-
-		  public void mouseMoved(MouseEvent e) {
-		  }
-		}
-
-	
 	
 	private void showMatchViewer(FindResult find_result){
 
@@ -1138,9 +1145,12 @@ public class HistoryViewer extends JPanel {
 		
 		super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        screen.paintHelper(g, current_mode);
-       
-		controlsFrame.pack();
+        
+        if (screen != null)
+        	screen.paintHelper(g, current_mode);
+
+        if (controlsFrame != null)
+        	controlsFrame.pack();
     }
 	
     public static void main(String[] args) {
