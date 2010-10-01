@@ -623,7 +623,7 @@ public class HistoryViewer extends JPanel {
 
 	FindBox findBox;
 	
-	static String[] exampleStrings = {"facebook", "chi", "pilyoung","video","live","inbox"};
+	static String[] exampleStrings = {"facebook", "chi", "pilyoung","video","live","inbox","login"};
 	private void createControls(){
 		
 		findBox = new FindBox();
@@ -887,6 +887,12 @@ public class HistoryViewer extends JPanel {
 			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
 			navigator.setIterator(iter);
 			navigator.jump(40);
+		}
+		else if (exampleName == "login"){
+			HistoryScreenDatabase.load(exampleName,10);
+			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
+			navigator.setIterator(iter);
+			navigator.jump(2);
 		}
 
 	}

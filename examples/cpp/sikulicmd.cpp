@@ -93,6 +93,8 @@ int index_main(int argc, const char* argv[]){
    
    for (int i=0;i<n;++i){
       sprintf(filename, "%s/screen%d.png", inputdir, i);
+      cout << "indexing " << filename << endl;
+      
       db.insert_file(filename, i);
    }
       
@@ -132,6 +134,66 @@ int query_main(int argc, const char* argv[]){
    return 1;
 }
 
+int compare_main(int argc, const char* argv[]){
+   if (argc < 3)
+      return -1;
+   
+   const char* image1_filename = argv[1];   
+   const char* image2_filename = argv[2];
+      
+   Mat image1 = imread(image1_filename,1);
+   Mat image2 = imread(image2_filename,1);
+   
+   double score = Vision::compare(image1,image2);
+   
+   cout << score << endl;
+   
+   return 1;
+}
+
+#include "sikuli.h"
+int capture_main(int argc, const char* argv[]){
+   if (argc < 2)
+      return -1;
+   
+   sikuli::Screen screen;
+   
+   const char* outputdir = argv[1];   
+   
+   char buf[200];
+   int i=0;
+   while (true){
+      
+      cout << "capturing frame no. " << i << endl;
+      
+      ScreenImage image = screen.capture();
+      
+      sprintf(buf,"%s/screen%d.png", outputdir, i);
+      image.save(buf);
+      
+      OCRText text = OCR::recognize_screenshot(buf);      
+      
+      sprintf(buf,"%s/screen%d.png.ocr.txt", outputdir, i);
+      text.save(buf);
+      
+      sprintf(buf,"%s/screen%d.png.ocr.loc", outputdir, i);
+      text.save_with_location(buf);
+      
+      sprintf(buf,"%s/screen%d.png.ui.txt", outputdir, i);
+      ofstream of1(buf);
+      of1.close();
+      
+      sprintf(buf,"%s/screen%d.png.ui.loc", outputdir, i);
+      ofstream of2(buf);
+      of2.close();
+      
+      
+      i++;
+   }
+   
+   return 1;
+}
+
 
 int main(int argc, const char* argv[]){
    
@@ -154,6 +216,12 @@ int main(int argc, const char* argv[]){
    
    else if (strcmp(command, "QUERY") == 0)
       return query_main(argc-1, argv+1);
+   
+   else if (strcmp(command, "COMPARE") == 0)
+      return compare_main(argc-1, argv+1);
+   
+   else if (strcmp(command, "CAPTURE") == 0)
+      return capture_main(argc-1, argv+1);
    
    return 0;
 }

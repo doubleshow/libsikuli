@@ -108,8 +108,7 @@ Vision::compare(Mat im1, Mat im2){
    Mat diff1;
    absdiff(gray1,gray2,diff1);
    
-   typedef float T;
-   
+   typedef uchar T;
    Size size = diff1.size();
    
    int diff_cnt = 0;
@@ -122,7 +121,6 @@ Vision::compare(Mat im1, Mat im2){
             diff_cnt++;
       }
    }
-   
    
    // ratio of pixels that are different
    double score = 1.0 * diff_cnt / (im1.rows * im1.cols);

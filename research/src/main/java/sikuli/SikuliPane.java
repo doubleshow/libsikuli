@@ -264,7 +264,7 @@ public class SikuliPane extends JTextPane implements KeyListener,
 	   return "";
    }
 
-   private void saveAsBundle(String bundlePath) throws IOException{
+   public void saveAsBundle(String bundlePath) throws IOException{
       bundlePath = Utils.slashify(bundlePath, true);
       if(_srcBundlePath != null)
          Utils.xcopy( _srcBundlePath, bundlePath );
@@ -273,7 +273,7 @@ public class SikuliPane extends JTextPane implements KeyListener,
       _srcBundlePath = bundlePath;
       _editingFilename = getSourceFilename(bundlePath);
       Debug.log(1, "save to bundle: " + _srcBundlePath);
-      writeSrcFile(true);
+      writeSrcFile(false);
    }
    
    private String getSourceFilename(String filename){

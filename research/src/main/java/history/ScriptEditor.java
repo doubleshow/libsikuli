@@ -48,20 +48,27 @@ public class ScriptEditor extends JFrame{
 		
 		
 		
-		double scale = 0.5;
-	      BufferedImageOp op = new AffineTransformOp(
-	              AffineTransform.getScaleInstance(scale, scale),
-	              new RenderingHints(RenderingHints.KEY_INTERPOLATION,
-	                                 RenderingHints.VALUE_INTERPOLATION_BICUBIC));
-	      BufferedImage scaled_target_image = op.filter(target_image, null);
-
-	    
+//		double scale = 0.5;
+//	      BufferedImageOp op = new AffineTransformOp(
+//	              AffineTransform.getScaleInstance(scale, scale),
+//	              new RenderingHints(RenderingHints.KEY_INTERPOLATION,
+//	                                 RenderingHints.VALUE_INTERPOLATION_BICUBIC));
+//	      BufferedImage scaled_target_image = op.filter(target_image, null);
+//
+//	    
 
 		AutoResize ar = new AutoResize(target_image);
 		ar.setPreferredSize(new Dimension(200,200));
 		ar.setAlignmentX(LEFT_ALIGNMENT);		
 		left.add(ar);
 		left.setAlignmentY(TOP_ALIGNMENT);
+		
+		File target_image_file = new File("sikulitest.sikuli/target.png");
+		try {
+			ImageIO.write(target_image, "png", target_image_file);
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
 		
 		
 		JPanel right = new JPanel();
@@ -95,7 +102,7 @@ public class ScriptEditor extends JFrame{
 		saveBtn.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				dispose();
+				doSave();
 			}
 		});
 		
@@ -136,13 +143,30 @@ public class ScriptEditor extends JFrame{
 	}
 	
 	
+	protected void doSave() {
+		try {
+			sikuli_pane.saveAsBundle("sikulitest.sikuli");
+			
+			String command = "python monitor.py";
+			//System.out.println(command);
+			File dir = new File("sikulitest.sikuli");
+			Process p = Runtime.getRuntime().exec(command,null,dir);
+			
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		dispose();
+	}
+
+
 	public void insertImage(BufferedImage image){
 		
 		try {
 
         	File f;
-			f = File.createTempFile("target", ".png");
-			f.deleteOnExit(); 
+        	File curdir = new File("sikulitest.sikuli");
+			f = File.createTempFile("target", ".png",curdir);
+			//f.deleteOnExit(); 
 			ImageIO.write(image, "png", f);
 			sikuli_pane.insertComponent(new ImageButton(sikuli_pane, f.getPath()));
 			sikuli_pane.requestFocus();

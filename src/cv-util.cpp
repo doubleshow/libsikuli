@@ -73,7 +73,28 @@ void imshowDebugZoom(const char* name, Mat& m, bool  pause){
 		waitKey();	
 }
 
-
+void 
+putTextWithBackgroundCentered(Scalar fillColor, Mat& img, const string text, Point org, int fontFace, 
+                      double fontScale, Scalar color, int thickness, 
+                      int linetype, bool bottomLeftOrigin){
+   
+   // determine the region the text would occupy
+   // so we can draw a solid background for the
+   // text
+   int baseline = 0;
+   Size textSize = getTextSize(text.c_str(), 
+                               fontFace,
+                               fontScale, thickness, &baseline);    
+   
+   //org = org + Point(-textSize.width/2,baseline);
+   rectangle(img, 
+             org+Point(-textSize.width/2,baseline+textSize.height/2),
+             org+Point(textSize.width/2, -textSize.height+textSize.height/2),
+             fillColor, CV_FILLED);
+   
+   putText(img,text,org+Point(-textSize.width/2,textSize.height/2),
+           fontFace,fontScale,color,thickness,linetype,bottomLeftOrigin);
+}
 
 void 
 putTextWithBackground(Scalar fillColor, Mat& img, const string text, Point org, int fontFace, 

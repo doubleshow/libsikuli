@@ -33,6 +33,12 @@ putTextWithBackground(Scalar fillColor, Mat& img, const string text, Point org, 
                       double fontScale, Scalar color, int thickness=1, 
                       int linetype=8, bool bottomLeftOrigin=false);
 
+void 
+putTextWithBackgroundCentered(Scalar fillColor, Mat& img, const string text, Point org, int fontFace, 
+                      double fontScale, Scalar color, int thickness=1, 
+                      int linetype=8, bool bottomLeftOrigin=false);
+
+
 void draw_rectangle(Mat& img, Rect& rect, Scalar color = Scalar(0,0,255));
 
 void imshowCompare(const Mat& m1, const Mat& m2, bool pause = true);
