@@ -20,6 +20,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
@@ -116,45 +118,15 @@ public class HistoryViewer extends JPanel {
 		virtualPage.setFocusable(true);		
 		layeredPane.add(virtualPage, new Integer(3));	
 				
-	
-		//testDiff();
-		//testMove();
-		//testPilyoung();
-		
-		
-		
-		current_mode = Mode.BROWSE;
-		//NavigationIterator iter = HistoryScreenDatabase.getIterator(800);
-		//NavigationIterator iter = HistoryScreenDatabase.getIterator(10);
-		//navigator.setIterator(iter);
-		navigator.setListener(new HistoryScreenNavigationListener());
-		//setExample("facebook");		
-		//setExample("inbox");	
-		setExample("chi");	
-		//doCompareToNow();
-		
-
-		
-		//navigator.
-		//setHistoryScreen((HistoryScreen)iter.getCurrent());
-		
-		
-//		
-//		
-//		if (false){
-		
-//		current_mode = Mode.FIND;
-//		//input_query_string.setText("deadline");
-//		//find_result = new FindResult("deadline");		
-//		find_result = FindResult.createMockResult();
-//		setHistoryScreen(find_result.getMostRecent());	
-//		navigator.setIterator(find_result);
-		
-		//}
-		
-		
-	
 		selector = new RegionSelector();
+	
+		current_mode = Mode.BROWSE;
+		navigator.setListener(new HistoryScreenNavigationListener());
+
+		setExample("facebook");		
+		//setExample("inbox");	
+		//setExample("chi");	
+		
 		
 		
 	}
@@ -499,15 +471,45 @@ public class HistoryViewer extends JPanel {
 		});	
 	}
 	
+	
+	class QueryImageFrame extends JFrame{
+		
+		public QueryImageFrame(BufferedImage newimg){
+			ImageIcon imgicn = new ImageIcon(newimg);
+			JLabel imglbl = new JLabel(imgicn);
+			add(imglbl);
+			setVisible(true);
+			setLocationRelativeTo(controls);
+			setTitle("Image query");
+			pack();
+			
+			
+	        addWindowListener(new WindowAdapter() {
+	            public void windowClosing(WindowEvent ev) {
+	                findBox.removeQueryImage();
+	            }
+	        });
+		}
+		
+	}
+	
+	QueryImageFrame queryImageFrame = null;
 	private void doCaptureQueryImage(){
 
+		if (queryImageFrame != null)
+			queryImageFrame.dispose();
+		
 		selector.start();
 		selector.setListener(new RegionSelectorListener(){
 			
 			@Override
 			public void rectangleSelected(Rectangle rectangle) {
+				screen.clear();
+				
 				BufferedImage newimg = screen.crop(rectangle);
-				findBox.setImage(newimg);			
+				
+				queryImageFrame = new QueryImageFrame(newimg);		
+				findBox.setQueryImage(newimg);			
 				current_mode = Mode.BROWSE;
 			}			
 			
@@ -559,13 +561,16 @@ public class HistoryViewer extends JPanel {
 		JButton searchBtn;
 		JButton captureBtn;
 		
-		AutoResize imagePanel;
+		BufferedImage queryImage;
 		
-		public void setImage(BufferedImage image){
-			imagePanel.setImage(image);
-			updateUI();
+		public void setQueryImage(BufferedImage image){
+			queryImage = image;
 		}
 		
+		public void removeQueryImage() {
+			queryImage = null;
+		}
+
 		public FindBox(){
 			super(BoxLayout.X_AXIS);
 			
@@ -593,10 +598,10 @@ public class HistoryViewer extends JPanel {
 			add(captureBtn);
 			
 			
-			imagePanel = new AutoResize(null);
-			imagePanel.setMaximumSize(new Dimension(200,20));
-			imagePanel.setPreferredSize(new Dimension(200,20));
-			
+//			queryImage = new AutoResize(null);
+//			queryImage.setMaximumSize(new Dimension(200,20));
+//			queryImage.setPreferredSize(new Dimension(200,20));
+//			
 			//add(imagePanel);
 			add(Box.createHorizontalGlue());
 			
@@ -611,7 +616,7 @@ public class HistoryViewer extends JPanel {
 		}
 		
 		public BufferedImage getQueryImage(){
-			return imagePanel.getImage();
+			return queryImage;
 		}
 		
 	}

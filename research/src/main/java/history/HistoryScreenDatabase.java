@@ -72,8 +72,10 @@ public class HistoryScreenDatabase{
 //
 //	}
 
+	static private String example_name;
 	static private String index_path;
 	static public void load(String name){
+		example_name = name;
 		String root = "captured/" + name;
 
 		File f1=new File(root);
@@ -98,6 +100,7 @@ public class HistoryScreenDatabase{
 	
 	static public void load(String name, int n, boolean rebuild_index){
 		String root = "captured/" + name;
+		example_name = name;
 		
 		filenames.clear();
 		history_screens.clear();
@@ -383,5 +386,8 @@ public class HistoryScreenDatabase{
 		//HistoryScreenDatabase.find("vancouver && conference");
 		HistoryScreenDatabase.find("ui64 AND volunteers");
 	    
+	}
+	public static String getSikuliIndexFilename() {
+		return "captured/" + example_name + ".index";
 	}
 }

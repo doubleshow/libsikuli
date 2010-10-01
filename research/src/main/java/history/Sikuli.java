@@ -101,7 +101,9 @@ public class Sikuli {
 			//File  f = new File("tmpocr.png");
 			ImageIO.write(ui_image, "png", f);
 
-			String command = "./sikulicmd QUERY pilyoung.index " + f.getPath();
+			String index_filename = HistoryScreenDatabase.getSikuliIndexFilename();
+			
+			String command = "./sikulicmd QUERY " + index_filename + " " + f.getPath();
 			System.out.println(command);
 			Process p = Runtime.getRuntime().exec(command);
 
