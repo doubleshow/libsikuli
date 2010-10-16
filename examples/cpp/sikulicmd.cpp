@@ -7,9 +7,42 @@
  *
  */
 
-#include "myocr.h"
-#include "ocr.h"
+#include "tessocr.h"
+#include "sikuli.h"
+#include "imgdb.h"
 
+#include <stdio.h>
+
+#define MAXLEN 80
+
+using namespace sikuli;
+int prefix_main(int argc, const char* argv[]){
+   
+   
+//   Screen s;
+//   s.capture();
+//   ScreenImage image = s.capture();
+//   OCR::find_word(image.getMat(),"namedWindow");
+//   ScreenImage image = s.capture();
+   Mat screen = imread("screen.png");
+   //OCR::find_word(screen,"Keyboard");
+   
+   //
+//   vector<string> phrase;
+//   phrase.push_back("System");
+//   phrase.push_back("Preferences");
+//
+//   
+   
+   vector<string> phrase;
+   phrase.push_back("Software");
+   phrase.push_back("Update");   
+   OCR::find_phrase(screen,phrase);
+   
+   
+   return 0;
+   
+}
 
 int ocr_main(int argc, const char* argv[]){
    const char* filename = argv[1];
@@ -59,12 +92,12 @@ int ocrdir_main(int argc, const char* argv[]){
 #include "vision.h"
 using namespace sikuli;
 int match_main(int argc, const char* argv[]){
-   
-   ScreenImage screen(argv[1]);
-   Pattern ptn(argv[2]);
-   
+     
    vector<FindResult> results;
-   results = Vision::find(screen, ptn.all());
+   
+   FindInput input(argv[1],argv[2]);
+   input.setFindAll(true);
+   results = Vision::find(input);
    
    for (vector<FindResult>::iterator r = results.begin(); 
         r != results.end(); ++r){
@@ -151,7 +184,7 @@ int compare_main(int argc, const char* argv[]){
    return 1;
 }
 
-#include "sikuli.h"
+
 int capture_main(int argc, const char* argv[]){
    if (argc < 2)
       return -1;
@@ -222,6 +255,10 @@ int main(int argc, const char* argv[]){
    
    else if (strcmp(command, "CAPTURE") == 0)
       return capture_main(argc-1, argv+1);
+   
+   else if (strcmp(command, "PREFIX") == 0)
+      return prefix_main(argc-1, argv+1);
+  
    
    return 0;
 }

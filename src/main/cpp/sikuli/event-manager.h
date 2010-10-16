@@ -1,14 +1,7 @@
 #ifndef _EVENT_MANAGER_
 #define _EVENT_MANAGER_
 
-#ifdef OPENCV_NEW
-	#include "opencv2/opencv.hpp"
-#else
-	#include "cv.h"
-	#include "cxcore.h"
-	#include "highgui.h"
-#endif
-
+#include "opencv.hpp"
 #include <vector>
 
 #include "pattern.h"

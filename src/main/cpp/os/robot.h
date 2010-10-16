@@ -9,16 +9,9 @@
 #ifndef _SIKULI_ROBOT_
 #define _SIKULI_ROBOT_
 
-#include "config.h"
 #include <string>
 
-#ifdef OPENCV_NEW
-	#include "opencv.hpp"
-#else
-	#include "cv.h"
-	#include "cxcore.h"
-	#include "highgui.h"
-#endif
+#include <opencv.hpp>
 
 using namespace std;
 

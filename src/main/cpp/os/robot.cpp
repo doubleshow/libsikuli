@@ -856,7 +856,7 @@ Robot::getTopWindowBounds(int& x, int& y, int& w, int& h){
 
 using namespace cv;
 
-#include "glgrab.h"
+//#include "glgrab.h"
 
 Mat
 Robot::capture(int screen){
@@ -1000,11 +1000,11 @@ inspect(AXUIElementRef elementRef, int depth){
 void
 Robot::openApp(const char* appname){
    
-   AXUIElementRef _systemWideElement;
-   if(!AXAPIEnabled()){
-      //exit
-   }
-   AXUIElementRef _focusedApp;
+//   AXUIElementRef _systemWideElement;
+//   if(!AXAPIEnabled()){
+//      //exit
+//   }
+//   AXUIElementRef _focusedApp;
 //   CFTypeRef _focusedWindow;
 //   _systemWideElement = AXUIElementCreateSystemWide();
 //   AXError err0 = AXUIElementCopyAttributeValue(_systemWideElement,
@@ -1014,11 +1014,11 @@ Robot::openApp(const char* appname){
 //                                 (CFStringRef)kAXFocusedWindowAttribute,(CFTypeRef*)&_focusedWindow);
 
    //AXUIElementRef elementRef = AXUIElementCreateApplication(52230);
-   AXUIElementRef elementRef = AXUIElementCreateApplication(19358);
-
-   
-   
-   inspect(elementRef, 0);
+//   AXUIElementRef elementRef = AXUIElementCreateApplication(19358);
+//
+//   
+//   
+//   inspect(elementRef, 0);
 //   
 //   AXError err0;
 //   

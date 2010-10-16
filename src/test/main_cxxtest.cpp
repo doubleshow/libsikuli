@@ -13,7 +13,7 @@
 int main() {
 
    //CxxTest::leaveOnly("CoreTestSuite","testPageUpDown");
-   CxxTest::leaveOnly("CoreTestSuite","testAXAPI");
+   //CxxTest::leaveOnly("CoreTestSuite","testAXAPI");
    //CxxTest::leaveOnly("CoreTestSuite","testGetMouseLocation");
    //CxxTest::leaveOnly("CoreTestSuite","testCapture");
    
@@ -28,8 +28,10 @@ int main() {
 	//CxxTest::leaveOnly("FlashTestSuite","testType");
 	//CxxTest::leaveOnly("FlashTestSuite","testKeys");
 	//CxxTest::leaveOnly("FlashTestSuite","testPaste");
+	CxxTest::leaveOnly("FlashTestSuite","testOCR");
+
    
-  //CxxTest::leaveOnly("FlashTestSuite");
+   //CxxTest::leaveOnly("FlashTestSuite");
    //CxxTest::leaveOnly("CoreTestSuite","");
    return CxxTest::StdioPrinter().run();
 }

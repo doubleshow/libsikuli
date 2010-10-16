@@ -1513,42 +1513,43 @@ bool
 recognize_word_by_tesseract(const Mat& inputImageGray, 
                             const WordRect& wordRect,
                             string &result){
-   result = "";
-   
-   Mat wordImage(inputImageGray, wordRect);
-   
-   
-   
-   Mat ocrImage;  // the image passed to tesseract
-   
-   bool upsampled = false;
-   if (wordRect.height < 20){
-      upsampled = true;
-      resize(wordImage, ocrImage, Size(wordImage.cols*2,wordImage.rows*2));
-   }else{
-      ocrImage = wordImage.clone();
-   }  
-   
-   OCRResult ocr_result = OCR::recognize((unsigned char*)ocrImage.data,
-                                         ocrImage.cols,
-                                         ocrImage.rows,
-                                         8); 
-   
-   for (OCRResult::Iterator iter = ocr_result.begin(); iter != ocr_result.end(); iter++){
+   //result = "";
+//   
+//   Mat wordImage(inputImageGray, wordRect);
+//   
+//   
+//   
+//   Mat ocrImage;  // the image passed to tesseract
+//   
+//   bool upsampled = false;
+//   if (wordRect.height < 20){
+//      upsampled = true;
+//      resize(wordImage, ocrImage, Size(wordImage.cols*2,wordImage.rows*2));
+//   }else{
+//      ocrImage = wordImage.clone();
+//   }  
+//   
+//   OCRResult ocr_result = OCR::recognize((unsigned char*)ocrImage.data,
+//                                         ocrImage.cols,
+//                                         ocrImage.rows,
+//                                         8); 
+//   
+//   for (OCRResult::Iterator iter = ocr_result.begin(); iter != ocr_result.end(); iter++){
+//
+//      if (upsampled){
+//         // scale back the coordinates in the OCR result
+//
+//         iter->x = iter->x/2;
+//         iter->y = iter->y/2;
+//         iter->width = iter->width/2;
+//         iter->height = iter->height/2;
+//      }
+//      
+//      result += iter->ch;
+//   }
 
-      if (upsampled){
-         // scale back the coordinates in the OCR result
-
-         iter->x0 = iter->x0/2;
-         iter->y0 = iter->y0/2;
-         iter->x1 = iter->x1/2;
-         iter->y1 = iter->y1/2;
-      }
-      
-      result += iter->ch;
-   }
-
-   return ocr_result.isValidWord();
+//   return ocr_result.isValidWord();
+   return false;
 }
 
 Mat visualize_ocr_result(const Mat& inputImage, 

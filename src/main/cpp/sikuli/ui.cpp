@@ -48,7 +48,8 @@ SikuliUI::handleMatchFound(Region region, Pattern target, vector<Match> matches)
    for (int i=0;i <n; ++i){ 
       Match& match = matches[i];
       if (i<5)
-         cout << '\t' << i+1 << ": (" << match.x << "," << match.y << "), score = " << match.getScore()  << endl;
+         cout << '\t' << i+1 << ": (" << match.x << "," << match.y << "," << match.w << "," << match.h <<
+         "), score = " << match.getScore()  << endl;
       else if (i==5) 
          cout << '\t' << "... more" << endl;
    }

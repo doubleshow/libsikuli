@@ -9,20 +9,12 @@
 #ifndef _PYRAMID_TEMPLATE_MATCHER_
 #define _PYRAMID_TEMPLATE_MATCHER_
 
-#include "config.h"
-
 #include <stdio.h>
 #include <iostream>
 
-#ifdef OPENCV_NEW
-	#include "opencv.hpp"
-#else
-	#include "cv.h"
-	#include "cxcore.h"
-	#include "highgui.h"
-#endif
 
-#include "result.h"
+#include "opencv.hpp"
+#include "find-result.h"
 
 using namespace cv;
 using namespace std;

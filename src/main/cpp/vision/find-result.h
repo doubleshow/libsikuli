@@ -1,5 +1,5 @@
 /*
- *  result.h
+ *  find-result.h
  *  sikuli
  *
  *  Created by Tom Yeh on 8/1/10.

@@ -489,7 +489,7 @@ ChangeFinder::next(){
 
 
 //=====================================================================================
-#include "ocr.h"
+#include "tessocr.h"
 
 TextFinder::TextFinder(Mat inputImage)
 : BaseFinder(inputImage){
@@ -497,7 +497,7 @@ TextFinder::TextFinder(Mat inputImage)
 
 void
 TextFinder::train(Mat& trainingImage){	
-	train_by_image(trainingImage);
+//	train_by_image(trainingImage);
 }
 
 
@@ -536,7 +536,7 @@ TextFinder::find(vector<string> words, double _min_similarity){
    this->min_similarity = _min_similarity;
    BaseFinder::find();
 	TimingBlock tb("TextFinder::find");
-	matches = find_phrase(roiSource, words);
+	matches = OCR::find_phrase(roiSource, words);
    matches_iterator = matches.begin();   
 }
 
@@ -565,7 +565,7 @@ TextFinder::next(){
 
 vector<string>
 TextFinder::recognize(const Mat& inputImage){	
-	return recognize_words(inputImage);
+	return vector<string>();//recognize_words(inputImage);
 }
 
 

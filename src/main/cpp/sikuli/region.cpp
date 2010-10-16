@@ -575,6 +575,21 @@ Region::doFind_callback(Pattern target, vector<Match>& matches){
    return !matches.empty();
 }
 
+
+
+static bool sort_by_y_asc(const FindResult& r1, const FindResult& r2){
+   return r1.y < r2.y;
+}
+static bool sort_by_y_dsc(const FindResult& r1, const FindResult& r2){
+   return r1.y > r2.y;
+}
+static bool sort_by_x_asc(const FindResult& r1, const FindResult& r2){
+   return r1.x < r2.x;
+}
+static bool sort_by_x_dsc(const FindResult& r1, const FindResult& r2){
+   return r1.x > r2.x;
+}
+
 vector<Match>
 Region::doFind(Pattern target) {
 
@@ -583,11 +598,55 @@ Region::doFind(Pattern target) {
   
    ScreenImage simg = capture();
 
-	//namedWindow("Test");
-	//imshow("Test",simg.getMat());
-	//waitKey();
+   FindInput* fi;
+   
+   if (target.isText())
+      fi = new FindInput(simg.getMat(), target.getText(), true);
+   else
+      fi = new FindInput(simg.getMat(), target.getImageURL());   
+      
 
-   vector<FindResult> results = Vision::find(simg, target);
+   FindInput& input = *fi;   
+   input.setFindAll(target.bAll());
+   input.setLimit(target.getLimit());
+   input.setSimilarity(target.getSimilarity());
+   
+   
+  if (!target.bAll() && target.where() != ANYWHERE){
+     input.setFindAll(true);
+  }
+   
+   vector<FindResult> results = Vision::find(input);
+   delete fi;
+   
+            
+   if (target.getOrdering() == TOPDOWN){
+      sort(results.begin(), results.end(), sort_by_y_asc);
+   }else if (target.getOrdering() == BOTTOMUP){
+      sort(results.begin(), results.end(), sort_by_y_dsc);
+   }else if (target.getOrdering() == LEFTRIGHT){
+      sort(results.begin(), results.end(), sort_by_x_asc);
+   }else if (target.getOrdering() == RIGHTLEFT){
+      sort(results.begin(), results.end(), sort_by_x_dsc);
+   }
+   
+   if (!target.bAll() && target.where() != ANYWHERE){   
+         if (!results.empty()){
+            // Filter Results
+            FindResult r = results[0];
+            for (int i=1; i<results.size(); ++i){
+               FindResult& ri = results[i];
+               if ((target.where() == TOPMOST && ri.y < r.y) ||
+                   (target.where() == BOTTOMMOST && ri.y > r.y) ||
+                   (target.where() == LEFTMOST && ri.x < r.x) ||
+                   (target.where() == RIGHTMOST && ri.x > r.x))
+                  r = ri;
+            }
+            
+            results.clear();
+            results.push_back(r);
+         }
+   }   
    
    vector<Match> matches;
    int n = min((int)results.size(), (int)target.getLimit());

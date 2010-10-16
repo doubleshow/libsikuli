@@ -1,0 +1,145 @@
+/*
+ *  cvgui.h
+ *  sikuli
+ *
+ *  Created by Tom Yeh on 9/8/10.
+ *  Copyright 2010 sikuli.org. All rights reserved.
+ *
+ */
+#ifndef _CVGUI_H_
+#define _CVGUI_H_
+
+#include "opencv.hpp"
+#include <iostream>
+#include "tessocr.h"
+
+using namespace cv;
+
+class Blob : public Rect{
+   
+public:
+
+   Blob(){};
+   
+   Blob(const Rect& rect){
+      x = rect.x;
+      y = rect.y;
+      height = rect.height;
+      width = rect.width;
+      area = 0;
+   }
+   
+   bool isContainedBy(Blob& b){
+      return x >= b.x && y >= b.y && (x+width) <= (b.x+b.width) && (y+height) <= (b.y+b.height);
+   }
+   
+   double area;
+   int mb;
+   int mg;
+   int mr;
+};
+
+
+class LineBlob : public Blob{
+  
+public:
+   
+   LineBlob() {};
+      
+   void add(Blob& blob);
+   void merge(LineBlob& blob);
+   
+   void calculateBoundingRectangle();   
+   vector<Blob> blobs;
+
+protected:
+   
+   void updateBoundingRect(Blob& blob);
+
+};
+
+
+class ParagraphBlob : public LineBlob {
+   
+public:   
+   void add(LineBlob& lineblob);
+   vector<LineBlob> lineblobs;
+};
+
+
+class Painter {
+
+public:
+   
+   static void drawRect(Mat& image, Rect r, Scalar color);
+   static void drawRects(Mat& image, vector<Rect>& rects, Scalar color);
+   static void drawRects(Mat& image, vector<Rect>& rects);
+  
+   static void drawBlobs(Mat& image, vector<Blob>& blobs, Scalar color);
+   static void drawLineBlobs(Mat& image, vector<LineBlob>& lineblobs, Scalar color);
+   static void drawParagraphBlobs(Mat& image, vector<ParagraphBlob> blobs, Scalar color);
+  
+   
+   static void drawOCRWord(Mat& image, OCRWord& ocrword);
+   static void drawOCRWords(Mat& image, vector<OCRWord>& ocrwords);
+   static void drawOCRLines(Mat& image, vector<OCRLine>& ocrlines);
+   
+};
+
+class Util{
+  
+public:
+   
+   static void growRect(Rect& rect, int xd, int yd, Rect bounds); 
+   static void growRect(Rect& rect, int xd, int yd, cv::Mat image);
+   static void rgb2grayC3(const Mat& input, Mat& output);
+   
+};
+
+class cvgui {
+   
+public:
+   
+   static void segmentScreenshot(const Mat& screen, vector<Blob>& text_blobs, vector<Blob>& image_blobs);
+   static void getLineBlobsAsIndividualWords(const Mat& screen, vector<LineBlob>& lineblobs);
+   static void getParagraphBlobs(const Mat& screen, vector<ParagraphBlob>& parablobs);
+   
+private:
+   
+   static void computeUnitBlobs(const Mat& input, Mat& output);
+   
+   static Mat removeGrayBackground(const Mat& input);
+   static Mat obtainGrayBackgroundMask(const Mat& input);
+
+   static void findLongLines(const Mat& binary, Mat& dest);
+   static void findLongLines_Horizontal(const Mat& binary, Mat& dest);
+   
+   static void extractRects(const Mat& src, vector<Rect>& rects);
+   static void extractBlobs(const Mat& src, vector<Blob>& blobs);
+
+   
+   
+   static void extractSmallRects(const Mat& src, vector<Rect>& rects);
+
+   
+   static bool hasMoreThanNUniqueColors(const Mat& src, int n);
+   static bool areHorizontallyAligned(const vector<Rect>& rects);
+   
+   
+   // linking
+   static void linkLineBlobsIntoPagagraphBlobs(vector<LineBlob>& blobs, vector<ParagraphBlob>& parablobs);
+   static void mergeLineBlobs(vector<LineBlob>& blobs, vector<LineBlob>& merged_blobs);
+   static void linkBlobsIntoLineBlobs(vector<Blob>& blobs, vector<LineBlob>& lines, int max_spacing = 8);
+   
+   static void run_ocr_on_lineblobs(vector<LineBlob>& ocr_input_lineblobs,
+                                    Mat& input_image,
+                                    vector<OCRLine>& ocrlines);
+   
+
+   static void calculateColor(vector<Blob>& blobs, 
+                               const Mat& color_image,
+                               const Mat& foreground_mask);
+   
+};
+
+#endif // _CVGUI_H_ 

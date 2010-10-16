@@ -11,10 +11,7 @@
 
 #include "sikuli.h"
 #include "vision.h"
-
-#include "myocr.h"
-#include "ocr.h"
-
+#include "tessocr.h"
 
 using namespace cv;
 using namespace sikuli;
@@ -103,7 +100,7 @@ public:
          text.save(buf);
 
          sprintf(buf,"%s.ocr.loc", filename);
-         text.save_with_location(buf);sik
+         text.save_with_location(buf);
          
       }
       
