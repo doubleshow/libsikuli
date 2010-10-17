@@ -25,7 +25,7 @@ static char* mytesseract(const unsigned char* imagedata,
 
 
 void
-OCRWord::add(OCRChar& ocr_char){
+OCRWord::add(const OCRChar& ocr_char){
    ocr_chars_.push_back(ocr_char);
 }
 
@@ -36,7 +36,12 @@ OCRWord::str(){
       ret = ret + it->ch;    
    }
    return ret;
-};
+}
+
+string
+OCRWord::getString(){
+   return str();
+}
 
 bool
 OCRWord::isValidWord(){
@@ -48,6 +53,21 @@ OCRLine::addWord(OCRWord& ocr_word){
    ocr_words_.push_back(ocr_word);
 }
 
+
+string
+OCRLine::getString(){   
+   if (ocr_words_.empty())
+      return string("");
+   
+   string ret;
+   ret = ocr_words_.front().getString();
+   for (vector<OCRWord>::iterator it = ocr_words_.begin()+1; 
+        it != ocr_words_.end(); ++it){
+      OCRWord& word = *it;
+      ret = ret + " " + word.getString();    
+   }
+   return ret;
+}
 
 void
 OCRParagraph::addLine(OCRLine& ocr_line){
@@ -99,6 +119,78 @@ void
 OCRText::addParagraph(OCRParagraph& ocr_paragraph){
    ocr_paragraphs_.push_back(ocr_paragraph);
 }
+
+vector<string>
+OCRText::getLineStrings(){
+   vector<string> line_strings;
+   
+   for (vector<OCRParagraph>::iterator it = ocr_paragraphs_.begin(); 
+        it != ocr_paragraphs_.end(); ++it){
+
+      OCRParagraph& para = *it;
+      
+      for (vector<OCRLine>::iterator it1 = para.ocr_lines_.begin(); 
+           it1 != para.ocr_lines_.end(); ++it1){
+
+         OCRLine& line = *it1;
+         
+         string line_string = line.getString();
+       
+         line_strings.push_back(line_string);
+         
+      }
+   }
+   
+   return line_strings;
+}
+
+
+vector<string> 
+OCRText::getWordStrings(){
+   vector<string> word_strings;
+   
+   for (vector<OCRParagraph>::iterator it = ocr_paragraphs_.begin(); 
+        it != ocr_paragraphs_.end(); ++it){
+      
+      OCRParagraph& para = *it;
+      
+      for (vector<OCRLine>::iterator it1 = para.ocr_lines_.begin(); 
+           it1 != para.ocr_lines_.end(); ++it1){
+         
+         OCRLine& line = *it1;
+         
+         for (vector<OCRWord>::iterator it2 = line.ocr_words_.begin();
+              it2 != line.ocr_words_.end(); ++it2){
+          
+            OCRWord& word = *it2;
+            word_strings.push_back(word.getString());
+         }
+      }
+   }
+   
+   return word_strings;
+}
+
+string
+OCRText::getString(){
+   vector<string> word_strings;
+   word_strings = getWordStrings();
+   
+   if (word_strings.empty())
+      return "";
+   
+   
+   string ret = word_strings.front();
+   
+   for (vector<string>::iterator it = word_strings.begin() + 1;
+        it != word_strings.end(); ++it){
+    
+      ret = ret + " " + *it;
+   }
+   
+   return ret;
+}
+
 
 char  
 encode(char ch){
@@ -167,6 +259,9 @@ OCR::init(const char* datapath){
 }
 
 
+
+
+
 #include "cvgui.h"
 using namespace cv;
 
@@ -229,7 +324,7 @@ static int findEditDistance(const char *s1, const char *s2) {
    return findMin(d1, d2, d3);
 }
 
-vector<OCRChar> run_ocr(const Mat& screen, Blob& blob){
+vector<OCRChar> run_ocr(const Mat& screen, const Blob& blob){
  
    
    Mat blobImage(screen,blob);
@@ -441,12 +536,125 @@ OCR::recognize_screenshot(const char* screenshot_filename){
 }
 
 
-OCRText 
-OCR::recognize(cv::Mat screenshot){
-   
-   OCRText text;
 
-   return text; 
+OCRLine
+linkOCRCharsToOCRLine(const vector<OCRChar>& ocrchars){
+   
+   OCRLine ocrline;
+   OCRWord ocrword;
+
+   int previous_spacing = 1000;
+   int next_spacing = 1000;
+   for (vector<OCRChar>::const_iterator it = ocrchars.begin(); 
+        it != ocrchars.end(); it++){
+      
+      const OCRChar& ocrchar = *it;
+      
+      int current_spacing = 0;
+      if (it > ocrchars.begin()){
+         const OCRChar& previous_ocrchar = *(it-1);
+         
+         current_spacing = ocrchar.x - (previous_ocrchar.x + previous_ocrchar.width);
+         //cout << '[' << ocrchar.height << ':' << spacing << ']';
+         //cout << '[' << spacing << ']';
+      }
+      
+      
+      if (it < ocrchars.end() - 1){
+         const OCRChar& next_ocrchar = *(it+1);         
+         next_spacing = next_ocrchar.x - (ocrchar.x + ocrchar.width);
+         
+//         if (current_spacing > next_spacing + 1){// || spacing >= 2){
+//            ocrline.addWord(ocrword);
+//            ocrword.clear();               
+//            //cout << ' ';
+//         }
+
+      }
+      
+      if (current_spacing > previous_spacing + 2 ||
+          current_spacing > next_spacing + 2){
+         ocrline.addWord(ocrword);
+         ocrword.clear();               
+         //cout << ' ';
+      }
+      
+      
+      previous_spacing = current_spacing;
+      
+      ocrword.add(ocrchar);
+      //cout << ocrchar.ch;
+   } 
+   
+   if (!ocrword.empty())
+   
+      ocrline.addWord(ocrword);
+   //cout << endl;
+   
+//   ocrword.add(ocrchar);
+//   ocrword.y = lineblob.y;
+//   ocrword.height = lineblob.height;
+         
+   return ocrline;
+}
+
+OCRLine
+recognize_line(const cv::Mat& screen_gray, const LineBlob& lineblob){
+   vector<OCRChar> ocrchars = run_ocr(screen_gray, lineblob);
+   OCRLine ocrline = linkOCRCharsToOCRLine(ocrchars);
+   return ocrline;
+}
+
+
+OCRParagraph
+recognize_paragraph(const cv::Mat& screen_gray, const ParagraphBlob& parablob){
+   
+   OCRParagraph ocrparagraph;
+   
+   for (vector<LineBlob>::const_iterator it = parablob.begin(); 
+        it != parablob.end(); ++it){
+      
+      const LineBlob& lineblob = *it;
+      OCRLine ocrline = recognize_line(screen_gray, lineblob);
+      
+      
+      if (!ocrline.ocr_words_.empty())
+         ocrparagraph.addLine(ocrline);      
+   }
+   
+   return ocrparagraph;
+}
+
+OCRText 
+OCR::recognize(cv::Mat screen){
+   
+   OCRText ocrtext;
+   
+   
+   vector<ParagraphBlob> parablobs;
+   cvgui::getParagraphBlobs(screen, parablobs);
+
+   Mat screen_gray;
+   cvtColor(screen,screen_gray,CV_RGB2GRAY);
+   
+   
+   for (vector<ParagraphBlob>::iterator it = parablobs.begin(); 
+        it != parablobs.end(); ++it){
+      
+      ParagraphBlob& parablob = *it;
+      
+      OCRParagraph ocrpara;
+      ocrpara = recognize_paragraph(screen_gray, parablob);      
+      ocrtext.addParagraph(ocrpara);
+      
+   }
+   
+   Mat dark = screen * 0.2;
+   Painter::drawOCRText(dark, ocrtext);
+   VLOG("OCR-result", dark);
+   
+   
+   return ocrtext; 
 }
 
 

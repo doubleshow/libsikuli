@@ -51,7 +51,7 @@ public:
 class OCRWord : public OCRRect {
 
 public:
-   void add(OCRChar& ocr_char);
+   void add(const OCRChar& ocr_char);
    
    string str();
    
@@ -60,6 +60,9 @@ public:
     bool empty() { return ocr_chars_.empty();};
    
    bool isValidWord();
+   
+   string getString();
+
    
 //private:
    
@@ -71,6 +74,8 @@ public:
    
    void addWord(OCRWord& word);
    
+   
+   string getString();
 //private:   
    
    vector<OCRWord> ocr_words_;
@@ -81,7 +86,7 @@ public:
    
    void addLine(OCRLine& line);
    
-private:
+//private:
    
    vector<OCRLine> ocr_lines_;
    
@@ -101,7 +106,11 @@ public:
    void save(const char* filename);
    void save_with_location(const char* filename);
    
-private:
+   vector<string> getLineStrings();
+   vector<string> getWordStrings();
+   string getString();
+   
+//private:
    vector<OCRLine> ocr_lines_;
    vector<OCRWord> ocr_words_;
    vector<OCRParagraph> ocr_paragraphs_;

@@ -203,3 +203,11 @@ Vision::find(FindInput input){
 
    return final_results;
 }
+
+
+string
+Vision::recognize(Mat image){
+
+   OCRText text = OCR::recognize(image);
+   return text.getString();
+}

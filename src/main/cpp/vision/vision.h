@@ -69,6 +69,8 @@ public:
    static double compare(cv::Mat m1, cv::Mat m2);
    
    static void initOCR(const char* ocrDataPath);
+      
+   static string recognize(cv::Mat image);
    
 };
 

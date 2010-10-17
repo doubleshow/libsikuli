@@ -15,6 +15,44 @@
 
 using namespace cv;
 
+class VisualLogger{
+   
+private:
+   
+   static int image_i;
+   static int step_i;
+   static char* prefix;
+   
+public:
+   
+//   VisualLogger(){
+//   }
+   
+   static void newImage(){
+      image_i++;
+      step_i = 0;
+   }
+   
+   static void log(const char* name, const Mat& image){
+      char buf[200];
+      
+      if (prefix){
+         
+         sprintf(buf, "%s-%02d-%s.vlog.png", prefix, step_i, name);
+         
+      }else{
+         sprintf(buf, "%03d-%02d-%s.vlog.png",image_i,step_i,name);           
+      }
+      
+      imwrite(buf, image);
+      
+      step_i++;  
+   }
+};
+
+#define VLOG(x,y) VisualLogger::log(x,y)
+#define VNEW()    VisualLogger::newImage()
+
 class Blob : public Rect{
    
 public:
@@ -63,6 +101,12 @@ class ParagraphBlob : public LineBlob {
    
 public:   
    void add(LineBlob& lineblob);
+   
+   
+   vector<LineBlob>::const_iterator begin() const { return lineblobs.begin();};
+   vector<LineBlob>::const_iterator end() const { return lineblobs.end();};
+   
+   
    vector<LineBlob> lineblobs;
 };
 
@@ -81,8 +125,9 @@ public:
   
    
    static void drawOCRWord(Mat& image, OCRWord& ocrword);
-   static void drawOCRWords(Mat& image, vector<OCRWord>& ocrwords);
-   static void drawOCRLines(Mat& image, vector<OCRLine>& ocrlines);
+   static void drawOCRLine(Mat& image, OCRLine& ocrline);
+   static void drawOCRParagraph(Mat& image, OCRParagraph& ocrparagraph);
+   static void drawOCRText(Mat& image, OCRText& ocrtext);
    
 };
 

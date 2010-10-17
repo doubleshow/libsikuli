@@ -1,5 +1,5 @@
 /*
- *  runocr.cpp
+ *  sikulicmd.cpp
  *  sikuli
  *
  *  Created by Tom Yeh on 9/12/10.
@@ -10,6 +10,8 @@
 #include "tessocr.h"
 #include "sikuli.h"
 #include "imgdb.h"
+#include "cvgui.h"
+#include "vision.h"
 
 #include <stdio.h>
 
@@ -24,7 +26,32 @@ int prefix_main(int argc, const char* argv[]){
 //   ScreenImage image = s.capture();
 //   OCR::find_word(image.getMat(),"namedWindow");
 //   ScreenImage image = s.capture();
-   Mat screen = imread("screen.png");
+ 
+   //Mat screen = imread("screen.png");
+   //Mat screen = imread("screen_eclipse.png");
+   Mat screen = imread("screen_bl.png");
+
+   OCRText text = OCR::recognize(screen);
+   
+   vector<string> strs = text.getLineStrings();
+   //vector<string> strs = text.getWordStrings();
+   
+   
+   for (vector<string>::iterator it = strs.begin();
+        it != strs.end(); ++it){
+    
+      cout << (*it) << endl;
+   }
+   
+   
+   string str = text.getString();
+   cout << str;
+   
+   
+   str = Vision::recognize(screen);
+   cout << str;
+   
+   
    //OCR::find_word(screen,"Keyboard");
    
    //
@@ -34,10 +61,10 @@ int prefix_main(int argc, const char* argv[]){
 //
 //   
    
-   vector<string> phrase;
-   phrase.push_back("Software");
-   phrase.push_back("Update");   
-   OCR::find_phrase(screen,phrase);
+//   vector<string> phrase;
+//   phrase.push_back("Software");
+//   phrase.push_back("Update");   
+//   OCR::find_phrase(screen,phrase);
    
    
    return 0;
@@ -89,7 +116,7 @@ int ocrdir_main(int argc, const char* argv[]){
 
 
 
-#include "vision.h"
+
 using namespace sikuli;
 int match_main(int argc, const char* argv[]){
      
@@ -111,7 +138,7 @@ int match_main(int argc, const char* argv[]){
    return 1;
 }
 
-#include "cvgui.h"
+
 int index_main(int argc, const char* argv[]){
    if (argc < 4)
       return -1;

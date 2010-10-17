@@ -8,7 +8,6 @@
  */
 
 #include "cvgui.h"
-//#include "cv-util.h"
 
 #include <iostream>
 using namespace std;
@@ -28,45 +27,46 @@ static bool sort_blob_by_y(Blob a, Blob b){
 #define SHOW(x) namedWindow(#x,1); imshow(#x,x);
 #define SHOW0(x) namedWindow(#x,1); imshow(#x,x); waitKey(0);
 
-class VisualLogger{
-   
-   
-   int image_i;
-   int step_i;
-   char* prefix;
-   
-public:
-   
-   VisualLogger(){
-   }
-   
-   void newImage(){
-      image_i++;
-      step_i = 0;
-   }
-   
-   void log(const char* name, const Mat& image){
-      char buf[200];
-      
-      if (prefix){
-         
-         sprintf(buf, "%s-%02d-%s.vlog.png", prefix, step_i, name);
-         
-      }else{
-         sprintf(buf, "%03d-%02d-%s.vlog.png",image_i,step_i,name);           
-      }
-      
-      imwrite(buf, image);
-      
-      step_i++;  
-   }
-};
+//class VisualLogger{
+//   
+//   
+//   int image_i;
+//   int step_i;
+//   char* prefix;
+//   
+//public:
+//   
+//   VisualLogger(){
+//   }
+//   
+//   static void newImage(){
+//      image_i++;
+//      step_i = 0;
+//   }
+//   
+//   static void log(const char* name, const Mat& image){
+//      char buf[200];
+//      
+//      if (prefix){
+//         
+//         sprintf(buf, "%s-%02d-%s.vlog.png", prefix, step_i, name);
+//         
+//      }else{
+//         sprintf(buf, "%03d-%02d-%s.vlog.png",image_i,step_i,name);           
+//      }
+//      
+//      imwrite(buf, image);
+//      
+//      step_i++;  
+//   }
+//};
+//
+//static VisualLogger vlog;
 
+int VisualLogger::image_i = 0;
+int VisualLogger::step_i = 0;
+char* VisualLogger::prefix = 0;
 
-
-
-VisualLogger vlog;
-#define VLOG(x,y) vlog.log(x,y)
 //#define VLOG(x,y) 
 
 void
@@ -205,7 +205,8 @@ Painter::drawOCRWord(Mat& ocr_result_image, OCRWord& ocrword){
       char buf[2];
       buf[0] = ch;
       buf[1] = 0;
-      Point pt(ocr_rect.x,ocrword.y+ocrword.height);
+      //Point pt(ocr_rect.x,ocrword.y+ocrword.height);
+      Point pt(ocr_rect.x,ocr_rect.y + ocr_rect.height);
       
       Scalar white(255,255,255);
       Scalar black(0,0,0);
@@ -218,22 +219,29 @@ Painter::drawOCRWord(Mat& ocr_result_image, OCRWord& ocrword){
 }
 
 void 
-Painter::drawOCRWords(Mat& ocr_result_image, vector<OCRWord>& ocrwords){
+Painter::drawOCRLine(Mat& ocr_result_image, OCRLine& ocrline){
+   vector<OCRWord>& ocrwords = ocrline.ocr_words_;
    for (vector<OCRWord>::iterator it = ocrwords.begin(); it != ocrwords.end(); ++it){
       OCRWord& ocrword = *it;
       drawOCRWord(ocr_result_image, ocrword);
-      
-      //cout << ' ';
    }
 }
 
 void 
-Painter::drawOCRLines(Mat& ocr_result_image, vector<OCRLine>& ocrlines){
+Painter::drawOCRParagraph(Mat& ocr_result_image, OCRParagraph& ocrpara){
+   vector<OCRLine>& ocrlines = ocrpara.ocr_lines_;
    for (vector<OCRLine>::iterator it = ocrlines.begin(); it != ocrlines.end(); ++it){
       OCRLine& ocrline = *it;
-      drawOCRWords(ocr_result_image, ocrline.ocr_words_);
-      
-      //cout << endl;
+      drawOCRLine(ocr_result_image, ocrline);
+   }
+}
+
+void 
+Painter::drawOCRText(Mat& ocr_result_image, OCRText& ocrtext){
+   vector<OCRParagraph>& ocrparas = ocrtext.ocr_paragraphs_;
+   for (vector<OCRParagraph>::iterator it = ocrparas.begin(); it != ocrparas.end(); ++it){
+      OCRParagraph& ocrpara = *it;
+      drawOCRParagraph(ocr_result_image, ocrpara);
    }
 }
 
@@ -711,7 +719,7 @@ cvgui::computeUnitBlobs(const Mat& screen, Mat& output){
 void 
 cvgui::getParagraphBlobs(const Mat& screen, vector<ParagraphBlob>& output_parablobs){
    
-   vlog.newImage();
+   VNEW();
    
    Mat screen_gray;
    cvtColor(screen,screen_gray,CV_RGB2GRAY);
@@ -758,7 +766,7 @@ cvgui::getParagraphBlobs(const Mat& screen, vector<ParagraphBlob>& output_parabl
    Mat result_lineblobs = dark.clone();
    
    vector<LineBlob> lineblobs;
-   cvgui::linkBlobsIntoLineBlobs(filtered_blobs, lineblobs, 3);
+   cvgui::linkBlobsIntoLineBlobs(filtered_blobs, lineblobs, 20);
    
    Painter::drawLineBlobs(result_lineblobs, lineblobs, Scalar(255,255,0));
    VLOG("lineblobs", result_lineblobs);
@@ -837,7 +845,7 @@ cvgui::getParagraphBlobs(const Mat& screen, vector<ParagraphBlob>& output_parabl
 
 void
 cvgui::getLineBlobsAsIndividualWords(const Mat& screen, vector<LineBlob>& output_lineblobs){
-   vlog.newImage();
+   VNEW();
    
    Mat screen_gray;
    cvtColor(screen,screen_gray,CV_RGB2GRAY);
@@ -960,7 +968,7 @@ cvgui::getLineBlobsAsIndividualWords(const Mat& screen, vector<LineBlob>& output
 void 
 cvgui::segmentScreenshot(const Mat& screen, vector<Blob>& text_blobs, vector<Blob>& image_blobs){
    
-   vlog.newImage();
+   VNEW();
    
    VLOG("Input", screen);
    
