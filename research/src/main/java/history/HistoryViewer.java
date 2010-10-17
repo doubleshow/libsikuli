@@ -67,7 +67,7 @@ public class HistoryViewer extends JPanel {
 	
 
 	JPanel controls;
-	JLabel timeLabel;
+
 	
 	boolean isBrowsing; 
 	
@@ -305,12 +305,17 @@ public class HistoryViewer extends JPanel {
 				rewindBtn.setText("<< Rewind");
 				rewindBtn.setEnabled(iterator.hasBefore());
 			}
+			
+			
+			HistoryScreen hs = (HistoryScreen) iterator.getCurrent();
+			timeLabel.setText("" + hs.getId());
 		}
 		
 		JButton backwardBtn;
 		JButton forwardBtn;		
 		JButton playBtn;
 		JButton rewindBtn;
+		JLabel  timeLabel;
 		public NavigationControl(){
 			super(BoxLayout.X_AXIS);
 			
@@ -347,10 +352,15 @@ public class HistoryViewer extends JPanel {
 					
 				}			
 			});
+
+			timeLabel = new JLabel();
 			
+			add(rewindBtn);	
 			add(backwardBtn);
+			
+			add(timeLabel);
+			
 			add(forwardBtn);
-			add(rewindBtn);
 			add(playBtn);
 			
 		}
@@ -622,8 +632,8 @@ public class HistoryViewer extends JPanel {
 	}
 
 	FindBox findBox;
-	
-	static String[] exampleStrings = {"facebook", "chi", "pilyoung","video","live","inbox","login"};
+	JButton recordBtn;
+	static String[] exampleStrings = {"facebook", "chi", "pilyoung","video","live","inbox","login","order"};
 	private void createControls(){
 		
 		findBox = new FindBox();
@@ -720,6 +730,17 @@ public class HistoryViewer extends JPanel {
 			}			
 		});
 		
+		recordBtn = new JButton("Record");
+		recordBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doRecord();
+			}			
+		});
+		
+		
+		
+		
 		JRadioButton frameButton = new JRadioButton("Frame");
 	    frameButton.setActionCommand("Frame");
 	    frameButton.setSelected(true);
@@ -739,27 +760,20 @@ public class HistoryViewer extends JPanel {
 		navigator = new NavigationControl();
 
 		
-		timeLabel = new JLabel("ID");
-		//time.setOpaque(true);
-		//Font font = new Font("sansserif", Font.BOLD, 32);
-		//time.setFont(font);
-		//time.setForeground(Color.red);
-
 		controls = new JPanel();
 		controls.setLayout(new BoxLayout(controls, BoxLayout.Y_AXIS));
 		
 		
 		Box row1 = new Box(BoxLayout.X_AXIS);
 		row1.add(findBox);
-		row1.add(navigator);
+		row1.add(new JSeparator(JSeparator.VERTICAL));
+		row1.add(navigator);	
 		controls.add(row1);
-		
+
 		controls.add(new JSeparator());
 		
 		JPanel row2 = new JPanel();
 		row2.add(exampleList);
-		row2.add(new JLabel("Frame:"));
-		row2.add(timeLabel);
 		row2.add(scriptBtn);
 		row2.add(readBtn);
 		row2.add(compareBtn);
@@ -767,9 +781,58 @@ public class HistoryViewer extends JPanel {
 		row2.add(copyBtn);
 		row2.add(filterBtn);
 		row2.add(ocrBtn);
+		row2.add(recordBtn);
+		row2.add(new JSeparator(JSeparator.VERTICAL));
 		row2.add(frameButton);
 		row2.add(shotButton);
 		controls.add(row2);
+		
+	}
+
+	boolean is_recording = false;
+	Process recording_process;
+	protected void doRecord() {
+		
+		if (is_recording){
+			
+			
+			recording_process.destroy();
+			is_recording = false;
+			recordBtn.setText("Record");
+			
+		}else{
+
+
+			
+			String output_path = "captured/live";
+			
+			
+			// clear directory
+			File directory = new File(output_path);
+
+			// Get all files in directory
+			File[] files = directory.listFiles();
+			for (File file : files){
+			   // Delete each file
+			   if (!file.delete()){
+			       // Failed to delete file
+			       System.out.println("Failed to delete "+file);
+			   }
+			}
+			
+			String command = "./sikulicmd CAPTURE " + output_path;;
+			try {
+				recording_process = Runtime.getRuntime().exec(command);
+			} catch (IOException e) {
+				
+				
+			}
+
+			is_recording = true;
+			recordBtn.setText("Stop");
+			
+			
+		}
 		
 	}
 
@@ -894,7 +957,12 @@ public class HistoryViewer extends JPanel {
 			navigator.setIterator(iter);
 			navigator.jump(2);
 		}
-
+		else if (exampleName == "order"){
+			HistoryScreenDatabase.load(exampleName,1800);
+			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
+			navigator.setIterator(iter);
+			navigator.jump(100);
+		}
 	}
 
 	private void refreshHistoryScreen() {
@@ -1147,8 +1215,6 @@ public class HistoryViewer extends JPanel {
 			
 		}
 		
-		timeLabel.setText(""+hs.getId());
-
 		repaint();
 	}
 		
