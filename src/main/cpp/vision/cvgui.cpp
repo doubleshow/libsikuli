@@ -198,15 +198,12 @@ Painter::drawOCRWord(Mat& ocr_result_image, OCRWord& ocrword){
       OCRChar& ocrchar = *it;
       char ch = ocrchar.ch;
       
-      OCRRect ocr_rect = ocrchar;
-      
-      //cout << ocrchar.ch;
-      
       char buf[2];
       buf[0] = ch;
       buf[1] = 0;
-      //Point pt(ocr_rect.x,ocrword.y+ocrword.height);
-      Point pt(ocr_rect.x,ocr_rect.y + ocr_rect.height);
+     
+      Point pt(ocrchar.x, ocrword.y + ocrword.height);      
+//      //Point pt(ocr_rect.x,ocr_rect.y + ocr_rect.height);
       
       Scalar white(255,255,255);
       Scalar black(0,0,0);
