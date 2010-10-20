@@ -110,6 +110,8 @@ public:
    vector<string> getWordStrings();
    string getString();
    
+   vector<OCRWord> getWords();
+   
 //private:
    vector<OCRLine> ocr_lines_;
    vector<OCRWord> ocr_words_;

@@ -32,6 +32,8 @@ void
 FindInput::init(){
    bFindingText = false;
    bFindingAll = false;
+   similarity = 0.8;
+   limit = 10;
 }
 
 void

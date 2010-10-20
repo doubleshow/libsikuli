@@ -1156,14 +1156,12 @@ cvgui::segmentScreenshot(const Mat& screen, vector<Blob>& text_blobs, vector<Blo
       
    }
    
-   
-   return;
-   
-   
    Mat image_result = bg.clone();
    
    Painter::drawBlobs(image_result, image_blobs, Scalar(0,0,255));
    VLOG("ImageRecordsExtracted", image_result);
+
+   return;
    
    Mat ui_mask = Mat::zeros(screen.size(), CV_8UC1);
    Mat photo_mask = Mat::zeros(screen.size(), CV_8UC1);
@@ -1571,7 +1569,7 @@ cvgui::findLongLines(const Mat& src, Mat& dest){
 }
 
 
-#define LONGLINE_THRESHOLD 20
+#define LONGLINE_THRESHOLD 100
 void
 cvgui::findLongLines_Horizontal(const Mat& binary, Mat& dest){
    

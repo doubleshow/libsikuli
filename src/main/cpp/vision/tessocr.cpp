@@ -102,13 +102,18 @@ OCRText::save(const char* filename){
 void
 OCRText::save_with_location(const char* filename){
    
+   
+   vector<OCRWord> words = getWords();
+   
    ofstream of(filename);
    
-   for (iterator it = begin();
-        it != end(); ++it){
+   for (vector<OCRWord>::iterator it = words.begin();
+        it != words.end(); ++it){
       
-      of << it->x << " " << it->y << " " << it->width << " " << it->height << " ";
-      of << it->str() << " ";
+      OCRWord& w = *it;
+      
+      of << w.x << " " << w.y << " " << w.width << " " << w.height << " ";
+      of << w.getString() << " ";
       of << endl;
    }
    
@@ -144,6 +149,32 @@ OCRText::getLineStrings(){
    return line_strings;
 }
 
+
+vector<OCRWord> 
+OCRText::getWords(){
+   vector<OCRWord> words;
+   
+   for (vector<OCRParagraph>::iterator it = ocr_paragraphs_.begin(); 
+        it != ocr_paragraphs_.end(); ++it){
+      
+      OCRParagraph& para = *it;
+      
+      for (vector<OCRLine>::iterator it1 = para.ocr_lines_.begin(); 
+           it1 != para.ocr_lines_.end(); ++it1){
+         
+         OCRLine& line = *it1;
+         
+         for (vector<OCRWord>::iterator it2 = line.ocr_words_.begin();
+              it2 != line.ocr_words_.end(); ++it2){
+            
+            OCRWord& word = *it2;
+            words.push_back(word);
+         }
+      }
+   }
+   
+   return words;
+}
 
 vector<string> 
 OCRText::getWordStrings(){
