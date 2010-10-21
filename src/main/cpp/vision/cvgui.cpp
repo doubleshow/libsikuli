@@ -311,7 +311,7 @@ void extractFeatures(Mat src){
    
    //flann::IndexParams );
    
-   flann::Index idx(src, flann::KDTreeIndexParams(4));
+   cv::flann::Index idx(src, cv::flann::KDTreeIndexParams(4));
    
    //cvflann::Index idx;
    
