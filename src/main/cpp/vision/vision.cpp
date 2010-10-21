@@ -10,8 +10,18 @@
 #include "vision.h"
 #include "finder.h"
 #include "tessocr.h"
+#include <sys/stat.h> 
 
 using namespace sikuli;
+
+bool fileExists(const char* strFilename){
+   struct stat stFileInfo;
+   return !stat(strFilename,&stFileInfo);
+}
+
+FindInput::FindInput(){
+   init();
+}
 
 FindInput::FindInput(Mat source_, Mat target_){
    source = source_;
@@ -24,7 +34,8 @@ FindInput::FindInput(Mat source_, const char* target_string, bool text){
 }
 
 FindInput::FindInput(const char* source_filename, const char* target_string, bool text){
-   source = cv::imread(source_filename,1);
+   if(fileExists(source_filename))
+      source = cv::imread(source_filename,1);
    init(source, target_string, text);
 }
 
@@ -40,17 +51,32 @@ void
 FindInput::init(Mat source_, const char* target_string, bool text){
    init();
    
-   source = source_;
-   
+   setSource(source_);
+   setTarget(target_string, text);
+}
+
+void FindInput::setSource(const char* source_filename){
+   if(fileExists(source_filename))
+      source = cv::imread(source_filename,1);
+}
+
+void FindInput::setTarget(const char* target_string, bool text){
+   bFindingText = text;
    if (text){
       targetText = target_string;
    }else{
-      target = cv::imread(target_string,1);
+      if(fileExists(target_string))
+         target = cv::imread(target_string,1);
    }
-   
-   bFindingText = text;
 }
 
+void FindInput::setSource(Mat source_){
+   source = source_;
+}
+
+void FindInput::setTarget(Mat target_){
+   target = target_;
+}
 
 Mat 
 FindInput::getSourceMat(){
@@ -93,12 +119,17 @@ FindInput::getSimilarity(){
    return similarity;
 }
 
+
+void FindInput::setFindText(bool text){
+  bFindingText = text; 
+}
+
 bool 
 FindInput::isFindingText(){
    return bFindingText;
 }
 
-string 
+std::string 
 FindInput::getTargetText(){
    return targetText;
 }
@@ -115,9 +146,12 @@ find_helper(FindInput& input){
    vector<FindResult> results;
    
    if (input.isFindingText()){
+      Mat source = input.getSourceMat();
       
+      if(!source.rows || !source.cols) 
+         return results;
       
-      TextFinder f(input.getSourceMat());
+      TextFinder f(source);
       f.find(input.getTargetText().c_str(), input.getSimilarity());
       
       if (input.isFindingAll()){
@@ -133,9 +167,12 @@ find_helper(FindInput& input){
       
       
    }else{
-      
-      TemplateFinder f(input.getSourceMat());
-	   Mat image = input.getTargetMat();
+      Mat source = input.getSourceMat();
+      Mat image = input.getTargetMat();
+      if(!source.rows || !source.cols || !image.rows || !image.cols)
+         return results;
+         
+      TemplateFinder f(source);
       
       if (input.isFindingAll()){
          f.find_all(image, input.getSimilarity());
@@ -212,4 +249,14 @@ Vision::recognize(Mat image){
 
    OCRText text = OCR::recognize(image);
    return text.getString();
+}
+
+
+cv::Mat Vision::createMat(int _rows, int _cols, unsigned char* _data){
+   Mat mat_ref = Mat(_rows, _cols, CV_8UC4, _data);
+   Mat mat;
+   cvtColor(mat_ref, mat, CV_RGBA2BGR, 3);
+   //cout << "createMat: " << mat.rows << " " << mat.cols << endl;
+   //imwrite("createMat.png", mat);
+   return mat;
 }
