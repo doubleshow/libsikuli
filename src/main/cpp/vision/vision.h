@@ -21,9 +21,13 @@ class FindInput{
       
 public:
    
+   FindInput(){};
    FindInput(Mat source, Mat target);
    FindInput(Mat source, const char* target, bool text = false);
    FindInput(const char* source_filename, const char* target, bool text = false);
+ 
+   // copy everything in 'other' except for the source image
+   FindInput(Mat source, const FindInput other);
 
    Mat getSourceMat();
    Mat getTargetMat();

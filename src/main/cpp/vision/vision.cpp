@@ -28,6 +28,15 @@ FindInput::FindInput(const char* source_filename, const char* target_string, boo
    init(source, target_string, text);
 }
 
+Findinput::FindInput(Mat source_, const FindInput other){
+   souce = source_;
+   target = other.target_;
+   bFindingText = other.bFindingText;
+   bFindingAll = other.bFindingAll;
+   similarity = other.similarity;
+   limit = other.limit;
+}
+
 void 
 FindInput::init(){
    bFindingText = false;
