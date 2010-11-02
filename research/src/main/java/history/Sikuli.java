@@ -159,14 +159,14 @@ public class Sikuli {
 		try{
 			File f;
 			String line;
-
-			f = File.createTempFile("target", ".png");
-			f.deleteOnExit(); 
+			File curdir = new File(".");
+			f = File.createTempFile("target", ".png",curdir);
+			//f.deleteOnExit(); 
 
 			ImageIO.write(target_image, "png", f);
 
 			String command = "./sikulicmd MATCH " + screen_image + " " + f.getPath();
-			//System.out.println(command);
+			System.out.println(command);
 			Process p = Runtime.getRuntime().exec(command);
 
 			BufferedReader input = new BufferedReader
