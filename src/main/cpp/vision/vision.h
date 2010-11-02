@@ -11,7 +11,7 @@
 #define _VISION_H_
 
 #include "find-result.h"
-#include <opencv.hpp>
+#include "opencv.hpp"
 
 using namespace cv;
 
@@ -21,7 +21,7 @@ class FindInput{
       
 public:
    
-   FindInput(){};
+   FindInput();
    FindInput(Mat source, Mat target);
    FindInput(Mat source, const char* target, bool text = false);
    FindInput(const char* source_filename, const char* target, bool text = false);
@@ -29,12 +29,17 @@ public:
    // copy everything in 'other' except for the source image
    FindInput(Mat source, const FindInput other);
 
+   void setSource(const char* source_filename);
+   void setTarget(const char* target_string, bool text = false);
+   void setSource(Mat source);
+   void setTarget(Mat target);
    Mat getSourceMat();
    Mat getTargetMat();
       
    void setFindAll(bool all);
-      
    bool isFindingAll();
+
+   void setFindText(bool text);
    bool isFindingText();
 
    void setLimit(int limit);
@@ -43,7 +48,7 @@ public:
    void setSimilarity(double similarity);
    double getSimilarity();
      
-   string getTargetText();
+   std::string getTargetText();
    
 private:
    
@@ -53,7 +58,7 @@ private:
       
    Mat source;
    Mat target;
-   string targetText;
+   std::string targetText;
    
    int limit;
    double similarity;
@@ -74,8 +79,10 @@ public:
    
    static void initOCR(const char* ocrDataPath);
       
-   static string recognize(cv::Mat image);
+   static std::string recognize(cv::Mat image);
    
+   //helper functions
+   static cv::Mat createMat(int _rows, int _cols, unsigned char* _data);
 };
 
 }
