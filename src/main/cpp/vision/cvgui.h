@@ -149,6 +149,9 @@ public:
    static void getLineBlobsAsIndividualWords(const Mat& screen, vector<LineBlob>& lineblobs);
    static void getParagraphBlobs(const Mat& screen, vector<ParagraphBlob>& parablobs);
    
+   static void findBoxes(const Mat& screen);
+
+   
 private:
    
    static void computeUnitBlobs(const Mat& input, Mat& output);
@@ -169,6 +172,8 @@ private:
    
    static bool hasMoreThanNUniqueColors(const Mat& src, int n);
    static bool areHorizontallyAligned(const vector<Rect>& rects);
+   
+   
    
    
    // linking

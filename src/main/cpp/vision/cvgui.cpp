@@ -668,6 +668,86 @@ cvgui::run_ocr_on_lineblobs(vector<LineBlob>& ocr_input_lineblobs,
    }
 }
 
+void
+cvgui::findBoxes(const Mat& screen){
+
+   Mat dark;
+   Util::rgb2grayC3(screen,dark);
+   dark = dark * 0.5;
+   
+   
+   VLOG("Input", screen);
+   
+   Mat gray;
+   cvtColor(screen,gray,CV_RGB2GRAY);
+   
+//   medianBlur(gray, gray, 3);
+   VLOG("Blurred", gray); 
+   
+   Mat edges;
+//   Canny(gray,edges,0.66*50,1.33*50,3,true);  
+   Canny(gray,edges,0.66*50,1.33*50,5,true);  
+   
+  // dilate(edges, edges, Mat::ones(2,2,CV_8UC1));
+   VLOG("Canny", edges); 
+   
+   
+   Mat result = dark.clone();
+   Mat copy = edges.clone();
+   
+//   findContours(edges, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+   
+   
+   vector<vector<Point> > contours;
+   vector<Vec4i> hierarchy;
+   
+   findContours( copy, contours, hierarchy,
+                CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
+
+//   findContours(edges, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+
+   //findContours( copy, contours, hierarchy,
+    //            CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
+   
+   cout << contours.size() << " " << hierarchy.size() << endl;
+   // iterate through all the top-level contours,
+   // draw each connected component with its own random color
+ //  int idx = 0;
+//   for( ; idx >= 0; idx = hierarchy[idx][0] )
+//   {
+      //Scalar color( rand()&255, rand()&255, rand()&255 );
+   Scalar color(255,255,0);//,255);
+ //     drawContours( result, contours, idx, color, CV_FILLED, 8, hierarchy );
+
+   //  }
+   
+   
+   for (vector<vector<Point> >::iterator it = contours.begin();
+        it != contours.end(); ++it){
+      
+      vector<Point>& contour = *it;
+    
+      Rect r = boundingRect(Mat(contour));
+      
+      double a1 = contourArea(Mat(contour));
+      double a2 = r.height * r.width;
+      
+      if ( min(a1,a2)/max(a1,a2) > 0.80){
+
+         vector<vector<Point> > cs;
+         cs.push_back(contour);
+         //drawContours( result, cs, -1, color, 2);//, CV_FILLED);
+         
+         Painter::drawRect(result, r, Scalar(0,0,255));
+      }
+      
+   }
+   
+   
+   VLOG("Contours", result); 
+   
+}
+
 
 void
 cvgui::computeUnitBlobs(const Mat& screen, Mat& output){
@@ -681,6 +761,18 @@ cvgui::computeUnitBlobs(const Mat& screen, Mat& output){
    Mat edges;
    Canny(gray,edges,0.66*50,1.33*50,3,true);  
    VLOG("Canny", edges); 
+   
+//   Mat corners;
+//   cornerHarris(gray,corners,10,5,1.0);
+
+   Mat corners_result = screen.clone();
+   vector<Point2f> corners;
+   goodFeaturesToTrack(gray, corners, 50, 0.5, 10);
+   for (vector<Point2f>::iterator it = corners.begin(); it != corners.end(); ++it){
+      Point2f& p = *it;
+      circle(corners_result, p, 3, Scalar(0,0,255));
+   }
+   VLOG("Corners", corners_result); 
    
    
    adaptiveThreshold(gray, gray, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 5, 1);
