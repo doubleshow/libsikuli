@@ -70,9 +70,6 @@ public class OCRDocument {
 
 			scanner.close();
 
-			Collections.reverse(words);
-
-
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
