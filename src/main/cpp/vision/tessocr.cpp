@@ -456,7 +456,7 @@ ostream& dhead(const char* name){
 
 void
 find_phrase_helper(const Mat& screen_gray, vector<string> words, vector<LineBlob> lineblobs,
-                   LineBlob resultblob, vector<FindResult>& results){
+                   LineBlob resultblob, vector<FindResult>& results, bool is_find_one = true){
    
    string word = words[0];
    
@@ -467,112 +467,115 @@ find_phrase_helper(const Mat& screen_gray, vector<string> words, vector<LineBlob
    
    dhead("find_phrase") << "<" << word << ">" << endl;
    
+   for (int tolerance = 0; tolerance < 3; ++tolerance){
    
-   for (vector<LineBlob>::iterator it = lineblobs.begin();
-        it != lineblobs.end(); ++it){
-      
-      LineBlob& lineblob = *it;
+      for (vector<LineBlob>::iterator it = lineblobs.begin();
+           it != lineblobs.end(); ++it){
+         
+         LineBlob& lineblob = *it;
 
-      
-      if (abs((int)lineblob.blobs.size() - (int)word.size()) > 2)
-         continue;
-      
-      vector<OCRChar> ocr_chars = run_ocr(screen_gray, lineblob);
-      
-      
-      dhead("find_phrase") << word << "<->";
-      
-      string ocrword = "";
-      for (vector<OCRChar>::iterator iter = ocr_chars.begin(); 
-           iter != ocr_chars.end(); iter++){
          
-         OCRChar& ocrchar = *iter;
-         cout << ocrchar.ch;
+         if (abs((int)lineblob.blobs.size() - (int)word.size()) > tolerance)
+            continue;
          
-         ocrword = ocrword + ocrchar.ch;
-      }
-      
-      if (ocr_chars.size() < 1){
-         dout("find_phrase") << endl;
-         continue;
-      }
-      
-      
-      //int d = findEditDistance(word.c_str(), ocrword.c_str());
-      int d = findEditDistanceLessThanK(word.c_str(), ocrword.c_str(),3);
-   
-      
-      dout("find_phrase") << '[' << d << ']';      
+         vector<OCRChar> ocr_chars = run_ocr(screen_gray, lineblob);
+         
+         
+         dhead("find_phrase") << word << "<->";
+         
+         string ocrword = "";
+         for (vector<OCRChar>::iterator iter = ocr_chars.begin(); 
+              iter != ocr_chars.end(); iter++){
             
-      if (d > 2){
+            OCRChar& ocrchar = *iter;
+            cout << ocrchar.ch;
+            
+            ocrword = ocrword + ocrchar.ch;
+         }
+         
+         if (ocr_chars.size() < 1){
+            dout("find_phrase") << endl;
+            continue;
+         }
+         
+         int d = findEditDistanceLessThanK(word.c_str(), ocrword.c_str(),3);
+      
+         
+         dout("find_phrase") << '[' << d << ']';      
+               
+         if (d > 2){
+            dout("find_phrase") << endl;
+            continue;
+         }
+            
+            
+         if (rest.empty()){
+            dout("find_phrase") << " ... match!" << endl;
+            
+            Blob b = resultblob;
+            cout << b.x << "," << b.y << endl;
+            b = lineblob;
+            cout << b.x << "," << b.y << endl;
+            
+            resultblob.merge(lineblob);
+            
+            FindResult result(resultblob.x,resultblob.y,
+                              resultblob.width,resultblob.height, 1.0);
+
+            results.push_back(result);
+            return;
+            
+         }
+         else 
+            dout("find_phrase") << endl;
+            
+         
+
+         
+         vector<LineBlob> nextblobs;
+         for (vector<LineBlob>::iterator it2 = lineblobs.begin();
+              it2 != lineblobs.end(); ++it2){
+            
+            LineBlob& b1 = lineblob;
+            LineBlob& b2 = *it2;
+            
+            bool similar_baseline = abs((b1.y + b1.height) - (b2.y + b2.height)) < 5;
+            bool close_right = (b2.x > b1.x) && (b2.x - (b1.x+b1.width)) < 20;
+            bool close_below = (b2.y > b1.y) && (b2.y - b1.y) < 20;
+            
+            if (close_right && similar_baseline)
+               nextblobs.push_back(b2);
+            
+         }
+         
+
+         
+         if (!rest.empty() && !nextblobs.empty()){
+            
+            LineBlob next_resultblob = resultblob;
+            next_resultblob.merge(lineblob);
+            
+            find_phrase_helper(screen_gray, rest, nextblobs, next_resultblob, results, is_find_one);
+         }
+            
+            
+            
          dout("find_phrase") << endl;
-         continue;
-      }
          
-         
-      if (rest.empty()){
-         dout("find_phrase") << " ... match!" << endl;
-         
-         Blob b = resultblob;
-         cout << b.x << "," << b.y << endl;
-         b = lineblob;
-         cout << b.x << "," << b.y << endl;
-         
-         
-         
-         resultblob.merge(lineblob);
-         
-         FindResult result(resultblob.x,resultblob.y,
-                           resultblob.width,resultblob.height, 1.0);
-
-         results.push_back(result);
-         return;
+         // check if we have already found one match
+         if (is_find_one && results.size() >= 1)
+            // if so, we return the reuslts right away
+            return;
          
       }
-      else 
-         dout("find_phrase") << endl;
-         
-      
-
-      
-      vector<LineBlob> nextblobs;
-      for (vector<LineBlob>::iterator it2 = lineblobs.begin();
-           it2 != lineblobs.end(); ++it2){
-         
-         LineBlob& b1 = lineblob;
-         LineBlob& b2 = *it2;
-         
-         bool similar_baseline = abs((b1.y + b1.height) - (b2.y + b2.height)) < 5;
-         //            int horizontal_spacing = b2.x - (b1.x + b1.width);
-         //            bool small_horizontal_spacing = horizontal_spacing < 10 && horizontal_spacing > -2;
-         
-         bool close_right = (b2.x > b1.x) && (b2.x - (b1.x+b1.width)) < 20;
-         bool close_below = (b2.y > b1.y) && (b2.y - b1.y) < 20;
-         
-         if (close_right && similar_baseline)
-            nextblobs.push_back(b2);
-         
-      }
-      
-
-      
-      if (!rest.empty() && !nextblobs.empty()){
-         
-         LineBlob next_resultblob = resultblob;
-         next_resultblob.merge(lineblob);
-         
-         find_phrase_helper(screen_gray, rest, nextblobs, next_resultblob, results);
-      }
-         
-         
-         
-      dout("find_phrase") << endl;
-      
    }
 }
 
+
+
+
 vector<FindResult>
-OCR::find_phrase(const Mat& screen, vector<string> words){
+OCR::find_phrase(const Mat& screen, vector<string> words, bool is_find_one){
    
    vector<LineBlob> lineblobs;
    cvgui::getLineBlobsAsIndividualWords(screen, lineblobs);
@@ -583,19 +586,18 @@ OCR::find_phrase(const Mat& screen, vector<string> words){
    vector<FindResult> results;
    
    LineBlob empty;
-   find_phrase_helper(screen_gray, words, lineblobs, empty, results);
+   find_phrase_helper(screen_gray, words, lineblobs, empty, results, is_find_one);
       
-
    return results;   
 }
 
 vector<FindResult>
-OCR::find_word(const Mat& screenshot, string word){
+OCR::find_word(const Mat& screenshot, string word, bool is_find_one){
    
    vector<string> words;
    words.push_back(word);
    
-   return find_phrase(screenshot, words);
+   return find_phrase(screenshot, words, is_find_one);
 }
 
 OCRText

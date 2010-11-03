@@ -532,6 +532,14 @@ TextFinder::find(const char* text, double _min_similarity){
 }
 
 void
+TextFinder::find_all(const char* text, double _min_similarity){
+   vector<string> words;
+   Tokenize(text, words, " ");
+   return find_all(words, _min_similarity);
+}
+
+
+void
 TextFinder::find(vector<string> words, double _min_similarity){
    this->min_similarity = _min_similarity;
    BaseFinder::find();
@@ -539,6 +547,16 @@ TextFinder::find(vector<string> words, double _min_similarity){
 	matches = OCR::find_phrase(roiSource, words);
    matches_iterator = matches.begin();   
 }
+
+void
+TextFinder::find_all(vector<string> words, double _min_similarity){
+   this->min_similarity = _min_similarity;
+   BaseFinder::find();
+	TimingBlock tb("TextFinder::find_all");
+	matches = OCR::find_phrase(roiSource, words, false);
+   matches_iterator = matches.begin();   
+}
+
 
 bool      
 TextFinder::hasNext(){

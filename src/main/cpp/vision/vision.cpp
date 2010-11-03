@@ -39,9 +39,9 @@ FindInput::FindInput(const char* source_filename, const char* target_string, boo
    init(source, target_string, text);
 }
 
-Findinput::FindInput(Mat source_, const FindInput other){
-   souce = source_;
-   target = other.target_;
+FindInput::FindInput(Mat source_, const FindInput other){
+   source = source_;
+   target = other.target;
    bFindingText = other.bFindingText;
    bFindingAll = other.bFindingAll;
    similarity = other.similarity;
@@ -161,14 +161,16 @@ find_helper(FindInput& input){
          return results;
       
       TextFinder f(source);
-      f.find(input.getTargetText().c_str(), input.getSimilarity());
       
       if (input.isFindingAll()){
+         
+         f.find_all(input.getTargetText().c_str(), input.getSimilarity());
          while (f.hasNext()){
             results.push_back(f.next());
          }
       }
       else{
+         f.find(input.getTargetText().c_str(), input.getSimilarity());
          if (f.hasNext())
             results.push_back(f.next());
       }
