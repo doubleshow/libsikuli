@@ -122,6 +122,7 @@ public:
 class Color{
 public:   
    static Scalar RED;
+   static Scalar RANDOM();
 
 };
 

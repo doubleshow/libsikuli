@@ -14,7 +14,9 @@ using namespace std;
 
 
 Scalar Color::RED(0,0,255);
-
+Scalar Color::RANDOM() { 
+   return Scalar(rand()&255, rand()&255, rand()&255);
+};
 
 static bool sort_by_x (Rect a, Rect b){ 
 	return (a.x < b.x); 
@@ -729,20 +731,18 @@ cvgui::findBoxes(const Mat& screen, vector<Blob>& output_blobs){
    cvtColor(screen,gray,CV_RGB2GRAY);
    
    //medianBlur(gray, gray, 3);
-   VLOG("Blurred", gray); 
+   //VLOG("Blurred", gray); 
    
    Mat edges;
 
-   //for (int c=3;c<=7;c=c+2){
-   for (int c=10;c<=100;c=c+10){
-      
-  // dilate(edges, edges, Mat::ones(2,2,CV_8UC1));
-      char buf[50];
-      Mat test;
-      sprintf(buf,"Canny%d",c);
-      Canny(gray,test,0.66*c,1.33*c,3,true);  
-      VLOG(buf, test);       
-   }
+// Code for experimenting differenty parameters for Canny
+//   for (int c=10;c<=100;c=c+10){
+//      char buf[50];
+//      Mat test;
+//      sprintf(buf,"Canny%d",c);
+//      Canny(gray,test,0.66*c,1.33*c,3,true);  
+//      VLOG(buf, test);       
+//   }
 
    int s = 100;
    Canny(gray,edges,0.66*s,1.33*s,3,true);  
@@ -753,11 +753,8 @@ cvgui::findBoxes(const Mat& screen, vector<Blob>& output_blobs){
    VLOG("Dilated", edges); 
 
    
-   
    Mat result = dark.clone();
    Mat copy = edges.clone();
-   
-//   findContours(edges, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
    
    
    vector<vector<Point> > contours;
@@ -793,6 +790,8 @@ cvgui::findBoxes(const Mat& screen, vector<Blob>& output_blobs){
    vector<Blob> blobs;
    
    
+   Mat box_contour_image = dark.clone();
+   
    for (vector<vector<Point> >::iterator it = contours.begin();
         it != contours.end(); ++it){
       
@@ -807,22 +806,17 @@ cvgui::findBoxes(const Mat& screen, vector<Blob>& output_blobs){
 
          vector<vector<Point> > cs;
          cs.push_back(contour);
-         //drawContours( result, cs, -1, color, 2);//, CV_FILLED);
+         drawContours(box_contour_image, cs, -1, Color::RANDOM(), 2);//, CV_FILLED);
          
-         Scalar randcolor( rand()&255, rand()&255, rand()&255 );
-       
-         Painter::drawRect(result, r, randcolor);
          
          Blob blob(r);
          blobs.push_back(blob);
-
-         //Painter::drawRect(result, r, Scalar(0,0,255));
       }
       
    }
    
-   
-   VLOG("Contours", result); 
+        
+   VLOG("Box-shaped contours", box_contour_image); 
    
    
    Mat blobs_result = dark.clone();
@@ -895,20 +889,19 @@ cvgui::computeUnitBlobs(const Mat& screen, Mat& output){
    
    Mat edges;
    Canny(gray,edges,0.66*50,1.33*50,3,true);  
-//   Canny(gray,edges,0.66*100,1.33*100,3,true);  
    VLOG("Canny", edges); 
    
 //   Mat corners;
 //   cornerHarris(gray,corners,10,5,1.0);
 
-   Mat corners_result = screen.clone();
-   vector<Point2f> corners;
-   goodFeaturesToTrack(gray, corners, 50, 0.5, 10);
-   for (vector<Point2f>::iterator it = corners.begin(); it != corners.end(); ++it){
-      Point2f& p = *it;
-      circle(corners_result, p, 3, Scalar(0,0,255));
-   }
-   VLOG("Corners", corners_result); 
+//   Mat corners_result = screen.clone();
+//   vector<Point2f> corners;
+//   goodFeaturesToTrack(gray, corners, 50, 0.5, 10);
+//   for (vector<Point2f>::iterator it = corners.begin(); it != corners.end(); ++it){
+//      Point2f& p = *it;
+//      circle(corners_result, p, 3, Scalar(0,0,255));
+//   }
+//   VLOG("Corners", corners_result); 
    
    
    adaptiveThreshold(gray, gray, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 5, 1);
