@@ -136,8 +136,8 @@ public:
    static vector<FindResult> find_phrase(const cv::Mat& mat, vector<string> words, bool is_find_one = true);   
    
    static OCRText recognize_screenshot(const char* screenshot_filename);
-                                         
    
+      
    static void init();
    static void init(const char* datapath);
    

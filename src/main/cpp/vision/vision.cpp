@@ -23,6 +23,11 @@ FindInput::FindInput(){
    init();
 }
 
+FindInput::FindInput(Mat source_){
+   source = source_;
+   init();
+}
+
 FindInput::FindInput(Mat source_, Mat target_){
    source = source_;
    target = target_;
@@ -254,6 +259,62 @@ Vision::find(FindInput input){
    return final_results;
 }
 
+#include "cvgui.h"
+#include "tessocr.h"
+
+vector<FindResult> 
+Vision::find_buttons(FindInput input){
+   
+   vector<FindResult> results;
+   
+   Mat screen = input.getSourceMat();
+   
+   vector<Blob> blobs;
+   cvgui::findBoxes(screen, blobs);
+   
+   
+   VisualLogger::setEnabled(false);
+   
+   for (vector<Blob>::iterator it = blobs.begin();
+        it != blobs.end(); ++it){
+      Blob& blob = *it;
+      
+      
+      if (blob.width < 10)
+         continue;
+      
+      Util::growRect(blob, -3, 0, screen);
+      
+      Mat blob_image(screen, blob);
+      
+      FindResult result(blob.x,blob.y,blob.width,blob.height,1);      
+      result.text = recognize(blob_image);
+      
+      if (result.text.empty())
+         continue;
+      
+      results.push_back(result);      
+   }
+   
+   
+   Mat result_image = screen * 0.5;
+   for (vector<FindResult>::iterator it = results.begin();
+        it != results.end(); ++it){
+    
+      FindResult& r = *it;
+      
+      Point pt(r.x,r.y);
+      putText(result_image, r.text, pt,  
+              FONT_HERSHEY_SIMPLEX, 0.3, Color::RED);
+      
+      
+   }
+   
+   VisualLogger::setEnabled(true);
+   VisualLogger::log("Buttons OCR", result_image);
+      
+   return results;
+}
 
 string
 Vision::recognize(Mat image){

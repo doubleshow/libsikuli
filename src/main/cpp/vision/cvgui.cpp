@@ -12,6 +12,10 @@
 #include <iostream>
 using namespace std;
 
+
+Scalar Color::RED(0,0,255);
+
+
 static bool sort_by_x (Rect a, Rect b){ 
 	return (a.x < b.x); 
 }
@@ -65,6 +69,7 @@ static bool sort_blob_by_y(Blob a, Blob b){
 
 int VisualLogger::image_i = 0;
 int VisualLogger::step_i = 0;
+bool VisualLogger::enabled = true;
 char* VisualLogger::prefix = 0;
 
 //#define VLOG(x,y) 
@@ -105,6 +110,7 @@ Util::growRect(Rect& rect, int xd, int yd, cv::Mat image){
 }
 
 
+
 void 
 Painter::drawRect(Mat& image, Rect r, Scalar color){
    rectangle(image, 
@@ -131,7 +137,7 @@ Painter::drawRects(Mat& image, vector<Rect>& rects){
 }
 
 void 
-Painter::drawBlobs(Mat& image, vector<Blob>& blobs, Scalar color){
+Painter::drawBlobs(Mat& image, vector<Blob>& blobs){
    for (vector<Blob>::iterator it = blobs.begin();
         it != blobs.end(); ++it){
       
@@ -142,6 +148,19 @@ Painter::drawBlobs(Mat& image, vector<Blob>& blobs, Scalar color){
       rs.push_back(blob);
       drawRects(image, rs, color);
    }
+}
+
+void 
+Painter::drawBlobs(Mat& image, vector<Blob>& blobs, Scalar color){
+   vector<Rect> rs;
+
+   for (vector<Blob>::iterator it = blobs.begin();
+        it != blobs.end(); ++it){
+      
+      Blob& blob = *it;
+      rs.push_back(blob);
+   }
+   drawRects(image, rs, color);
 }
 
 void 
@@ -668,8 +687,36 @@ cvgui::run_ocr_on_lineblobs(vector<LineBlob>& ocr_input_lineblobs,
    }
 }
 
+void getLeafBlobs(vector<Blob>& blobs, vector<Blob>& leaf_blobs){
+   
+   leaf_blobs.clear();
+   
+   for (vector<Blob>::iterator it = blobs.begin();
+        it != blobs.end(); ++it){
+      
+      Blob& a = *it;
+      
+      // check if blob 'a' contains any other blob
+      vector<Blob>::iterator it1;
+      for (it1 = blobs.begin(); 
+           it1 != blobs.end(); ++it1){
+         
+         Blob& b = *it1;
+         
+         if (it != it1 && b.isContainedBy(a))
+            break;
+      }
+      
+      // if not, it is a leave blob
+      if (it1 == blobs.end())
+         leaf_blobs.push_back(a);
+         
+   }
+}
+
+
 void
-cvgui::findBoxes(const Mat& screen){
+cvgui::findBoxes(const Mat& screen, vector<Blob>& output_blobs){
 
    Mat dark;
    Util::rgb2grayC3(screen,dark);
@@ -681,15 +728,30 @@ cvgui::findBoxes(const Mat& screen){
    Mat gray;
    cvtColor(screen,gray,CV_RGB2GRAY);
    
-//   medianBlur(gray, gray, 3);
+   //medianBlur(gray, gray, 3);
    VLOG("Blurred", gray); 
    
    Mat edges;
-//   Canny(gray,edges,0.66*50,1.33*50,3,true);  
-   Canny(gray,edges,0.66*50,1.33*50,5,true);  
-   
+
+   //for (int c=3;c<=7;c=c+2){
+   for (int c=10;c<=100;c=c+10){
+      
   // dilate(edges, edges, Mat::ones(2,2,CV_8UC1));
+      char buf[50];
+      Mat test;
+      sprintf(buf,"Canny%d",c);
+      Canny(gray,test,0.66*c,1.33*c,3,true);  
+      VLOG(buf, test);       
+   }
+
+   int s = 100;
+   Canny(gray,edges,0.66*s,1.33*s,3,true);  
    VLOG("Canny", edges); 
+
+
+   dilate(edges, edges, Mat::ones(2,2,CV_8UC1));
+   VLOG("Dilated", edges); 
+
    
    
    Mat result = dark.clone();
@@ -712,14 +774,23 @@ cvgui::findBoxes(const Mat& screen){
    cout << contours.size() << " " << hierarchy.size() << endl;
    // iterate through all the top-level contours,
    // draw each connected component with its own random color
- //  int idx = 0;
-//   for( ; idx >= 0; idx = hierarchy[idx][0] )
-//   {
-      //Scalar color( rand()&255, rand()&255, rand()&255 );
-   Scalar color(255,255,0);//,255);
- //     drawContours( result, contours, idx, color, CV_FILLED, 8, hierarchy );
-
-   //  }
+//   int idx = 0;
+//   for( ; idx >= 0; idx = hierarchy[idx][0]){
+//      
+//      vector<Point>& contour = contours[idx];
+//      
+//      
+//      //Scalar color( rand()&255, rand()&255, rand()&255 );
+//      Scalar cyan(255,255,0);
+//      vector<vector<Point> > cs;
+//      cs.push_back(contour);
+//      drawContours( result, cs, -1, cyan, 2);//, CV_FILLED);
+//      
+// //     drawContours( result, contours, idx, color, CV_FILLED, 8, hierarchy );
+//
+//   }
+   
+   vector<Blob> blobs;
    
    
    for (vector<vector<Point> >::iterator it = contours.begin();
@@ -738,7 +809,14 @@ cvgui::findBoxes(const Mat& screen){
          cs.push_back(contour);
          //drawContours( result, cs, -1, color, 2);//, CV_FILLED);
          
-         Painter::drawRect(result, r, Scalar(0,0,255));
+         Scalar randcolor( rand()&255, rand()&255, rand()&255 );
+       
+         Painter::drawRect(result, r, randcolor);
+         
+         Blob blob(r);
+         blobs.push_back(blob);
+
+         //Painter::drawRect(result, r, Scalar(0,0,255));
       }
       
    }
@@ -746,7 +824,64 @@ cvgui::findBoxes(const Mat& screen){
    
    VLOG("Contours", result); 
    
+   
+   Mat blobs_result = dark.clone();
+   Painter::drawBlobs(blobs_result, blobs, Color::RED);
+   
+   VLOG("Blobs", blobs_result);
+   
+   
+   vector<Blob> unique_blobs;
+   for (vector<Blob>::iterator it = blobs.begin();
+        it != blobs.end(); ++it){
+      
+      Blob& a = *it;
+
+      
+      vector<Blob>::iterator it1;
+      for (it1 = unique_blobs.begin(); 
+           it1 != unique_blobs.end(); ++it1){
+         
+         Blob& b = *it1;
+         
+         int d = 5;
+         bool similar_bounding_box = 
+            abs(a.x-b.x) < d && abs(a.y-b.y) < d &&
+         abs(a.height-b.height) < 2*d &&
+         abs(a.width-b.width) < 2*d;
+         
+         
+         if (similar_bounding_box)
+            break;
+            
+      }
+      
+      // if no blob whose bounding box is similar
+      if (it1 == unique_blobs.end()){
+       
+         // add this blob to the list of unique blobs
+         unique_blobs.push_back(a);
+      }
+   }
+   
+   Mat unique_blobs_result = dark.clone();
+   Painter::drawBlobs(unique_blobs_result, unique_blobs, Color::RED);
+   
+   VLOG("UniqueBlobs", unique_blobs_result);
+   
+   
+   vector<Blob> leaf_blobs;
+   getLeafBlobs(unique_blobs, leaf_blobs);
+   
+      
+   Mat leaf_blobs_result = dark.clone();
+   Painter::drawBlobs(leaf_blobs_result, leaf_blobs, Color::RED);
+   VLOG("LeafBlobs", leaf_blobs_result);
+   
+   output_blobs = leaf_blobs;
 }
+
+
 
 
 void
@@ -760,6 +895,7 @@ cvgui::computeUnitBlobs(const Mat& screen, Mat& output){
    
    Mat edges;
    Canny(gray,edges,0.66*50,1.33*50,3,true);  
+//   Canny(gray,edges,0.66*100,1.33*100,3,true);  
    VLOG("Canny", edges); 
    
 //   Mat corners;

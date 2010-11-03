@@ -22,6 +22,7 @@ private:
    static int image_i;
    static int step_i;
    static char* prefix;
+   static bool enabled;
    
 public:
    
@@ -33,7 +34,15 @@ public:
       step_i = 0;
    }
    
+   
+   static void setEnabled(bool enabled_){
+      enabled = enabled_;
+   }
+   
    static void log(const char* name, const Mat& image){
+      if (!enabled)
+         return;
+      
       char buf[200];
       
       if (prefix){
@@ -110,6 +119,11 @@ public:
    vector<LineBlob> lineblobs;
 };
 
+class Color{
+public:   
+   static Scalar RED;
+
+};
 
 class Painter {
 
@@ -118,8 +132,10 @@ public:
    static void drawRect(Mat& image, Rect r, Scalar color);
    static void drawRects(Mat& image, vector<Rect>& rects, Scalar color);
    static void drawRects(Mat& image, vector<Rect>& rects);
-  
+
+   static void drawBlobs(Mat& image, vector<Blob>& blobs);
    static void drawBlobs(Mat& image, vector<Blob>& blobs, Scalar color);
+   
    static void drawLineBlobs(Mat& image, vector<LineBlob>& lineblobs, Scalar color);
    static void drawParagraphBlobs(Mat& image, vector<ParagraphBlob> blobs, Scalar color);
   
@@ -149,7 +165,7 @@ public:
    static void getLineBlobsAsIndividualWords(const Mat& screen, vector<LineBlob>& lineblobs);
    static void getParagraphBlobs(const Mat& screen, vector<ParagraphBlob>& parablobs);
    
-   static void findBoxes(const Mat& screen);
+   static void findBoxes(const Mat& screen, vector<Blob>& output_blobs);
 
    
 private:

@@ -25,7 +25,8 @@ public:
    FindInput(Mat source, Mat target);
    FindInput(Mat source, const char* target, bool text = false);
    FindInput(const char* source_filename, const char* target, bool text = false);
- 
+   FindInput(Mat source);
+   
    // copy everything in 'other' except for the source image
    FindInput(Mat source, const FindInput other);
 
@@ -80,6 +81,9 @@ public:
    static void initOCR(const char* ocrDataPath);
       
    static std::string recognize(cv::Mat image);
+   
+   
+   static vector<FindResult> find_buttons(FindInput q);
    
    //helper functions
    static cv::Mat createMat(int _rows, int _cols, unsigned char* _data);
