@@ -122,6 +122,8 @@ public:
 class Color{
 public:   
    static Scalar RED;
+   static Scalar WHITE;
+   
    static Scalar RANDOM();
 
 };
@@ -167,6 +169,7 @@ public:
    static void getParagraphBlobs(const Mat& screen, vector<ParagraphBlob>& parablobs);
    
    static void findBoxes(const Mat& screen, vector<Blob>& output_blobs);
+   static void findPokerBoxes(const Mat& screen, vector<Blob>& output_blobs);
 
    
 private:
@@ -176,8 +179,8 @@ private:
    static Mat removeGrayBackground(const Mat& input);
    static Mat obtainGrayBackgroundMask(const Mat& input);
 
-   static void findLongLines(const Mat& binary, Mat& dest);
-   static void findLongLines_Horizontal(const Mat& binary, Mat& dest);
+   static void findLongLines(const Mat& binary, Mat& dest, int min_length = 100, int extension = 0);
+   static void findLongLines_Horizontal(const Mat& binary, Mat& dest, int min_length = 100, int extension = 0);
    
    static void extractRects(const Mat& src, vector<Rect>& rects);
    static void extractBlobs(const Mat& src, vector<Blob>& blobs);

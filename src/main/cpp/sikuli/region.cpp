@@ -601,9 +601,9 @@ Region::doFind(Pattern target) {
    FindInput* fi;
    
    if (target.isText())
-      fi = new FindInput(simg.getMat(), target.getText(), true);
+      fi = new FindInput(simg.getMat(), TARGET_TYPE_TEXT, target.getText());
    else
-      fi = new FindInput(simg.getMat(), target.getImageURL());   
+      fi = new FindInput(simg.getMat(), TARGET_TYPE_IMAGE, target.getImageURL());   
       
 
    FindInput& input = *fi;   

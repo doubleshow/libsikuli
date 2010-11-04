@@ -14,6 +14,8 @@ using namespace std;
 
 
 Scalar Color::RED(0,0,255);
+Scalar Color::WHITE(255,255,255);
+
 Scalar Color::RANDOM() { 
    return Scalar(rand()&255, rand()&255, rand()&255);
 };
@@ -716,6 +718,132 @@ void getLeafBlobs(vector<Blob>& blobs, vector<Blob>& leaf_blobs){
    }
 }
 
+void
+cvgui::findPokerBoxes(const Mat& screen, vector<Blob>& output_blobs){
+   Mat dark;
+   Util::rgb2grayC3(screen,dark);
+   dark = dark * 0.5;
+   
+   
+   VLOG("Input", screen);
+   
+   Mat gray;
+   cvtColor(screen,gray,CV_RGB2GRAY);
+   
+   //medianBlur(gray, gray, 3);
+   //VLOG("Blurred", gray); 
+   
+   Mat edges;
+   
+   // Code for experimenting differenty parameters for Canny
+   //   for (int c=10;c<=100;c=c+10){
+   //      char buf[50];
+   //      Mat test;
+   //      sprintf(buf,"Canny%d",c);
+   //      Canny(gray,test,0.66*c,1.33*c,3,true);  
+   //      VLOG(buf, test);       
+   //   }
+   
+   int s = 100;
+   Canny(gray,edges,0.66*s,1.33*s,3,true);  
+   VLOG("Canny", edges); 
+   
+   
+   Mat v = Mat::ones(2,2,CV_8UC1);
+
+   dilate(edges, edges, v);
+   erode(edges, edges, v);
+
+   VLOG("Dilated", edges); 
+
+   Mat lines;
+   findLongLines(edges, lines, 15);
+   
+   Mat w = Mat::ones(5,5,CV_8UC1);
+   dilate(lines, lines, w);
+   erode(lines, lines, w);
+   
+   VLOG("Lines", lines); 
+
+   
+   Mat lines2;
+   Mat z = Mat::ones(2,2,CV_8UC1);   
+
+   dilate(lines, lines, z);
+   
+   findLongLines(lines, lines2, 30, 15);
+
+   //dilate(lines2, lines2, z);
+   //erode(lines2, lines2, z);
+   
+   VLOG("Lines2", lines2); 
+
+
+   
+   Mat result = dark.clone();
+   //Mat copy = edges.clone();
+   //Mat copy = lines.clone();
+   
+   Mat copy = lines2.clone();
+   
+   
+   vector<vector<Point> > contours;
+   vector<Vec4i> hierarchy;
+   
+   findContours( copy, contours, hierarchy,
+                CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
+  
+   vector<Blob> blobs;
+   
+   Mat blank = dark.clone();
+   blank = 0.0;
+   
+   Mat contour_shading = blank;//dark.clone();
+   
+   for (vector<vector<Point> >::iterator it = contours.begin();
+        it != contours.end(); ++it){
+      
+      vector<Point>& contour = *it;
+      
+      Rect r = boundingRect(Mat(contour));
+      
+      double a1 = contourArea(Mat(contour));
+      double a2 = r.height * r.width;
+      
+      
+      if (a2 < 100)
+         continue;
+         
+      
+      if (abs(r.width - 65) > 5)
+         continue;
+      
+      //if ( min(a1,a2)/max(a1,a2) > 0.80){
+         
+         vector<vector<Point> > cs;
+         cs.push_back(contour);
+         drawContours(contour_shading, cs, -1, Color::RANDOM(), CV_FILLED);
+         
+         
+         Blob blob(r);
+         blobs.push_back(blob);
+      //}
+      
+   }
+   
+   Mat contours_image = contour_shading*0.7 + dark*0.5;
+
+   Painter::drawBlobs(contours_image, blobs, Color::WHITE);
+
+   VLOG("ColoredSelectedContours", contours_image); 
+   
+   
+   Mat blobs_result = dark.clone();
+   Painter::drawBlobs(blobs_result, blobs, Color::RED);
+   
+   VLOG("OutputBlobs", blobs_result);
+         
+}
 
 void
 cvgui::findBoxes(const Mat& screen, vector<Blob>& output_blobs){
@@ -768,7 +896,7 @@ cvgui::findBoxes(const Mat& screen, vector<Blob>& output_blobs){
    //findContours( copy, contours, hierarchy,
     //            CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
    
-   cout << contours.size() << " " << hierarchy.size() << endl;
+//   cout << contours.size() << " " << hierarchy.size() << endl;
    // iterate through all the top-level contours,
    // draw each connected component with its own random color
 //   int idx = 0;
@@ -801,6 +929,9 @@ cvgui::findBoxes(const Mat& screen, vector<Blob>& output_blobs){
       
       double a1 = contourArea(Mat(contour));
       double a2 = r.height * r.width;
+      
+      
+      
       
       if ( min(a1,a2)/max(a1,a2) > 0.80){
 
@@ -1766,18 +1897,16 @@ cvgui::extractRects(const Mat& src,
 
 
 void
-cvgui::findLongLines(const Mat& src, Mat& dest){
+cvgui::findLongLines(const Mat& src, Mat& dest, int min_length, int extension){
    
    dest = src.clone();
-   //   adaptiveThreshold(src, dest, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 3, 1);
-   //   Canny(dest, dest, 10, 0);  
    
    Mat mask;
-   cvgui::findLongLines_Horizontal(dest,mask);
+   cvgui::findLongLines_Horizontal(dest,mask, min_length, extension);
    
    Mat maskT, destT;
    transpose(dest,destT);
-   cvgui::findLongLines_Horizontal(destT,maskT);
+   cvgui::findLongLines_Horizontal(destT,maskT,min_length, extension);
    
    Mat maskTT;
    transpose(maskT,maskTT);
@@ -1787,9 +1916,9 @@ cvgui::findLongLines(const Mat& src, Mat& dest){
 }
 
 
-#define LONGLINE_THRESHOLD 100
 void
-cvgui::findLongLines_Horizontal(const Mat& binary, Mat& dest){
+cvgui::findLongLines_Horizontal(const Mat& binary, Mat& dest,
+                                int min_length, int extension){
    
    typedef uchar T;
    
@@ -1820,7 +1949,7 @@ cvgui::findLongLines_Horizontal(const Mat& binary, Mat& dest){
             
 				// check for the condition of a baseline hypothesis
 				// the length of the baseline must be > 15
-				if ((j - current_baseline_startpoint) > LONGLINE_THRESHOLD){// || j == size.width - 1){
+				if ((j - current_baseline_startpoint) > min_length){// || j == size.width - 1){
 					
                //					int closeness_threshold = 1; 					
                //					if (has_previous_baseline && 
@@ -1842,6 +1971,11 @@ cvgui::findLongLines_Horizontal(const Mat& binary, Mat& dest){
 					for (int k=current_baseline_startpoint; k < j; ++k){
                   ptr2[k] = 255;
 					}	
+
+               for (int k=j; k < min(j+extension,size.width-1); ++k){
+                  ptr2[k] = 255;
+					}	
+               
 					
 				}
 				
