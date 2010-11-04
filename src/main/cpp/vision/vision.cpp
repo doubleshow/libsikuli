@@ -29,6 +29,12 @@ FindInput::FindInput(Mat source_, int target_type_){
    target_type = target_type_;
 }
 
+FindInput::FindInput(const char* source_filename_, int target_type_){
+   init();
+   setSource(source_filename_);
+   target_type = target_type_;
+}
+
 FindInput::FindInput(Mat source_, Mat target_){
    init();
    source = source_;
@@ -51,7 +57,7 @@ FindInput::FindInput(Mat source_, const FindInput other){
    source = source_;
    target = other.target;
    target_type = other.target_type;
-   bFindingText = other.bFindingText;
+   target_text = other.target_text;
    bFindingAll = other.bFindingAll;
    similarity = other.similarity;
    limit = other.limit;
@@ -60,16 +66,11 @@ FindInput::FindInput(Mat source_, const FindInput other){
 void 
 FindInput::init(){
    target_type = TARGET_TYPE_IMAGE;
+   target_text = "";
    similarity = 0.8;
    limit = 100;
+   bFindingAll = false;
 }
-
-//void
-//FindInput::init(Mat source_, int target_type, const char* target_string){
-//   init();
-//   setSource(source_);
-//   setTarget(target_type, target_string);
-//}
 
 void FindInput::setSource(const char* source_filename){
    if(fileExists(source_filename))
@@ -79,8 +80,9 @@ void FindInput::setSource(const char* source_filename){
 void FindInput::setTarget(int target_type_, const char* target_string){
    target_type = target_type_;
    
-   if (target_type == TARGET_TYPE_TEXT){
-      targetText = target_string;
+   if (target_type == TARGET_TYPE_TEXT  
+       || target_type == TARGET_TYPE_BUTTON){
+      target_text = target_string;
    }else if (target_type == TARGET_TYPE_IMAGE){
       
       if(fileExists(target_string))
@@ -144,7 +146,7 @@ FindInput::getSimilarity(){
 
 std::string 
 FindInput::getTargetText(){
-   return targetText;
+   return target_text;
 }
 
 
@@ -153,6 +155,8 @@ Vision::initOCR(const char* ocrDataPath) {
    OCR::init(ocrDataPath);
 }
 
+#include "cvgui.h"
+#include "tessocr.h"
 static vector<FindResult> 
 find_text(FindInput& input){
   
@@ -175,6 +179,23 @@ find_text(FindInput& input){
       if (f.hasNext())
          results.push_back(f.next());
    }
+   
+   
+   
+   Mat result_image = source * 0.5;
+   for (vector<FindResult>::iterator it = results.begin();
+        it != results.end(); ++it){
+      
+      FindResult& r = *it;
+      
+      Point pt(r.x,r.y);
+      putText(result_image, input.getTargetText(), pt,  
+              FONT_HERSHEY_SIMPLEX, 0.3, Color::RED);
+      
+   }
+   VisualLogger::setEnabled(true);
+   VisualLogger::log("FindText-Result", result_image);
+
    
    return results;
 }
@@ -205,8 +226,7 @@ find_image(FindInput& input){
    return results;
 }
 
-#include "cvgui.h"
-#include "tessocr.h"
+
 static vector<FindResult> 
 find_button(FindInput& input){
    
@@ -238,7 +258,27 @@ find_button(FindInput& input){
       if (result.text.empty())
          continue;
       
-      results.push_back(result);      
+      
+      string target_text = input.getTargetText();
+      if (!target_text.empty()){
+         
+         int d;
+         d = OCR::findEditDistance(target_text.c_str(),
+                                            result.text.c_str(),
+                                            3);
+         
+         if (d < 2){
+            results.push_back(result);  
+         }
+      }else{
+         results.push_back(result);
+      }
+      
+      // if we only need to find one result, and we already have one result
+      if (!input.isFindingAll() && !results.empty()){
+         break;
+      }
+      
    }
    
    
@@ -257,7 +297,7 @@ find_button(FindInput& input){
    }
    
    VisualLogger::setEnabled(true);
-   VisualLogger::log("Buttons OCR", result_image);
+   VisualLogger::log("Buttons-OCR", result_image);
    
    return results;
 }
@@ -300,6 +340,7 @@ Vision::compare(Mat im1, Mat im2){
 
 vector<FindResult> 
 Vision::find(FindInput input){
+   VisualLogger::next();
 
    vector<FindResult> results;
 

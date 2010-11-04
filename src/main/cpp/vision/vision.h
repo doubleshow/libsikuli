@@ -32,7 +32,9 @@ public:
    FindInput(Mat source, int target_type, const char* target);
    
    FindInput(const char* source_filename, int target_type, const char* target);
+  
    FindInput(Mat source, int target_type);
+   FindInput(const char* source_filename, int target_type);
    
    // copy everything in 'other' except for the source image
    FindInput(Mat source, const FindInput other);
@@ -65,7 +67,7 @@ private:
       
    Mat source;
    Mat target;
-   std::string targetText;
+   std::string target_text;
    
    int limit;
    double similarity;

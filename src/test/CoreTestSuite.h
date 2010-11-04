@@ -12,6 +12,7 @@
 #include "sikuli.h"
 #include "vision.h"
 #include "tessocr.h"
+#include "cvgui.h"
 
 using namespace cv;
 using namespace sikuli;
@@ -189,6 +190,61 @@ public:
       TS_ASSERT_EQUALS(r.getW(), m.getW());
       TS_ASSERT_EQUALS(r.getH(), m.getH());
 
+   }
+   
+   void testDetectBoxes(void)
+   {
+            
+      //Mat screen = imread("buttons.png");
+      //Mat screen = imread("buttons2.png");
+      //Mat screen = imread("spider.png");
+      
+//      Mat screen = imread("spider2.png");
+//      vector<Blob> blobs;
+//      cvgui::findPokerBoxes(screen,blobs);
+//
+//      screen = imread("spider3.png");
+//      cvgui::findPokerBoxes(screen,blobs);
+      
+      {
+         FindInput fi("buttons4.png", TARGET_TYPE_BUTTON);
+         fi.setFindAll(true);
+         Vision::find(fi);
+      }
+      
+      {
+         FindInput fi("buttons4.png", TARGET_TYPE_BUTTON, "Compose Mail");
+         fi.setFindAll(true);
+         Vision::find(fi);
+      }
+      
+      {
+         FindInput fi("buttons4.png", TARGET_TYPE_BUTTON, "Compose Mail");
+         Vision::find(fi);
+      }
+
+      {
+         FindInput fi("buttons4.png", TARGET_TYPE_TEXT, "Compose Mail");
+         Vision::find(fi);
+      }
+
+      {
+         FindInput fi("buttons4.png", TARGET_TYPE_TEXT, "Compose Mail");
+         fi.setFindAll(true);
+         Vision::find(fi);
+      }
+      
+      {
+         FindInput fi("buttons4.png", TARGET_TYPE_TEXT, "Detect Displays");
+         Vision::find(fi);
+      }
+      
+      {
+         FindInput fi("buttons4.png", TARGET_TYPE_TEXT, "Detect Displays");
+         fi.setFindAll(true);
+         Vision::find(fi);
+      }
+      
    }
    
 };

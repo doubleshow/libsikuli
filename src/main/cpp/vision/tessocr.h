@@ -142,6 +142,9 @@ public:
    static void init(const char* datapath);
    
    
+   static int findEditDistance(const char *s1, const char *s2, 
+                                 int max_distance=100);
+   
 private:
    
    static bool isInitialized;

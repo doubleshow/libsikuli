@@ -16,6 +16,7 @@ int main() {
    //CxxTest::leaveOnly("CoreTestSuite","testAXAPI");
    //CxxTest::leaveOnly("CoreTestSuite","testGetMouseLocation");
    //CxxTest::leaveOnly("CoreTestSuite","testCapture");
+   CxxTest::leaveOnly("CoreTestSuite","testDetectBoxes");
    
    //CxxTest::leaveOnly("MacTestSuite","testHoverAndClick");
    //CxxTest::leaveOnly("MacTestSuite","testDragDrop");
@@ -28,7 +29,7 @@ int main() {
 	//CxxTest::leaveOnly("FlashTestSuite","testType");
 	//CxxTest::leaveOnly("FlashTestSuite","testKeys");
 	//CxxTest::leaveOnly("FlashTestSuite","testPaste");
-	CxxTest::leaveOnly("FlashTestSuite","testOCR");
+	//CxxTest::leaveOnly("FlashTestSuite","testOCR");
 
    
    //CxxTest::leaveOnly("FlashTestSuite");

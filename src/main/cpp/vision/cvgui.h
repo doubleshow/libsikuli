@@ -25,11 +25,19 @@ private:
    static bool enabled;
    
 public:
-   
-//   VisualLogger(){
-//   }
-   
+      
    static void newImage(){
+      if (!enabled)
+         return;
+      
+      image_i++;
+      step_i = 0;
+   }
+   
+   static void next(){
+      if (!enabled)
+         return;
+      
       image_i++;
       step_i = 0;
    }

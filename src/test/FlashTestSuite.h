@@ -134,7 +134,7 @@ public:
       initOCR("arial.png");
       s.click("/System Preferences/");
       s.click("/Configuration/");
-      s.click("/Keyboard/");
+//      s.click("/Keyboard/");
       s.click("/My Favorites/");
 
    }

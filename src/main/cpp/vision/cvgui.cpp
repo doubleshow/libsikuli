@@ -1067,9 +1067,7 @@ cvgui::computeUnitBlobs(const Mat& screen, Mat& output){
 
 void 
 cvgui::getParagraphBlobs(const Mat& screen, vector<ParagraphBlob>& output_parablobs){
-   
-   VNEW();
-   
+      
    Mat screen_gray;
    cvtColor(screen,screen_gray,CV_RGB2GRAY);
    
@@ -1194,8 +1192,7 @@ cvgui::getParagraphBlobs(const Mat& screen, vector<ParagraphBlob>& output_parabl
 
 void
 cvgui::getLineBlobsAsIndividualWords(const Mat& screen, vector<LineBlob>& output_lineblobs){
-   VNEW();
-   
+
    Mat screen_gray;
    cvtColor(screen,screen_gray,CV_RGB2GRAY);
    
@@ -1316,8 +1313,6 @@ cvgui::getLineBlobsAsIndividualWords(const Mat& screen, vector<LineBlob>& output
 
 void 
 cvgui::segmentScreenshot(const Mat& screen, vector<Blob>& text_blobs, vector<Blob>& image_blobs){
-   
-   VNEW();
    
    VLOG("Input", screen);
    
@@ -1630,47 +1625,6 @@ cvgui::segmentScreenshot(const Mat& screen, vector<Blob>& text_blobs, vector<Blo
 
 
 
-
-
-#ifdef TEST_CVGUI
-int main(){
-   
-   
-   index_screenshot_file("research/test/amazon.png",1);
-   
-   
-   //   index_screenshot_file("research/test/amazon1.png",1);
-   //   index_screenshot_file("research/test/amazon2.png",2);
-   //   index_screenshot_file("research/test/amazon3.png",3);
-   //   index_screenshot_file("research/test/amazon4.png",4);
-   //   index_screenshot_file("research/test/amazon5.png",5);
-   //   index_screenshot_file("research/test/amazon6.png",6);
-   
-   vector<Blob> text_blobs;
-   vector<Blob> image_blobs;
-   vector<ImageRecord> records;
-   
-   char query_file[] = "research/test/amazon_logo.png";
-   Mat query = imread(query_file, 1);
-   
-   cvgui::segmentScreenshot(query, text_blobs, image_blobs);  
-   records = create_image_records(query, image_blobs);   
-   
-   for (vector<ImageRecord>::iterator r = records.begin();
-        r != records.end(); ++r){
-      
-      cout << endl << r->area << " : ";
-      vector<ImageRecord> matches = db.find(*r);
-      for (vector<ImageRecord>::iterator m = matches.begin();
-           m != matches.end(); ++m){
-         
-         cout << "(" << m->screenshot_id << ":" << m->id << ")";
-      }
-   }
-   
-   
-}   
-#endif
 
 static int L1dist(Vec3b p1, Vec3b p2){
 	return max(p1[0],p2[0])-min(p1[0],p2[0])+	

@@ -18,6 +18,14 @@
 #define MAXLEN 80
 
 using namespace sikuli;
+
+int card_main(int argc, const char* argv[]){
+   const char* filename = argv[1];
+   Mat screen = imread(filename);
+   vector<Blob> blobs;
+   cvgui::findPokerBoxes(screen,blobs);
+}
+   
 int prefix_main(int argc, const char* argv[]){
    
    
@@ -29,9 +37,19 @@ int prefix_main(int argc, const char* argv[]){
  
    //Mat screen = imread("screen.png");
    //Mat screen = imread("screen_eclipse.png");
-   Mat screen = imread("screen_bl.png");
-
+   //Mat screen = imread("screen_bl.png");
+   //Mat screen = imread("keyboard.png");
+   //Mat screen = imread("windows.png");
+   //Mat screen = imread("spider.png");
+   
+   
+   //cvgui::findBoxes(screen);
+   
+   Mat screen = imread("cnn.png");
    OCRText text = OCR::recognize(screen);
+   
+   return 1;
+
    
    vector<string> strs = text.getLineStrings();
    //vector<string> strs = text.getWordStrings();
@@ -39,18 +57,26 @@ int prefix_main(int argc, const char* argv[]){
    
    for (vector<string>::iterator it = strs.begin();
         it != strs.end(); ++it){
-    
       cout << (*it) << endl;
    }
    
    
    string str = text.getString();
    cout << str;
+      
+   //str = Vision::recognize(screen);
+   //cout << str;
+   
+   vector<OCRWord> words = text.getWords();
+   //vector<string> strs = text.getWordStrings();
    
    
-   str = Vision::recognize(screen);
-   cout << str;
-   
+   for (vector<OCRWord>::iterator it = words.begin();
+        it != words.end(); ++it){
+      
+      OCRWord& word = *it;
+      cout << word.x << "," << word.y << ":" << word.getString() << endl;
+   }
    
    //OCR::find_word(screen,"Keyboard");
    
@@ -124,6 +150,7 @@ int match_main(int argc, const char* argv[]){
    
    FindInput input(argv[1],argv[2]);
    input.setFindAll(true);
+   input.setSimilarity(0.8);
    results = Vision::find(input);
    
    for (vector<FindResult>::iterator r = results.begin(); 
@@ -285,7 +312,10 @@ int main(int argc, const char* argv[]){
    
    else if (strcmp(command, "PREFIX") == 0)
       return prefix_main(argc-1, argv+1);
-  
+
+   else if (strcmp(command, "CARD") == 0)
+      return card_main(argc-1, argv+1);
+
    
    return 0;
 }
