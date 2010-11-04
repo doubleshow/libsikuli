@@ -235,6 +235,9 @@ OCRText::getWordStrings(){
             OCRWord& word = *it2;
             word_strings.push_back(word.getString());
          }
+         
+         // add new line
+         word_strings.push_back("\n");
       }
    }
    

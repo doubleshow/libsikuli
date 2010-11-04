@@ -192,6 +192,15 @@ public:
 
    }
    
+   void testOCR(void)
+   {
+      Mat screen = imread("cnn.png");
+     
+      cout << Vision::recognize(screen);
+      
+   }
+   
+   
    void testDetectCards(void)
    {
       Mat screen = imread("spider3.png");
