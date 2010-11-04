@@ -688,7 +688,11 @@ linkOCRCharsToOCRLine(const vector<OCRChar>& ocrchars){
 
 OCRLine
 recognize_line(const cv::Mat& screen_gray, const LineBlob& lineblob){
-   vector<OCRChar> ocrchars = run_ocr(screen_gray, lineblob);
+   
+   Blob b(lineblob);
+   //Util::growRect(b, 2, 2, screen_gray);
+   
+   vector<OCRChar> ocrchars = run_ocr(screen_gray, b);
    OCRLine ocrline = linkOCRCharsToOCRLine(ocrchars);
    return ocrline;
 }

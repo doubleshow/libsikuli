@@ -192,6 +192,13 @@ public:
 
    }
    
+   void testDetectCards(void)
+   {
+      Mat screen = imread("spider3.png");
+      vector<Blob> blobs;
+      cvgui::findPokerBoxes(screen,blobs);
+   }
+   
    void testDetectBoxes(void)
    {
             

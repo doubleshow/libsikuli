@@ -20,10 +20,16 @@
 using namespace sikuli;
 
 int card_main(int argc, const char* argv[]){
+   VisualLogger::setEnabled(false);
+   
    const char* filename = argv[1];
    Mat screen = imread(filename);
    vector<Blob> blobs;
-   cvgui::findPokerBoxes(screen,blobs);
+   Mat result = cvgui::findPokerBoxes(screen,blobs);
+   char buf[200];
+   sprintf(buf, "%s.cards.png", filename);
+   imwrite(buf, result);
+   return 1;
 }
    
 int prefix_main(int argc, const char* argv[]){
@@ -148,7 +154,7 @@ int match_main(int argc, const char* argv[]){
      
    vector<FindResult> results;
    
-   FindInput input(argv[1],argv[2]);
+   FindInput input(argv[1],TARGET_TYPE_IMAGE,argv[2]);
    input.setFindAll(true);
    input.setSimilarity(0.8);
    results = Vision::find(input);

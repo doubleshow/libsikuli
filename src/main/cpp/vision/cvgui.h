@@ -177,7 +177,7 @@ public:
    static void getParagraphBlobs(const Mat& screen, vector<ParagraphBlob>& parablobs);
    
    static void findBoxes(const Mat& screen, vector<Blob>& output_blobs);
-   static void findPokerBoxes(const Mat& screen, vector<Blob>& output_blobs);
+   static Mat findPokerBoxes(const Mat& screen, vector<Blob>& output_blobs);
 
    
 private:

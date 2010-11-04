@@ -225,14 +225,12 @@ Painter::drawOCRWord(Mat& ocr_result_image, OCRWord& ocrword){
       buf[0] = ch;
       buf[1] = 0;
      
-      Point pt(ocrchar.x, ocrword.y + ocrword.height);      
+      Point pt(ocrchar.x, ocrword.y + ocrword.height - 10);      
 //      //Point pt(ocr_rect.x,ocr_rect.y + ocr_rect.height);
       
-      Scalar white(255,255,255);
-      Scalar black(0,0,0);
-      Scalar red(0,0,255);
       putText(ocr_result_image, buf, pt,  
-              FONT_HERSHEY_SIMPLEX, 0.3, red);
+                        FONT_HERSHEY_SIMPLEX, 0.4, Color::RED);
+   //           FONT_HERSHEY_PLAIN, 0.8, Color::RED);
       
    }
    
@@ -718,7 +716,7 @@ void getLeafBlobs(vector<Blob>& blobs, vector<Blob>& leaf_blobs){
    }
 }
 
-void
+Mat
 cvgui::findPokerBoxes(const Mat& screen, vector<Blob>& output_blobs){
    Mat dark;
    Util::rgb2grayC3(screen,dark);
@@ -842,6 +840,17 @@ cvgui::findPokerBoxes(const Mat& screen, vector<Blob>& output_blobs){
    Painter::drawBlobs(blobs_result, blobs, Color::RED);
    
    VLOG("OutputBlobs", blobs_result);
+   
+   // print output to stdout
+   for (vector<Blob>::iterator it = blobs.begin();
+        it != blobs.end(); ++it){
+      
+      Blob& b = *it;
+      
+      cout << b.x << " " << b.y << " " << b.width << " " << b.height << endl;
+   }
+      
+   return contours_image;
          
 }
 
