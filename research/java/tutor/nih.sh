@@ -1,0 +1,1 @@
+java -classpath sikuli-script.jar:sikuli-tutor.jar edu.mit.csail.uid.SikuliScript  nihsenior.sikuli/
