@@ -32,9 +32,9 @@ endif (W32)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib 
                  ${CMAKE_CURRENT_SOURCE_DIR}/lib/opencv)
 
-set(OPENCV_LIBRARIES 
+set(OPENCV_LIBRARIES opencv_contrib
    opencv_legacy opencv_core opencv_imgproc opencv_highgui opencv_objdetect opencv_lapack
-   libpng libjpeg libtiff zlib)
+   libpng libjpeg zlib)
    
    
 if (OPENCV211)

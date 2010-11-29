@@ -12,6 +12,9 @@ import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
+import vision.OCRText;
+import vision.OCRWords;
+
 public class OCRDocument {
 
 	class OCRWord {
@@ -38,19 +41,48 @@ public class OCRDocument {
 	}
 
 
-	Map<String,Rectangles> word_to_rectangles;
-	ArrayList<OCRWord> words = new ArrayList<OCRWord>();
+	Map<String,Rectangles> _word_to_rectangles;
+	ArrayList<OCRWord> _words = new ArrayList<OCRWord>();
 
+	
+	
+	
 	public OCRDocument(BufferedImage image){
+		
+		_word_to_rectangles = new Hashtable<String,Rectangles>();
+		
+		OCRText ocrtext = SikuliVision.ocr(image);
 
-		String outputname = Sikuli.ocr(image);
-		parseFile(outputname);
+		OCRWords ws = ocrtext.getWords();
+		
+		for (int i=0; i < ws.size(); ++i){
+			vision.OCRWord w = (vision.OCRWord) ws.get(i);
+			String wstr = w.getString();
+			
+			String nstr = normalize(wstr);
+			
+			Rectangle rect = new Rectangle(w.getX(),w.getY(),w.getWidth(),w.getHeight());
+			OCRWord word = new OCRWord(w.getString(), rect);
+			
+			if (_word_to_rectangles.containsKey(nstr)){
+				Rectangles rects = _word_to_rectangles.get(nstr);
+				rects.add(rect);
 
+			}else{
+
+				Rectangles rects = new Rectangles();
+				rects.add(rect);
+				_word_to_rectangles.put(nstr, rects);		 
+			}
+
+			_words.add(word);
+			
+		}
 	}
 
 	private void parseFile(String filename){
 
-		word_to_rectangles = new Hashtable<String,Rectangles>();
+		_word_to_rectangles = new Hashtable<String,Rectangles>();
 
 		File fFile = new File(filename);  
 
@@ -109,37 +141,37 @@ public class OCRDocument {
 		Rectangle rect = new Rectangle(x,y,w,h);
 
 
-		if (word_to_rectangles.containsKey(word)){
-			Rectangles rects = word_to_rectangles.get(word);
+		if (_word_to_rectangles.containsKey(word)){
+			Rectangles rects = _word_to_rectangles.get(word);
 			rects.add(rect);
 
 		}else{
 
 			Rectangles rects = new Rectangles();
 			rects.add(rect);
-			word_to_rectangles.put(word, rects);		 
+			_word_to_rectangles.put(word, rects);		 
 		}
 
-		words.add(new OCRWord(word, rect));
+		_words.add(new OCRWord(word, rect));
 
 	}
 
 
 	public ArrayList<OCRWord> getWords() {
-		return words;
+		return _words;
 	}
 
 	public boolean hasWord(String word){
-		return word_to_rectangles.containsKey(word);
+		return _word_to_rectangles.containsKey(word);
 	}
 	
 	public Rectangles find(String word){
-		return word_to_rectangles.get(word);
+		return _word_to_rectangles.get(word);
 	}
 
 	public OCRWord find(Rectangle rect){
 
-		for (OCRWord word : words){
+		for (OCRWord word : _words){
 
 			if (word.getRectangle().intersects(rect))
 				return word;
@@ -149,10 +181,18 @@ public class OCRDocument {
 	}
 
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
-		OCRDocument doc = new OCRDocument("test.loc");
-		Rectangles rects = doc.find("deadline");
+//		OCRDocument doc = new OCRDocument("test.loc");
+//		Rectangles rects = doc.find("deadline");
+//
+//		for (Rectangle rect : rects){
+//			System.out.println(rect);
+//		}
+		
+		BufferedImage screen_image = ImageIO.read(new File("screen.png"));
+		OCRDocument doc = new OCRDocument(screen_image);
+		Rectangles rects = doc.find("happy");
 
 		for (Rectangle rect : rects){
 			System.out.println(rect);

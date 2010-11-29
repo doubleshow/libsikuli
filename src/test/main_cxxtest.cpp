@@ -17,7 +17,8 @@ int main() {
    //CxxTest::leaveOnly("CoreTestSuite","testGetMouseLocation");
    //CxxTest::leaveOnly("CoreTestSuite","testCapture");
    //CxxTest::leaveOnly("CoreTestSuite","testDetectBoxes");
-   CxxTest::leaveOnly("CoreTestSuite","testOCR");
+   CxxTest::leaveOnly("CoreTestSuite","testDetectCards");
+   //CxxTest::leaveOnly("CoreTestSuite","testOCR");
    
    //CxxTest::leaveOnly("MacTestSuite","testHoverAndClick");
    //CxxTest::leaveOnly("MacTestSuite","testDragDrop");

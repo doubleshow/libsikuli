@@ -62,11 +62,16 @@ OCRWord::add(const OCRChar& ocr_char){
 
 string
 OCRWord::str(){
-   string ret;
+   string ret = "";
    for (vector<OCRChar>::iterator it = ocr_chars_.begin(); it != ocr_chars_.end(); ++it){
       ret = ret + it->ch;    
    }
    return ret;
+}
+
+vector<OCRChar>
+OCRWord::getChars(){
+   return ocr_chars_;
 }
 
 string
@@ -91,6 +96,11 @@ OCRLine::addWord(OCRWord& ocr_word){
    ocr_words_.push_back(ocr_word);
 }
 
+vector<OCRWord>
+OCRLine::getWords(){
+   return ocr_words_;
+}
+
 string
 OCRLine::getString(){   
    if (ocr_words_.empty())
@@ -112,29 +122,36 @@ OCRParagraph::addLine(OCRLine& ocr_line){
    ocr_lines_.push_back(ocr_line);
 }
 
-void
-OCRText::add(OCRWord& ocr_word){
-   ocr_words_.push_back(ocr_word);
+vector<OCRLine>
+OCRParagraph::getLines(){
+   return ocr_lines_;
 }
 
-void
-OCRText::addLine(OCRLine& ocr_line){
-   ocr_lines_.push_back(ocr_line);
-}
+//void
+//OCRText::add(OCRWord& ocr_word){
+//   ocr_words_.push_back(ocr_word);
+//}
+//
+//void
+//OCRText::addLine(OCRLine& ocr_line){
+//   ocr_lines_.push_back(ocr_line);
+//}
 
 
 void
 OCRText::save(const char* filename){
+// TODO: reimplement
    
-   ofstream of(filename);
-   
-   for (iterator it = begin();
-        it != end(); ++it){
-      
-      of << it->str() << " ";
-   }
-   
-   of.close();
+//   
+//   ofstream of(filename);
+//   
+//   for (iterator it = begin();
+//        it != end(); ++it){
+//      
+//      of << it->str() << " ";
+//   }
+//   
+//   of.close();
 }
 
 void
@@ -173,8 +190,8 @@ OCRText::getLineStrings(){
 
       OCRParagraph& para = *it;
       
-      for (vector<OCRLine>::iterator it1 = para.ocr_lines_.begin(); 
-           it1 != para.ocr_lines_.end(); ++it1){
+      for (vector<OCRLine>::iterator it1 = para.getLines().begin(); 
+           it1 != para.getLines().end(); ++it1){
 
          OCRLine& line = *it1;
          
@@ -191,28 +208,33 @@ OCRText::getLineStrings(){
 
 vector<OCRWord> 
 OCRText::getWords(){
-   vector<OCRWord> words;
+   vector<OCRWord> ret_words;
    
    for (vector<OCRParagraph>::iterator it = ocr_paragraphs_.begin(); 
         it != ocr_paragraphs_.end(); ++it){
       
-      OCRParagraph& para = *it;
+      vector<OCRLine> lines = it->getLines();
       
-      for (vector<OCRLine>::iterator it1 = para.ocr_lines_.begin(); 
-           it1 != para.ocr_lines_.end(); ++it1){
+      for (vector<OCRLine>::iterator it1 = lines.begin(); 
+           it1 != lines.end(); ++it1){
          
-         OCRLine& line = *it1;
+         vector<OCRWord> words = it1->getWords();
          
-         for (vector<OCRWord>::iterator it2 = line.ocr_words_.begin();
-              it2 != line.ocr_words_.end(); ++it2){
+         for (vector<OCRWord>::iterator it2 = words.begin();
+              it2 != words.end(); ++it2){
             
-            OCRWord& word = *it2;
-            words.push_back(word);
+            OCRWord word = *it2;
+            ret_words.push_back(word);
          }
       }
    }
    
-   return words;
+   return ret_words;
+}
+
+vector<OCRParagraph>
+OCRText::getParagraphs(){
+   return ocr_paragraphs_;
 }
 
 vector<string> 
@@ -222,16 +244,16 @@ OCRText::getWordStrings(){
    for (vector<OCRParagraph>::iterator it = ocr_paragraphs_.begin(); 
         it != ocr_paragraphs_.end(); ++it){
       
-      OCRParagraph& para = *it;
+      vector<OCRLine> lines = it->getLines();
       
-      for (vector<OCRLine>::iterator it1 = para.ocr_lines_.begin(); 
-           it1 != para.ocr_lines_.end(); ++it1){
+      for (vector<OCRLine>::iterator it1 = lines.begin(); 
+           it1 != lines.end(); ++it1){
          
-         OCRLine& line = *it1;
+         vector<OCRWord> words = it1->getWords();
          
-         for (vector<OCRWord>::iterator it2 = line.ocr_words_.begin();
-              it2 != line.ocr_words_.end(); ++it2){
-          
+         for (vector<OCRWord>::iterator it2 = words.begin();
+              it2 != words.end(); ++it2){
+            
             OCRWord& word = *it2;
             word_strings.push_back(word.getString());
          }
@@ -713,7 +735,7 @@ recognize_paragraph(const cv::Mat& screen_gray, const ParagraphBlob& parablob){
       OCRLine ocrline = recognize_line(screen_gray, lineblob);
       
       
-      if (!ocrline.ocr_words_.empty())
+      if (!ocrline.getWords().empty())
          ocrparagraph.addLine(ocrline);      
    }
    

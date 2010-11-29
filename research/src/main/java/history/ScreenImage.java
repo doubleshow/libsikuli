@@ -94,7 +94,11 @@ public class ScreenImage {
 	}
 
 	public ArrayList<Rectangle> find(BufferedImage target_image){
-		return Sikuli.find(filename, target_image);
+		try {
+			return SikuliVision.find(filename, target_image);
+		} catch (IOException e) {
+			return new ArrayList<Rectangle>();
+		}
 	}
 
 	public BufferedImage getImage(){
@@ -558,7 +562,7 @@ public class ScreenImage {
 			region2_rect.grow(20, 100);
 			BufferedImage region2_image = history_image.crop0(region2_rect).getImage();
 			
-			ArrayList<Rectangle> matches = Sikuli.find(region2_image, word1_image);
+			ArrayList<Rectangle> matches = SikuliVision.find(region2_image, word1_image);
 			if (!matches.isEmpty())
 				continue;
 			

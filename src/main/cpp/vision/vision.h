@@ -12,6 +12,7 @@
 
 #include "find-result.h"
 #include "opencv.hpp"
+#include "tessocr.h"
 
 using namespace cv;
 
@@ -87,6 +88,9 @@ public:
    static double compare(cv::Mat m1, cv::Mat m2);
    
    static void initOCR(const char* ocrDataPath);
+   
+   
+   static OCRText recognize_as_ocrtext(cv::Mat image);
       
    static std::string recognize(cv::Mat image);
 

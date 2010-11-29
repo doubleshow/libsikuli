@@ -374,11 +374,14 @@ Vision::find(FindInput input){
 
 string
 Vision::recognize(Mat image){
-
    OCRText text = OCR::recognize(image);
    return text.getString();
 }
 
+OCRText
+Vision::recognize_as_ocrtext(Mat image){
+   return OCR::recognize(image);
+}
 
 cv::Mat Vision::createMat(int _rows, int _cols, unsigned char* _data){
    Mat mat_ref = Mat(_rows, _cols, CV_8UC4, _data);

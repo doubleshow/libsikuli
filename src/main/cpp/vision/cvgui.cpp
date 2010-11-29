@@ -212,11 +212,13 @@ Painter::drawParagraphBlobs(Mat& image, vector<ParagraphBlob> blobs, Scalar colo
 }
 
 void 
-Painter::drawOCRWord(Mat& ocr_result_image, OCRWord& ocrword){
+Painter::drawOCRWord(Mat& ocr_result_image, OCRWord ocrword){
    
+//   cout << ocrword.x << " " << ocrword.y <<  " " << ocrword.width <<  " " << ocrword.height << ":";
    
-   for (vector<OCRChar>::iterator it = ocrword.ocr_chars_.begin(); 
-        it != ocrword.ocr_chars_.end(); ++it){
+   vector<OCRChar> chars = ocrword.getChars();
+   for (vector<OCRChar>::iterator it = chars.begin(); 
+        it != chars.end(); ++it){
       
       OCRChar& ocrchar = *it;
       char ch = ocrchar.ch;
@@ -224,21 +226,24 @@ Painter::drawOCRWord(Mat& ocr_result_image, OCRWord& ocrword){
       char buf[2];
       buf[0] = ch;
       buf[1] = 0;
+      
+//      cout << buf;
+      
      
       Point pt(ocrchar.x, ocrword.y + ocrword.height - 10);      
-//      //Point pt(ocr_rect.x,ocr_rect.y + ocr_rect.height);
       
       putText(ocr_result_image, buf, pt,  
                         FONT_HERSHEY_SIMPLEX, 0.4, Color::RED);
    //           FONT_HERSHEY_PLAIN, 0.8, Color::RED);
       
    }
-   
+//   cout << "|" << ocrword.getString() << endl;
+
 }
 
 void 
-Painter::drawOCRLine(Mat& ocr_result_image, OCRLine& ocrline){
-   vector<OCRWord>& ocrwords = ocrline.ocr_words_;
+Painter::drawOCRLine(Mat& ocr_result_image, OCRLine ocrline){
+   vector<OCRWord> ocrwords = ocrline.getWords();
    for (vector<OCRWord>::iterator it = ocrwords.begin(); it != ocrwords.end(); ++it){
       OCRWord& ocrword = *it;
       drawOCRWord(ocr_result_image, ocrword);
@@ -246,8 +251,8 @@ Painter::drawOCRLine(Mat& ocr_result_image, OCRLine& ocrline){
 }
 
 void 
-Painter::drawOCRParagraph(Mat& ocr_result_image, OCRParagraph& ocrpara){
-   vector<OCRLine>& ocrlines = ocrpara.ocr_lines_;
+Painter::drawOCRParagraph(Mat& ocr_result_image, OCRParagraph ocrpara){
+   vector<OCRLine> ocrlines = ocrpara.getLines();
    for (vector<OCRLine>::iterator it = ocrlines.begin(); it != ocrlines.end(); ++it){
       OCRLine& ocrline = *it;
       drawOCRLine(ocr_result_image, ocrline);
@@ -255,8 +260,8 @@ Painter::drawOCRParagraph(Mat& ocr_result_image, OCRParagraph& ocrpara){
 }
 
 void 
-Painter::drawOCRText(Mat& ocr_result_image, OCRText& ocrtext){
-   vector<OCRParagraph>& ocrparas = ocrtext.ocr_paragraphs_;
+Painter::drawOCRText(Mat& ocr_result_image, OCRText ocrtext){
+   vector<OCRParagraph> ocrparas = ocrtext.getParagraphs();
    for (vector<OCRParagraph>::iterator it = ocrparas.begin(); it != ocrparas.end(); ++it){
       OCRParagraph& ocrpara = *it;
       drawOCRParagraph(ocr_result_image, ocrpara);

@@ -11,10 +11,6 @@
 		A006FE2F1229E2A000D079F7 /* libopencv_highgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2B1229E2A000D079F7 /* libopencv_highgui.a */; };
 		A006FE301229E2A000D079F7 /* libopencv_imgproc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2C1229E2A000D079F7 /* libopencv_imgproc.a */; };
 		A006FE311229E2A000D079F7 /* libopencv_objdetect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2D1229E2A000D079F7 /* libopencv_objdetect.a */; };
-		A006FE321229E2A000D079F7 /* libopencv_core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2A1229E2A000D079F7 /* libopencv_core.a */; };
-		A006FE331229E2A000D079F7 /* libopencv_highgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2B1229E2A000D079F7 /* libopencv_highgui.a */; };
-		A006FE341229E2A000D079F7 /* libopencv_imgproc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2C1229E2A000D079F7 /* libopencv_imgproc.a */; };
-		A006FE351229E2A000D079F7 /* libopencv_objdetect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2D1229E2A000D079F7 /* libopencv_objdetect.a */; };
 		A006FE361229E2A000D079F7 /* libopencv_core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2A1229E2A000D079F7 /* libopencv_core.a */; };
 		A006FE371229E2A000D079F7 /* libopencv_highgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2B1229E2A000D079F7 /* libopencv_highgui.a */; };
 		A006FE381229E2A000D079F7 /* libopencv_imgproc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2C1229E2A000D079F7 /* libopencv_imgproc.a */; };
@@ -35,10 +31,6 @@
 		A006FE511229E2E300D079F7 /* liblibpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE451229E2E300D079F7 /* liblibpng.a */; };
 		A006FE521229E2E300D079F7 /* libopencv_lapack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE461229E2E300D079F7 /* libopencv_lapack.a */; };
 		A006FE531229E2E300D079F7 /* libzlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE471229E2E300D079F7 /* libzlib.a */; };
-		A006FE541229E2E300D079F7 /* liblibjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE441229E2E300D079F7 /* liblibjpeg.a */; };
-		A006FE551229E2E300D079F7 /* liblibpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE451229E2E300D079F7 /* liblibpng.a */; };
-		A006FE561229E2E300D079F7 /* libopencv_lapack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE461229E2E300D079F7 /* libopencv_lapack.a */; };
-		A006FE571229E2E300D079F7 /* libzlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE471229E2E300D079F7 /* libzlib.a */; };
 		A024C9D4122294A000E21C0C /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0454E7F11FF19570018D949 /* ApplicationServices.framework */; };
 		A024CA64122332D200E21C0C /* play-bejeweled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A024CA62122332B500E21C0C /* play-bejeweled.cpp */; };
 		A024CA6D122332D600E21C0C /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0454E7F11FF19570018D949 /* ApplicationServices.framework */; };
@@ -48,11 +40,9 @@
 		A039A4571230AACA005EC9D9 /* libtesseract_full.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A039A4561230AACA005EC9D9 /* libtesseract_full.a */; };
 		A039A4581230AACA005EC9D9 /* libtesseract_full.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A039A4561230AACA005EC9D9 /* libtesseract_full.a */; };
 		A039A4591230AACA005EC9D9 /* libtesseract_full.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A039A4561230AACA005EC9D9 /* libtesseract_full.a */; };
-		A039A45A1230AACB005EC9D9 /* libtesseract_full.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A039A4561230AACA005EC9D9 /* libtesseract_full.a */; };
 		A039A4631230AAF9005EC9D9 /* libtiff.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A039A4621230AAF9005EC9D9 /* libtiff.dylib */; };
 		A039A4641230AAF9005EC9D9 /* libtiff.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A039A4621230AAF9005EC9D9 /* libtiff.dylib */; };
 		A039A4651230AAF9005EC9D9 /* libtiff.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A039A4621230AAF9005EC9D9 /* libtiff.dylib */; };
-		A039A4661230AAF9005EC9D9 /* libtiff.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A039A4621230AAF9005EC9D9 /* libtiff.dylib */; };
 		A039A8571237E162005EC9D9 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0454E7F11FF19570018D949 /* ApplicationServices.framework */; };
 		A039A92F1237E1FE005EC9D9 /* cv-util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A06B9952120834B5000C73A3 /* cv-util.cpp */; };
 		A039A93A1237E33D005EC9D9 /* libopencv_core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2A1229E2A000D079F7 /* libopencv_core.a */; };
@@ -65,14 +55,10 @@
 		A039A9411237E356005EC9D9 /* liblibjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE441229E2E300D079F7 /* liblibjpeg.a */; };
 		A039A9421237E356005EC9D9 /* libzlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE471229E2E300D079F7 /* libzlib.a */; };
 		A0426BDA12499115006163C8 /* libopencv_features2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0426BD912499114006163C8 /* libopencv_features2d.a */; };
-		A0426BDB12499115006163C8 /* libopencv_features2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0426BD912499114006163C8 /* libopencv_features2d.a */; };
 		A0426BDC12499115006163C8 /* libopencv_features2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0426BD912499114006163C8 /* libopencv_features2d.a */; };
 		A0426BDD12499115006163C8 /* libopencv_features2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0426BD912499114006163C8 /* libopencv_features2d.a */; };
 		A0426BDE12499115006163C8 /* libopencv_features2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0426BD912499114006163C8 /* libopencv_features2d.a */; };
 		A0426BDF12499115006163C8 /* libopencv_features2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0426BD912499114006163C8 /* libopencv_features2d.a */; };
-		A0971BF31267E754004B9D21 /* imgdb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0971BEE1267E754004B9D21 /* imgdb.cpp */; };
-		A0971BF51267E754004B9D21 /* imgdb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0971BEE1267E754004B9D21 /* imgdb.cpp */; };
-		A0971BF61267E754004B9D21 /* imgdb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0971BEE1267E754004B9D21 /* imgdb.cpp */; };
 		A0971EE6126919F8004B9D21 /* CoreTestSuite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0971ED8126919F8004B9D21 /* CoreTestSuite.cpp */; };
 		A0971EE7126919F8004B9D21 /* FlashTestSuite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0971EDB126919F8004B9D21 /* FlashTestSuite.cpp */; };
 		A0971EE8126919F8004B9D21 /* MacTestSuite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0971EDE126919F8004B9D21 /* MacTestSuite.cpp */; };
@@ -104,6 +90,9 @@
 		A0971FAE126930F6004B9D21 /* liblibcvgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0971EF612691B25004B9D21 /* liblibcvgui.a */; };
 		A0971FAF126930F6004B9D21 /* libsikuli.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0DB4FF7121FF3B500BF48E5 /* libsikuli.a */; };
 		A097200B126933AE004B9D21 /* liblibcvgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0971EF612691B25004B9D21 /* liblibcvgui.a */; };
+		A09720D8126964A6004B9D21 /* liblibcvgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0971EF612691B25004B9D21 /* liblibcvgui.a */; };
+		A09723FA12727A3B004B9D21 /* event-region.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A09723F812727A3B004B9D21 /* event-region.cpp */; };
+		A09723FB12727A3B004B9D21 /* event-region.h in Headers */ = {isa = PBXBuildFile; fileRef = A09723F912727A3B004B9D21 /* event-region.h */; };
 		A0A8F623123DAAE10090BD3C /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0454E7F11FF19570018D949 /* ApplicationServices.framework */; };
 		A0A8F651123DAC430090BD3C /* libopencv_core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2A1229E2A000D079F7 /* libopencv_core.a */; };
 		A0A8F652123DAC430090BD3C /* libopencv_highgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A006FE2B1229E2A000D079F7 /* libopencv_highgui.a */; };
@@ -118,11 +107,16 @@
 		A0A8F65F123DAC7C0090BD3C /* sikulicmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0A8F63A123DAB2B0090BD3C /* sikulicmd.cpp */; };
 		A0A8F662123DACAF0090BD3C /* libsikuli.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0DB4FF7121FF3B500BF48E5 /* libsikuli.a */; };
 		A0A8F665123DACD60090BD3C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0FE9D5C122750C3002179C1 /* Cocoa.framework */; };
-		A0A8F6F2123EA0EA0090BD3C /* cvgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0A8F6F0123EA0EA0090BD3C /* cvgui.cpp */; };
 		A0A8F6FD123EA2A30090BD3C /* cvgui_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0A8F6FA123EA2A30090BD3C /* cvgui_test.cpp */; };
 		A0A8F6FE123EA2A30090BD3C /* main_cxxtest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0A8F6FC123EA2A30090BD3C /* main_cxxtest.cpp */; };
 		A0A8F708123EA3530090BD3C /* cvgui_test.h in Sources */ = {isa = PBXBuildFile; fileRef = A0A8F6FB123EA2A30090BD3C /* cvgui_test.h */; };
-		A0A8F881123EB84A0090BD3C /* cvgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0A8F6F0123EA0EA0090BD3C /* cvgui.cpp */; };
+		A0D65DA91284CE1700D4498F /* libflann.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D65DA81284CE1700D4498F /* libflann.a */; };
+		A0D65DAA1284CE1700D4498F /* libflann.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D65DA81284CE1700D4498F /* libflann.a */; };
+		A0D65DAB1284CE1700D4498F /* libflann.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D65DA81284CE1700D4498F /* libflann.a */; };
+		A0D65DAC1284CE1700D4498F /* libflann.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D65DA81284CE1700D4498F /* libflann.a */; };
+		A0D65DAD1284CE1700D4498F /* libflann.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D65DA81284CE1700D4498F /* libflann.a */; };
+		A0D65DAE1284CE1700D4498F /* libflann.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D65DA81284CE1700D4498F /* libflann.a */; };
+		A0D65DAF1284CE1700D4498F /* libflann.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D65DA81284CE1700D4498F /* libflann.a */; };
 		A0DB4B16121EBBFE00BF48E5 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0454E7F11FF19570018D949 /* ApplicationServices.framework */; };
 		A0DB4B17121EBBFE00BF48E5 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A045505F11FF44440018D949 /* OpenGL.framework */; };
 		A0DB5038121FF58000BF48E5 /* libsikuli.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0DB4FF7121FF3B500BF48E5 /* libsikuli.a */; };
@@ -141,28 +135,35 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A0971EF512691B25004B9D21 /* libcvgui */;
+			remoteGlobalIDString = A0971EF512691B25004B9D21;
 			remoteInfo = libcvgui;
 		};
 		A0971FE7126931FD004B9D21 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A0971EF512691B25004B9D21 /* libcvgui */;
+			remoteGlobalIDString = A0971EF512691B25004B9D21;
 			remoteInfo = libcvgui;
 		};
 		A0971FE9126931FD004B9D21 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A0DB4FF6121FF3B500BF48E5 /* libsikuli */;
+			remoteGlobalIDString = A0DB4FF6121FF3B500BF48E5;
 			remoteInfo = libsikuli;
 		};
 		A0971FF5126932E4004B9D21 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A0971EF512691B25004B9D21 /* libcvgui */;
+			remoteGlobalIDString = A0971EF512691B25004B9D21;
+			remoteInfo = libcvgui;
+		};
+		A09720D612696494004B9D21 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A0971EF512691B25004B9D21;
 			remoteInfo = libcvgui;
 		};
 		A0A8F61C123DAAE10090BD3C /* PBXContainerItemProxy */ = {
@@ -256,8 +257,6 @@
 		A06B9953120834B5000C73A3 /* cv-util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "cv-util.h"; path = "src/cv-util.h"; sourceTree = "<group>"; };
 		A06B9956120834B5000C73A3 /* ocr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ocr.cpp; path = src/ocr.cpp; sourceTree = "<group>"; };
 		A06B9957120834B5000C73A3 /* ocr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ocr.h; path = src/ocr.h; sourceTree = "<group>"; };
-		A0971BEE1267E754004B9D21 /* imgdb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = imgdb.cpp; path = research/src/main/cpp/imgdb.cpp; sourceTree = "<group>"; };
-		A0971BEF1267E754004B9D21 /* imgdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = imgdb.h; path = research/src/main/cpp/imgdb.h; sourceTree = "<group>"; };
 		A0971E7512691994004B9D21 /* robot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = robot.cpp; sourceTree = "<group>"; };
 		A0971E7612691994004B9D21 /* robot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = robot.h; sourceTree = "<group>"; };
 		A0971E7812691994004B9D21 /* event-manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "event-manager.cpp"; sourceTree = "<group>"; };
@@ -303,13 +302,14 @@
 		A0971EF612691B25004B9D21 /* liblibcvgui.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibcvgui.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0971F2012691C17004B9D21 /* TimingBlock.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TimingBlock.cc; sourceTree = "<group>"; };
 		A0971F2112691C17004B9D21 /* TimingBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimingBlock.h; sourceTree = "<group>"; };
+		A09723F812727A3B004B9D21 /* event-region.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "event-region.cpp"; sourceTree = "<group>"; };
+		A09723F912727A3B004B9D21 /* event-region.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "event-region.h"; sourceTree = "<group>"; };
 		A0A8F633123DAAE10090BD3C /* sikulicmd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sikulicmd; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0A8F63A123DAB2B0090BD3C /* sikulicmd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sikulicmd.cpp; path = examples/cpp/sikulicmd.cpp; sourceTree = "<group>"; };
-		A0A8F6F0123EA0EA0090BD3C /* cvgui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cvgui.cpp; path = research/src/main/cpp/cvgui.cpp; sourceTree = "<group>"; };
-		A0A8F6F1123EA0EA0090BD3C /* cvgui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cvgui.h; path = research/src/main/cpp/cvgui.h; sourceTree = "<group>"; };
 		A0A8F6FA123EA2A30090BD3C /* cvgui_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cvgui_test.cpp; path = research/src/test/cpp/cvgui_test.cpp; sourceTree = "<group>"; };
 		A0A8F6FB123EA2A30090BD3C /* cvgui_test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cvgui_test.h; path = research/src/test/cpp/cvgui_test.h; sourceTree = "<group>"; };
 		A0A8F6FC123EA2A30090BD3C /* main_cxxtest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main_cxxtest.cpp; path = research/src/test/cpp/main_cxxtest.cpp; sourceTree = "<group>"; };
+		A0D65DA81284CE1700D4498F /* libflann.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libflann.a; path = ../../../install/opencv/3rdparty/lib/libflann.a; sourceTree = SOURCE_ROOT; };
 		A0DB4FF7121FF3B500BF48E5 /* libsikuli.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsikuli.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0FE970A1224A502002179C1 /* test_register.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_register.h; sourceTree = "<group>"; };
 		A0FE970B1224A502002179C1 /* test_register.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_register.cpp; sourceTree = "<group>"; };
@@ -334,6 +334,7 @@
 				A039A4591230AACA005EC9D9 /* libtesseract_full.a in Frameworks */,
 				A039A4651230AAF9005EC9D9 /* libtiff.dylib in Frameworks */,
 				A0426BDF12499115006163C8 /* libopencv_features2d.a in Frameworks */,
+				A0D65DAE1284CE1700D4498F /* libflann.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,6 +353,7 @@
 				A039A9401237E33D005EC9D9 /* libtiff.dylib in Frameworks */,
 				A039A8571237E162005EC9D9 /* ApplicationServices.framework in Frameworks */,
 				A0426BDA12499115006163C8 /* libopencv_features2d.a in Frameworks */,
+				A0D65DAD1284CE1700D4498F /* libflann.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -359,6 +361,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0D65DAA1284CE1700D4498F /* libflann.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,6 +383,8 @@
 				A0A8F65A123DAC430090BD3C /* libtiff.dylib in Frameworks */,
 				A0A8F623123DAAE10090BD3C /* ApplicationServices.framework in Frameworks */,
 				A0426BDC12499115006163C8 /* libopencv_features2d.a in Frameworks */,
+				A09720D8126964A6004B9D21 /* liblibcvgui.a in Frameworks */,
+				A0D65DAB1284CE1700D4498F /* libflann.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +406,7 @@
 				A0426BDD12499115006163C8 /* libopencv_features2d.a in Frameworks */,
 				A0971FAE126930F6004B9D21 /* liblibcvgui.a in Frameworks */,
 				A0971FAF126930F6004B9D21 /* libsikuli.a in Frameworks */,
+				A0D65DAF1284CE1700D4498F /* libflann.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,6 +430,7 @@
 				A039A4631230AAF9005EC9D9 /* libtiff.dylib in Frameworks */,
 				A0426BDE12499115006163C8 /* libopencv_features2d.a in Frameworks */,
 				A097200B126933AE004B9D21 /* liblibcvgui.a in Frameworks */,
+				A0D65DAC1284CE1700D4498F /* libflann.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,17 +438,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A006FE321229E2A000D079F7 /* libopencv_core.a in Frameworks */,
-				A006FE331229E2A000D079F7 /* libopencv_highgui.a in Frameworks */,
-				A006FE341229E2A000D079F7 /* libopencv_imgproc.a in Frameworks */,
-				A006FE351229E2A000D079F7 /* libopencv_objdetect.a in Frameworks */,
-				A006FE541229E2E300D079F7 /* liblibjpeg.a in Frameworks */,
-				A006FE551229E2E300D079F7 /* liblibpng.a in Frameworks */,
-				A006FE561229E2E300D079F7 /* libopencv_lapack.a in Frameworks */,
-				A006FE571229E2E300D079F7 /* libzlib.a in Frameworks */,
-				A039A45A1230AACB005EC9D9 /* libtesseract_full.a in Frameworks */,
-				A039A4661230AAF9005EC9D9 /* libtiff.dylib in Frameworks */,
-				A0426BDB12499115006163C8 /* libopencv_features2d.a in Frameworks */,
+				A0D65DA91284CE1700D4498F /* libflann.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,6 +486,7 @@
 		A0454E7E11FF19490018D949 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A0D65DA81284CE1700D4498F /* libflann.a */,
 				A0426BD912499114006163C8 /* libopencv_features2d.a */,
 				A039A4621230AAF9005EC9D9 /* libtiff.dylib */,
 				A039A4561230AACA005EC9D9 /* libtesseract_full.a */,
@@ -551,6 +549,8 @@
 		A0971E7712691994004B9D21 /* sikuli */ = {
 			isa = PBXGroup;
 			children = (
+				A09723F812727A3B004B9D21 /* event-region.cpp */,
+				A09723F912727A3B004B9D21 /* event-region.h */,
 				A0971E7812691994004B9D21 /* event-manager.cpp */,
 				A0971E7912691994004B9D21 /* event-manager.h */,
 				A0971E7A12691994004B9D21 /* exceptions.h */,
@@ -634,10 +634,6 @@
 		A0A8F723123EA5150090BD3C /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				A0971BEE1267E754004B9D21 /* imgdb.cpp */,
-				A0971BEF1267E754004B9D21 /* imgdb.h */,
-				A0A8F6F0123EA0EA0090BD3C /* cvgui.cpp */,
-				A0A8F6F1123EA0EA0090BD3C /* cvgui.h */,
 			);
 			name = Main;
 			sourceTree = "<group>";
@@ -682,6 +678,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A09723FB12727A3B004B9D21 /* event-region.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -753,6 +750,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A09720D712696494004B9D21 /* PBXTargetDependency */,
 				A0A8F61B123DAAE10090BD3C /* PBXTargetDependency */,
 			);
 			name = sikulicmd;
@@ -852,7 +850,6 @@
 			files = (
 				A024CA7E122332FB00E21C0C /* play-whackamole.cpp in Sources */,
 				A039A40C1230A6C8005EC9D9 /* ocr-matcher.cc in Sources */,
-				A0971BF31267E754004B9D21 /* imgdb.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -864,8 +861,6 @@
 				A0A8F708123EA3530090BD3C /* cvgui_test.h in Sources */,
 				A0A8F6FE123EA2A30090BD3C /* main_cxxtest.cpp in Sources */,
 				A039A92F1237E1FE005EC9D9 /* cv-util.cpp in Sources */,
-				A0A8F6F2123EA0EA0090BD3C /* cvgui.cpp in Sources */,
-				A0971BF51267E754004B9D21 /* imgdb.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -887,9 +882,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A0A8F881123EB84A0090BD3C /* cvgui.cpp in Sources */,
 				A0A8F65F123DAC7C0090BD3C /* sikulicmd.cpp in Sources */,
-				A0971BF61267E754004B9D21 /* imgdb.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -926,6 +919,7 @@
 				A0971F1412691B5C004B9D21 /* settings.cpp in Sources */,
 				A0971F1612691B5C004B9D21 /* sikuli.cpp in Sources */,
 				A0971F1812691B5C004B9D21 /* ui.cpp in Sources */,
+				A09723FA12727A3B004B9D21 /* event-region.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -956,6 +950,11 @@
 			isa = PBXTargetDependency;
 			target = A0971EF512691B25004B9D21 /* libcvgui */;
 			targetProxy = A0971FF5126932E4004B9D21 /* PBXContainerItemProxy */;
+		};
+		A09720D712696494004B9D21 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A0971EF512691B25004B9D21 /* libcvgui */;
+			targetProxy = A09720D612696494004B9D21 /* PBXContainerItemProxy */;
 		};
 		A0A8F61B123DAAE10090BD3C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1072,6 +1071,7 @@
 					"\\\"$(SRCROOT)/lib/opencv/64\\\"",
 					"\\\"$(SRCROOT)/lib/opencv\\\"",
 					"\"$(SRCROOT)/lib/opencv\"",
+					"\"$(SRCROOT)/../../../install/opencv/3rdparty/lib\"",
 				);
 				PRODUCT_NAME = "play-bejeweled";
 			};
@@ -1097,6 +1097,7 @@
 					"\\\"$(SRCROOT)/lib/opencv/64\\\"",
 					"\\\"$(SRCROOT)/lib/opencv\\\"",
 					"\"$(SRCROOT)/lib/opencv\"",
+					"\"$(SRCROOT)/../../../install/opencv/3rdparty/lib\"",
 				);
 				PRODUCT_NAME = "play-bejeweled";
 				VALID_ARCHS = "i386 x86_64";
@@ -1113,6 +1114,10 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../install/opencv/3rdparty/lib\"",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = libcvgui;
 			};
@@ -1127,6 +1132,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../install/opencv/3rdparty/lib\"",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = libcvgui;
 				ZERO_LINK = NO;
@@ -1147,14 +1156,13 @@
 					MAC,
 					OPENCV_NEW,
 				);
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/opt/local/lib,
 					"\\\"$(SRCROOT)/../../../install/opencv/3rdparty/lib\\\"",
-					"\\\"$(SRCROOT)/lib/opencv/64\\\"",
-					"\\\"$(SRCROOT)/lib/opencv\\\"",
 					"\"$(SRCROOT)/lib/opencv\"",
+					"\"$(SRCROOT)/../../../install/opencv/3rdparty/lib\"",
 				);
 				PRODUCT_NAME = sikulicmd;
 			};
@@ -1175,11 +1183,9 @@
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/opt/local/lib,
 					"\\\"$(SRCROOT)/../../../install/opencv/3rdparty/lib\\\"",
-					"\\\"$(SRCROOT)/lib/opencv/64\\\"",
-					"\\\"$(SRCROOT)/lib/opencv\\\"",
 					"\"$(SRCROOT)/lib/opencv\"",
+					"\"$(SRCROOT)/../../../install/opencv/3rdparty/lib\"",
 				);
 				PRODUCT_NAME = sikulicmd;
 				VALID_ARCHS = "i386 x86_64";

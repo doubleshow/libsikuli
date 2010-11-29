@@ -862,32 +862,39 @@ public class HistoryViewer extends JPanel {
 				//BufferedImage tracked = screen.crop(new Rectangle(370,200,200,100));
 				BufferedImage tracked = screen.crop(tracked_rectangle);
 				
-				ArrayList<Rectangle> rects = Sikuli.find("long.png", tracked);
-				if (!rects.isEmpty()){
+				ArrayList<Rectangle> rects;
+				try {
+					rects = SikuliVision.find("long.png", tracked);
+				
+					if (!rects.isEmpty()){
 
-					Rectangle top = rects.get(0);
+						Rectangle top = rects.get(0);
+						
+						int vx = top.x-tracked_rectangle.x+rectangle.x;
+						int vy = top.y-tracked_rectangle.y+rectangle.y;
+						
+						//virtualPage.move(top.x-370+20,top.y-200+96+5);
+						//virtualPage.move(0,0);//vx,vy);
+						//virtualPage.move(top.x,top.y);
+						virtualPage.move(vx,vy);
+					}
 					
-					int vx = top.x-tracked_rectangle.x+rectangle.x;
-					int vy = top.y-tracked_rectangle.y+rectangle.y;
+					virtualPage.setVisible(true);
+					virtualPage.requestFocus();
+					virtualPage.addKeyListener(virtualPage);
+
+					//Rectangle r = virtualPage.getBounds();
+					//r.grow(2,2);
+					//r.translate(0,4);
+					//screen.setHighlightRectangle(r);
+					//updateUI();
+
+
+					repaint();	
 					
-					//virtualPage.move(top.x-370+20,top.y-200+96+5);
-					//virtualPage.move(0,0);//vx,vy);
-					//virtualPage.move(top.x,top.y);
-					virtualPage.move(vx,vy);
+				} catch (IOException e) {
+					
 				}
-
-				virtualPage.setVisible(true);
-				virtualPage.requestFocus();
-				virtualPage.addKeyListener(virtualPage);
-
-				//Rectangle r = virtualPage.getBounds();
-				//r.grow(2,2);
-				//r.translate(0,4);
-				//screen.setHighlightRectangle(r);
-				//updateUI();
-
-
-				repaint();	
 				
 			}
 			

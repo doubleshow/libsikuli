@@ -151,10 +151,10 @@ public:
    static void drawParagraphBlobs(Mat& image, vector<ParagraphBlob> blobs, Scalar color);
   
    
-   static void drawOCRWord(Mat& image, OCRWord& ocrword);
-   static void drawOCRLine(Mat& image, OCRLine& ocrline);
-   static void drawOCRParagraph(Mat& image, OCRParagraph& ocrparagraph);
-   static void drawOCRText(Mat& image, OCRText& ocrtext);
+   static void drawOCRWord(Mat& image, OCRWord ocrword);
+   static void drawOCRLine(Mat& image, OCRLine ocrline);
+   static void drawOCRParagraph(Mat& image, OCRParagraph ocrparagraph);
+   static void drawOCRText(Mat& image, OCRText ocrtext);
    
 };
 

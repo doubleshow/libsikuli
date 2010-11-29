@@ -194,7 +194,8 @@ public:
    
    void testOCR(void)
    {
-      Mat screen = imread("cnn.png");
+      //Mat screen = imread("cnn.png");
+      Mat screen = imread("comic.png");
      
       cout << Vision::recognize(screen);
       
@@ -203,7 +204,8 @@ public:
    
    void testDetectCards(void)
    {
-      Mat screen = imread("spider3.png");
+      //Mat screen = imread("spider3.png");
+      Mat screen = imread("freecell.png");
       vector<Blob> blobs;
       cvgui::findPokerBoxes(screen,blobs);
    }
