@@ -37,6 +37,10 @@ implements Comparable{
 		return id;
 	}
 
+	public String getFilename() {
+		return filename;
+	}
+
 	String timeString;
 
 	public void setTimeString(String timeString) {

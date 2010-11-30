@@ -19,6 +19,7 @@ package history;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.StringReader;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
@@ -55,7 +56,7 @@ public class FileDocument {
     // a field that is indexed (i.e. searchable), but don't tokenize the field
     // into words.
     doc.add(new Field("modified",
-        DateTools.timeToString(f1.lastModified(), DateTools.Resolution.MINUTE),
+        DateTools.timeToString(f1.lastModified(), DateTools.Resolution.SECOND),
         Field.Store.YES, Field.Index.NOT_ANALYZED));
 
     // Add the contents of the file to a field named "contents".  Specify a Reader,
@@ -69,6 +70,33 @@ public class FileDocument {
     
     // return the document
     return doc;
+  }
+  
+  public static Document Document(String text, String path, int id){
+	    Document doc = new Document();
+	    
+	    doc.add(new Field("id", ""+id, Field.Store.YES, Field.Index.NOT_ANALYZED));
+
+	    // Add the path of the file as a field named "path".  Use a field that is 
+	    // indexed (i.e. searchable), but don't tokenize the field into words.
+	    doc.add(new Field("path", path, Field.Store.YES, Field.Index.NOT_ANALYZED));
+
+	    // Add the last modified date of the file a field named "modified".  Use 
+	    // a field that is indexed (i.e. searchable), but don't tokenize the field
+	    // into words.
+//	    doc.add(new Field("modified",
+//	        DateTools.timeToString(f1.lastModified(), DateTools.Resolution.MINUTE),
+//	        Field.Store.YES, Field.Index.NOT_ANALYZED));
+
+	    // Add the contents of the file to a field named "contents".  Specify a Reader,
+	    // so that the text of the file is tokenized and indexed, but not stored.
+	    // Note that FileReader expects the file to be in the system's default encoding.
+	    // If that's not the case searching for special characters will fail.
+	    doc.add(new Field("ocr", new StringReader(text)));
+	    
+	    doc.add(new Field("ui", new StringReader(text)));
+	    
+	    return doc; 
   }
 
   private FileDocument() {}

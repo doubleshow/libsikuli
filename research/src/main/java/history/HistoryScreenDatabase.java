@@ -6,6 +6,7 @@ package history;
 import history.HistoryViewer.NavigationIterator;
 
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -30,53 +31,42 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
+import db.DerbyDB;
+
 public class HistoryScreenDatabase{
 
 	private static final File INDEX_DIR =  new File("index");
-	static ArrayList<HistoryScreen> history_screens = new ArrayList<HistoryScreen>();
+	static ArrayList<HistoryScreen> _history_screens = new ArrayList<HistoryScreen>();
 
 	
-	//static final String ROOT_DIR = "captured/facebook";
-	//static final String[] ROOT_DIRS = new String[]{"captured/spam"};
-//	static final String[] ROOT_DIRS = new String[]{"captured/deadline"};
-//	static final int[] NS = new int[]{2};
-
-
-
-//	static final String[] ROOT_DIRS = new String[]{"captured/scroll"};
-//	static final int[] NS = new int[]{3};
-	
-	//	static final String[] ROOT_DIRS = new String[]{"captured/login","captured/mail", "captured/chi"};
-//	static final int[] NS = new int[]{10, 1, 30};
-//	static final String[] ROOT_DIRS = new String[]{"captured/mail", "captured/chi","captured/facebook"};
-//	static final int[] NS = new int[]{1, 30, 19};
+	static ArrayList<String> _filenames = new ArrayList<String>();
+	static ArrayList<Integer> _ids = new ArrayList<Integer>();
 
 	
-	static ArrayList<String> filenames = new ArrayList<String>();
-//	static {
-//
-//		for (int j=0; j<ROOT_DIRS.length; j++){
-//			String root = ROOT_DIRS[j];
-//			
-//			for (int i=NS[j]-1; i >= 0 ; --i){
-//				String file = root + "/screen" + i + ".png";
-//				filenames.add(file);
-//			}
-//		}
-//		
-//		for (int i=0; i < filenames.size() ; ++i){
-//			HistoryScreen hs = new HistoryScreen(i, filenames.get(i));
-//			hs.setTimeString("" + (i + TIME_OFFSET) + " minutes ago");
-//			history_screens.add(hs);
-//		}
-//
-//	}
-
-	static private String example_name;
-	static private String index_path;
+	static private String _current_index_path;
+	static private String _current_example_name;
+	
+	
+	static private DerbyDB _db;
+	static {
+		_db = new DerbyDB();
+		_db.connect();
+	};
+	
+	
+	
+	//static private int _last_id;
+	static private int _current_id = 152;
+	
+	static private int getNewId(){
+		_current_id ++;
+		return _current_id;
+	}
+	
 	static public void load(String name){
-		example_name = name;
+		_current_example_name = name;
 		String root = "captured/" + name;
+		
 
 		File f1=new File(root);
 		String files[]=f1.list(new FilenameFilter(){
@@ -100,27 +90,48 @@ public class HistoryScreenDatabase{
 	
 	static public void load(String name, int n, boolean rebuild_index){
 		String root = "captured/" + name;
-		example_name = name;
+		_current_example_name = name;
 		
-		filenames.clear();
-		history_screens.clear();
+		_filenames.clear();
+		_ids.clear();
+		_history_screens.clear();
 		
-		for (int i=n-1; i >= 0 ; --i){
+		for (int i=0; i < n ; ++i){
 			String file = root + "/screen" + i + ".png";
-			filenames.add(file);
+			_filenames.add(file);
+			
 		}	
 		
-		for (int i=0; i < filenames.size() ; ++i){
-			HistoryScreen hs = new HistoryScreen(i, filenames.get(i));
-			history_screens.add(hs);
+		
+		DerbyDB t = new DerbyDB();
+		
+		//t.connect();
+		//t.createTables();
+		//t.insert();
+		//t.list();
+		
+		for (String filename : _filenames){
+			
+			int new_id = getNewId();
+			_ids.add(new_id);
+			
+			HistoryScreen hs = new HistoryScreen(new_id, filename);
+			_history_screens.add(hs);
+			
+			_db.insertScreen(hs);
 		}
 		
-		index_path = "captured/lucene.index/" + name;
+		//.disconnect();
 		
-		File index_file = new File(index_path);
+		
+		_current_index_path = "captured/lucene.index/" + name;
+		
+		File index_file = new File(_current_index_path);
 		if (rebuild_index || !index_file.exists()){
 			indexOcrFiles(index_file);
 		}
+		
+		System.out.println(_current_index_path +" loaded.");
 	}
 	
 	static public Rectangles findRectangles(int id, String word, Rectangle filter){
@@ -150,28 +161,34 @@ public class HistoryScreenDatabase{
 	}
 	
 	static public OCRDocument getOCRDocument(int id){
-		String file = filenames.get(id) + ".ocr.loc";
+		HistoryScreen hs = get(id);
+		String file = hs.getFilename() + ".ocr.loc";
 		return new OCRDocument(file);
 	}
 
 	static public OCRDocument getUIDocument(int id){
-		String file = filenames.get(id) + ".ui.loc";
+		HistoryScreen hs = get(id);
+		String file = hs.getFilename() + ".ui.loc";
 		return new OCRDocument(file);
 	}
 
 	
+	static public HistoryScreen get(int id){
+		return _db.findScreen(id);
+	}
+	
 	static public HistoryScreen find(int id){
-		return history_screens.get(id);
+		return _history_screens.get(id);
 	}
 
 	static public HistoryScreen getMostRecent(){
-		return history_screens.get(0);
+		return _history_screens.get(_history_screens.size()-1);
 	}
 
 	static public FindResult getMostRecent(int n){
 		FindResult fr = new FindResult();
 		for (int i=0;i<n;++i){
-			fr.add(history_screens.get(i));
+			fr.add(_history_screens.get(_history_screens.size()-i-1));
 		}
 		return fr;
 	}		
@@ -182,7 +199,7 @@ public class HistoryScreenDatabase{
 	}
 	
 	static public HistoryScreenIterator getIteratorFromEarliest(){
-		return new HistoryScreenIterator(history_screens.size()-1);		
+		return new HistoryScreenIterator(0);		
 	}
 	
 	static public HistoryScreenIterator getShotIterator(int id){
@@ -201,9 +218,9 @@ public class HistoryScreenDatabase{
 			boolean same = true;
 			while (same && hasAfter()){
 				
-				int next_id = current_id-1;
-				String current_image_filename = filenames.get(current_id);
-				String next_image_filename = filenames.get(next_id);
+				int next_id = current_id+1;
+				String current_image_filename = _filenames.get(current_id);
+				String next_image_filename = _filenames.get(next_id);
 				
 				double difference = Sikuli.compare(current_image_filename,next_image_filename);
 				same = difference < 0.001;
@@ -211,7 +228,7 @@ public class HistoryScreenDatabase{
 				current_id = next_id;
 			}
 				
-			return history_screens.get(current_id);
+			return _history_screens.get(current_id);
 		}
 
 		@Override
@@ -219,16 +236,16 @@ public class HistoryScreenDatabase{
 			boolean same = true;
 			while (same && hasBefore()){
 				
-				int next_id = current_id+1;
-				String current_image_filename = filenames.get(current_id);
-				String next_image_filename = filenames.get(next_id);
+				int next_id = current_id-1;
+				String current_image_filename = _filenames.get(current_id);
+				String next_image_filename = _filenames.get(next_id);
 				
 				double difference = Sikuli.compare(current_image_filename,next_image_filename);
 				same = difference < 0.001;
 				
 				current_id = next_id;
 			}
-			return history_screens.get(current_id);
+			return _history_screens.get(current_id);
 		}
 		
 	}
@@ -243,40 +260,69 @@ public class HistoryScreenDatabase{
 
 		@Override
 		public Object getAfter() {
-			current_id--;
-			return history_screens.get(current_id);
+			current_id++;
+			return _history_screens.get(current_id);
 		}
 
 		@Override
 		public Object getBefore() {
-			current_id++;
-			return history_screens.get(current_id);
-		}
-
-		@Override
-		public boolean hasAfter() {
-			return current_id > 0;
+			current_id--;
+			return _history_screens.get(current_id);
 		}
 
 		@Override
 		public boolean hasBefore() {
-			return current_id < history_screens.size() - 1;
+			return current_id > 0;
+		}
+
+		@Override
+		public boolean hasAfter() {
+			return current_id < _history_screens.size() - 1;
 		}
 
 		@Override
 		public Object getCurrent() {
-			return history_screens.get(current_id);
+			return _history_screens.get(current_id);
 		}
 
 		@Override
 		public Object get(int i) {
 			current_id = i;
-			return history_screens.get(current_id);
+			return _history_screens.get(current_id);
 		}
 		
 	}
 	
 	
+//	String _index_dir;
+//	static void select(String index_file){
+//		
+//		
+//	}
+	
+	static void insert(String screen_image_filename){
+		
+		File index_file = new File(_current_index_path);
+		
+		try {
+
+			IndexWriter writer = new IndexWriter(FSDirectory.open(index_file), 
+					new StandardAnalyzer(Version.LUCENE_30), false, 
+					IndexWriter.MaxFieldLength.LIMITED);
+			
+			int new_id = getNewId();
+			_ids.add(new_id);
+			HistoryScreen hs = new HistoryScreen(new_id, screen_image_filename);
+			_history_screens.add(hs);
+			
+			writer.addDocument(FileDocument.Document("happy",screen_image_filename,new_id));
+			writer.optimize();
+			writer.close();
+			
+		}catch(IOException e){
+			
+		}
+	}
 	
 	static void indexOcrFiles(File index_file){
 
@@ -288,9 +334,10 @@ public class HistoryScreenDatabase{
 
 			System.out.println("Indexing to directory '" +INDEX_DIR+ "'...");
 
-			for (int i = 0; i < filenames.size(); ++i){
+			for (int i = 0; i < _filenames.size(); ++i){
 				
-				String filename = filenames.get(i);
+				String filename = _filenames.get(i);
+				Integer id = _ids.get(i);
 
 				String ocr_filename = filename + ".ocr.txt";
 				String ui_filename = filename + ".ui.txt";
@@ -298,10 +345,10 @@ public class HistoryScreenDatabase{
 				File ocr_file = new File(ocr_filename);
 				File ui_file = new File(ui_filename);
 				
-				System.out.println("adding " + ocr_file);
-				System.out.println("adding " + ui_file);
+				System.out.println("adding id = " + id + " : " + ocr_file);
+				//System.out.println("adding " + ui_file);
 
-				writer.addDocument(FileDocument.Document(ocr_file,ui_file,i));
+				writer.addDocument(FileDocument.Document(ocr_file,ui_file,id));
 
 			}
 
@@ -320,7 +367,7 @@ public class HistoryScreenDatabase{
 
 	
 	static public String getImageFilename(int id){
-		return filenames.get(id);
+		return _filenames.get(id);
 	}
 	
 	static public ArrayList<HistoryScreen> find(String query_string){
@@ -328,16 +375,14 @@ public class HistoryScreenDatabase{
 		ArrayList<HistoryScreen> ret = new ArrayList<HistoryScreen>();
 
 		try{
-			IndexReader reader = IndexReader.open(FSDirectory.open(new File(index_path)), true); 
+			IndexReader reader = IndexReader.open(FSDirectory.open(new File(_current_index_path)), true); 
 			// only searching, so read-only=true
 
-			String field = "ocr";
 			Searcher searcher = new IndexSearcher(reader);
 			Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
 
 			//QueryParser parser = new QueryParser(Version.LUCENE_30, field, analyzer);
-			
-			
+		
 			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LUCENE_30,
 			                                        new String[] {"ocr", "ui"},
 			                                        analyzer);
@@ -345,7 +390,7 @@ public class HistoryScreenDatabase{
 		
 			Query query = parser.parse(query_string);
 
-			TopScoreDocCollector collector = TopScoreDocCollector.create(10, false);
+			TopScoreDocCollector collector = TopScoreDocCollector.create(20, false);
 			searcher.search(query, collector);
 
 			ScoreDoc[] hits;
@@ -356,17 +401,26 @@ public class HistoryScreenDatabase{
 
 				Document doc = searcher.doc(hits[i].doc);
 				int id = Integer.parseInt(doc.get("id"));
-				String path = doc.get("path");
+				//String path = doc.get("path");
 
-				System.out.println("" + id + ":" + path);
+				String time = doc.get("modified");
+
 				
-				ret.add(find(id));
+				
+				int j = _ids.indexOf(new Integer(id));
+				
+				HistoryScreen hs = _db.findScreen(id);
+				if (hs != null){
+					System.out.println("" + (i+1) +" : [lucene] id = " + id + "\t [derby] filename = " + hs.getFilename());
+				}
+				ret.add(hs);
 			}
 			
 			Collections.sort(ret);
 			
+			
 		}catch(Exception e){
-
+			e.printStackTrace();
 		}
 
 		return ret;
@@ -378,16 +432,22 @@ public class HistoryScreenDatabase{
 
 		//HistoryScreenDatabase.load("facebook", 19);
 		//HistoryScreenDatabase.load("pilyoung", 1000);
-		//HistoryScreenDatabase.load("chi", 30);
-		HistoryScreenDatabase.load("video", 15);
+
+		HistoryScreenDatabase.load("chi", 30, true);
+		HistoryScreenDatabase.find("deadline");
+		
+		
+		//HistoryScreenDatabase.insert("screen.png");
+		//HistoryScreenDatabase.find("happy");
+		
+		//HistoryScreenDatabase.load("video", 15);
 		
 		//HistoryScreenDatabase.indexOcrFiles();
-		//HistoryScreenDatabase.find("deadline");
 		//HistoryScreenDatabase.find("vancouver && conference");
-		HistoryScreenDatabase.find("ui64 AND volunteers");
+		//HistoryScreenDatabase.find("ui64 AND volunteers");
 	    
 	}
 	public static String getSikuliIndexFilename() {
-		return "captured/" + example_name + ".index";
+		return "captured/" + _current_example_name + ".index";
 	}
 }
