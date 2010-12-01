@@ -3,7 +3,8 @@
  */
 package history;
 
-import history.HistoryViewer.NavigationIterator;
+
+import history.controls.NavigationIterator;
 
 import java.util.ArrayList;
 

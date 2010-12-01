@@ -170,7 +170,7 @@ public class DerbyDB {
 		return screens;
 	}
 
-	public void list() throws SQLException{
+	public void list(){
 		try{
 			s = conn.createStatement();
 
@@ -181,10 +181,6 @@ public class DerbyDB {
 			while (rs.next()) {
 				int num = rs.getInt("num");
 				String filename = rs.getString("filename");
-
-				//		        float price = rs.getFloat("PRICE");
-				//		        int sales = rs.getInt("SALES");
-				//		        int total = rs.getInt("TOTAL");
 				System.out.println(num + "\t" + filename);
 			}
 
@@ -192,7 +188,11 @@ public class DerbyDB {
 		}catch (SQLException sqle){
 			printSQLException(sqle);
 		}finally{
-			s.close();
+			try {
+				s.close();
+			} catch (SQLException e) {
+				printSQLException(e);
+			}
 		}
 
 	}

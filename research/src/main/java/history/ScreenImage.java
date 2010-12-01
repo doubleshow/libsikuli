@@ -196,7 +196,6 @@ public class ScreenImage {
 
 	public void addAnnotationArrow(Point from, Point to, Color color){
 		Annotation ai = new AnnotationArrow(from,to,color);
-		//annotation_arrows.add(ai);
 		annotations.add(ai);
 	}
 

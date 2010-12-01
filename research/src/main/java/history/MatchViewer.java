@@ -1,7 +1,7 @@
 package history;
 
 import history.HistoryViewer.Mode;
-import history.HistoryViewer.NavigationListener;
+import history.controls.NavigationListener;
 
 import java.awt.Color;
 import java.awt.Dimension;

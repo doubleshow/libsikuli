@@ -8,7 +8,8 @@
  */
 package history;
 
-import history.HistoryViewer.NavigationIterator;
+
+import history.controls.NavigationIterator;
 
 import java.awt.AWTException;
 import java.awt.Rectangle;
@@ -71,6 +72,8 @@ public class HistoryScreenDatabase{
 		_image_save_path = _root + "/screens";
 		_sqldb_path = _root + "/derby";
 		
+		new File(_image_save_path).mkdir();
+		
 		_sqldb = new DerbyDB();
 		_sqldb.connect(_sqldb_path);
 	}
@@ -96,7 +99,7 @@ public class HistoryScreenDatabase{
 		return _current_id;
 	}
 	
-	static public void load(String name){
+	static public void load0(String name){
 		_current_example_name = name;
 		String root = "captured/" + name;
 		
@@ -117,12 +120,11 @@ public class HistoryScreenDatabase{
 //		{System.out.println(files[i]);}
 //		System.out.println(files.length + " files");
 	}
-	static public void load(String name, int n){
-		//setRoot("rec");
+	
+	static public void load(String name){
 		setRoot("databases/" + name);
-		_history_screens = _sqldb.getScreens();
-		
-		return;
+//		_history_screens = _sqldb.getScreens();
+//		return;
 	}
 	
 	
@@ -641,29 +643,25 @@ public class HistoryScreenDatabase{
 		public void run(){
 			log.entry("run");
 		
-			createEmptyIndex(_current_index_path);
-			_sqldb.reset();
+			HistoryScreenDatabase db = new HistoryScreenDatabase();
+			db.create("databases/live");
 			
-			for (int i=0;i<2;++i){
+//			createEmptyIndex(_current_index_path);
+//			_sqldb.reset();
+			
+			for (int i=0;i<5;++i){
 				
-				//BufferedImage screen = _robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-				BufferedImage screen_image = _robot.createScreenCapture(new Rectangle(0,0,800,600));
+				Rectangle screen_rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+				BufferedImage screen_image = _robot.createScreenCapture(screen_rectangle);
+				
+				
+				//BufferedImage screen_image = _robot.createScreenCapture(new Rectangle(0,0,800,600));
+				
 				insert(screen_image);
 
-//				try {
-//					Thread.sleep(100);
-//				} catch (InterruptedException e) {
-//				}
-				
-			
 			}
 			
-			try {
-				_sqldb.list();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			_sqldb.list();
 
 			log.exit("run");
 
@@ -672,10 +670,8 @@ public class HistoryScreenDatabase{
 		
 	}
 	
-	public static void main(String[] args) throws Exception {
-		
+	static void tool_import_to_new(){
 		HistoryScreenDatabase db = new HistoryScreenDatabase();
-		//db.import_from_old("captured/chi","databases/chi");
 		db.create("databases/chi");
 		db.import_from_old("captured/chi","databases/chi");
 		db.import_from_old("captured/facebook","databases/chi");
@@ -683,28 +679,20 @@ public class HistoryScreenDatabase{
 		db.import_from_old("captured/inbox","databases/chi");
 		db.import_from_old("captured/video","databases/chi");
 		
-		_sqldb.list();
+		_sqldb.list();	
+	}
+	
+	public static void main(String[] args) throws Exception {
 		
-		//db.testRecorder();
+		//tool_import_to_new();
+		
+		HistoryScreenDatabase db = new HistoryScreenDatabase();
+		db.testRecorder();
 		
 		HistoryScreenDatabase.find("deadline");
 		
 		
-		
-		//HistoryScreenDatabase.load("facebook", 19);
-		//HistoryScreenDatabase.load("pilyoung", 1000);
-
-		//HistoryScreenDatabase.load("chi", 30, true);
-		//HistoryScreenDatabase.find("deadline");
-		
-		
-		//HistoryScreenDatabase.insert("screen.png");
-		//HistoryScreenDatabase.find("happy");
-		
-		//HistoryScreenDatabase.load("video", 15);
-		
-		//HistoryScreenDatabase.indexOcrFiles();
-		//HistoryScreenDatabase.find("vancouver && conference");
+				//HistoryScreenDatabase.find("vancouver && conference");
 		//HistoryScreenDatabase.find("ui64 AND volunteers");
 	    
 	}
