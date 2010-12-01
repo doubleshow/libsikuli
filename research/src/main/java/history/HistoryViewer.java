@@ -651,7 +651,7 @@ public class HistoryViewer extends JPanel implements KeyListener {
 			virtualPage.setVisible(false);
 			return;
 		}
-
+		_toolbar.hideFrame();
 		selector.start();
 		selector.setListener(new RegionSelectorListener(){
 
@@ -711,7 +711,27 @@ public class HistoryViewer extends JPanel implements KeyListener {
 
 	}
 
-	protected void doCompareToNow() {
+	public void doCompare(){
+		_toolbar.hideFrame();
+		
+		if (bookmarked_screens.size()!=2)
+			return;
+		
+		
+		current_mode = Mode.DIFF;
+		
+		HistoryScreen a = bookmarked_screens.get(0);
+		HistoryScreen b = bookmarked_screens.get(1);
+		
+		screen = a.createImage();
+
+		screen.drawWordMovements(a, b);
+		screen.highlightNewWords(a, b);
+
+		repaint();
+	}
+	
+	public void doCompareToNow() {
 		HistoryScreen current_screen = HistoryScreenDatabase.getMostRecent();
 		current_mode = Mode.DIFF;
 
@@ -1095,6 +1115,12 @@ public class HistoryViewer extends JPanel implements KeyListener {
 		repaint();
 	}	
 	
+	ArrayList<HistoryScreen> bookmarked_screens = new ArrayList<HistoryScreen>();
+	public void addBookmark(){
+		log.info("adding a bookmark:" + history_screen);
+		bookmarked_screens.add(history_screen);
+	}
+	
 	public static void main(String[] args) {
 		HistoryViewerFrame viewer =  HistoryViewerFrame.getInstance();
 		viewer.setVisible(false);		
@@ -1107,6 +1133,8 @@ public class HistoryViewer extends JPanel implements KeyListener {
         	_toolbar.showFrame();
         }else if (key == KeyEvent.VK_ESCAPE){
         	doBrowse();
+        }else if (key == KeyEvent.VK_B){
+        	addBookmark();
         }
 	}
 
