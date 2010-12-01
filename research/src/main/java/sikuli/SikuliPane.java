@@ -1,25 +1,42 @@
 package sikuli;
 
-import history.Lens;
-
-import java.io.*;
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.image.*;
-import java.awt.event.*;
-import java.util.regex.Pattern;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Insets;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.util.regex.Matcher;
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.filechooser.FileFilter;
+import java.util.regex.Pattern;
+
+import javax.swing.InputMap;
+import javax.swing.JFrame;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.imageio.*;
-//
-//import org.python.util.PythonInterpreter; 
-//import org.python.core.*; 
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.TabSet;
+import javax.swing.text.TabStop;
+import javax.swing.text.Utilities;
 
 public class SikuliPane extends JTextPane implements KeyListener, 
                                                      CaretListener{
