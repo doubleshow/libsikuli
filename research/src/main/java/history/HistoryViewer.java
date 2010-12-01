@@ -123,9 +123,9 @@ public class HistoryViewer extends JPanel {
 		current_mode = Mode.BROWSE;
 		navigator.setListener(new HistoryScreenNavigationListener());
 
-		setExample("facebook");		
+		//setExample("facebook");		
 		//setExample("inbox");	
-		//setExample("chi");	
+		setExample("chi");	
 		
 		
 		
@@ -932,7 +932,7 @@ public class HistoryViewer extends JPanel {
 			HistoryScreenDatabase.load(exampleName,19);
 			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
 			navigator.setIterator(iter);
-			navigator.jump(10);
+			navigator.jump(0);
 		}
 		else if (exampleName == "pilyoung"){
 			HistoryScreenDatabase.load(exampleName,1000);
@@ -942,9 +942,9 @@ public class HistoryViewer extends JPanel {
 		}	
 		else if (exampleName == "chi"){
 			HistoryScreenDatabase.load(exampleName,30);
-			NavigationIterator iter = HistoryScreenDatabase.getIterator(0);
+			NavigationIterator iter = HistoryScreenDatabase.getIterator(301);
 			navigator.setIterator(iter);
-			navigator.jump(10);
+			//navigator.jump(10);
 		}	
 		else if (exampleName == "video"){
 			HistoryScreenDatabase.load(exampleName,15);

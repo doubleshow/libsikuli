@@ -1,19 +1,35 @@
 /**
+/**
+ * 
+ */
+/**
+/**
  * 
  */
 package history;
 
 import history.HistoryViewer.NavigationIterator;
 
+import java.awt.AWTException;
 import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -30,14 +46,34 @@ import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.grlea.log.SimpleLogger;
+
+import vision.OCRText;
+import vision.OCRWord;
+import vision.OCRWords;
+import vision.Vision;
 
 import db.DerbyDB;
 
 public class HistoryScreenDatabase{
 
+	private static final SimpleLogger log = new SimpleLogger(HistoryScreenDatabase.class);
+//	private final static Logger LOGGER = Logger.getLogger(HistoryScreenDatabase.class .getName());
+
+	
 	private static final File INDEX_DIR =  new File("index");
 	static ArrayList<HistoryScreen> _history_screens = new ArrayList<HistoryScreen>();
-
+	
+	static String _root = ".";
+	static public void setRoot(String root){
+		_root = root;
+		_current_index_path = _root + "/lucene";
+		_image_save_path = _root + "/screens";
+		_sqldb_path = _root + "/derby";
+		
+		_sqldb = new DerbyDB();
+		_sqldb.connect(_sqldb_path);
+	}
 	
 	static ArrayList<String> _filenames = new ArrayList<String>();
 	static ArrayList<Integer> _ids = new ArrayList<Integer>();
@@ -45,18 +81,15 @@ public class HistoryScreenDatabase{
 	
 	static private String _current_index_path;
 	static private String _current_example_name;
+	static private String _image_save_path;
 	
-	
-	static private DerbyDB _db;
-	static {
-		_db = new DerbyDB();
-		_db.connect();
-	};
+	static private DerbyDB _sqldb;
+	static private String _sqldb_path;
 	
 	
 	
 	//static private int _last_id;
-	static private int _current_id = 152;
+	static private int _current_id = 300;
 	
 	static private int getNewId(){
 		_current_id ++;
@@ -85,7 +118,61 @@ public class HistoryScreenDatabase{
 //		System.out.println(files.length + " files");
 	}
 	static public void load(String name, int n){
-		load(name,n,false);
+		//setRoot("rec");
+		setRoot("databases/" + name);
+		_history_screens = _sqldb.getScreens();
+		
+		return;
+	}
+	
+	
+	public void create(String new_dir){
+		setRoot(new_dir);
+		new File(new_dir).mkdir();
+		createEmptyIndex(_current_index_path);
+		_sqldb.createTables();
+	}
+	
+	public void import_from_old(String src_dir, String dest_dir){	
+		
+		//create(dest_dir);
+		
+//		setRoot("dest_dir");
+//		createEmptyIndex(_current_index_path);
+//		_sqldb.createTables();
+		
+		//_sqldb.reset();
+		
+		File[] files = (new File(src_dir)).listFiles(new FilenameFilter(){
+
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith("png");
+			}
+			
+		});
+
+		// sort by last modified time
+		Arrays.sort(files, new Comparator<File>(){
+		    public int compare(File f1, File f2)
+		    {
+		        return Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
+		    } });
+		
+		log.info("Found " + files.length + " png images to import");
+		
+		for (File file : files){
+			String filename = file.getPath();
+			String ocr_filename = filename + ".ocr.loc";
+			String image_filename = filename;
+
+			log.info("importing " + filename);
+
+			if (new File(ocr_filename).exists()){
+				import_one_screen_from_old_version(image_filename, ocr_filename);
+			}
+		}
+		
 	}
 	
 	static public void load(String name, int n, boolean rebuild_index){
@@ -118,7 +205,7 @@ public class HistoryScreenDatabase{
 			HistoryScreen hs = new HistoryScreen(new_id, filename);
 			_history_screens.add(hs);
 			
-			_db.insertScreen(hs);
+			_sqldb.insertScreen(hs);
 		}
 		
 		//.disconnect();
@@ -132,6 +219,18 @@ public class HistoryScreenDatabase{
 		}
 		
 		System.out.println(_current_index_path +" loaded.");
+	}
+	
+	
+	static public void insert(String screen_image_filename, Document ocr_doc){
+		
+		int new_id = getNewId();
+		_ids.add(new_id);
+		
+		HistoryScreen hs = new HistoryScreen(new_id, screen_image_filename);
+		_history_screens.add(hs);
+		
+		_sqldb.insertScreen(hs);
 	}
 	
 	static public Rectangles findRectangles(int id, String word, Rectangle filter){
@@ -162,7 +261,7 @@ public class HistoryScreenDatabase{
 	
 	static public OCRDocument getOCRDocument(int id){
 		HistoryScreen hs = get(id);
-		String file = hs.getFilename() + ".ocr.loc";
+		String file = hs.getFilename().replaceFirst("png","ocr");
 		return new OCRDocument(file);
 	}
 
@@ -174,7 +273,7 @@ public class HistoryScreenDatabase{
 
 	
 	static public HistoryScreen get(int id){
-		return _db.findScreen(id);
+		return _sqldb.findScreen(id);
 	}
 	
 	static public HistoryScreen find(int id){
@@ -261,46 +360,40 @@ public class HistoryScreenDatabase{
 		@Override
 		public Object getAfter() {
 			current_id++;
-			return _history_screens.get(current_id);
+			return HistoryScreenDatabase.get(current_id);
 		}
 
 		@Override
 		public Object getBefore() {
 			current_id--;
-			return _history_screens.get(current_id);
+			return HistoryScreenDatabase.get(current_id);
 		}
 
 		@Override
 		public boolean hasBefore() {
-			return current_id > 0;
+			return HistoryScreenDatabase.get(current_id-1) != null;
 		}
 
 		@Override
 		public boolean hasAfter() {
-			return current_id < _history_screens.size() - 1;
+			return HistoryScreenDatabase.get(current_id+1) != null;
 		}
 
 		@Override
 		public Object getCurrent() {
-			return _history_screens.get(current_id);
+			return HistoryScreenDatabase.get(current_id);
 		}
 
 		@Override
 		public Object get(int i) {
 			current_id = i;
-			return _history_screens.get(current_id);
+			return HistoryScreenDatabase.get(current_id);
 		}
 		
 	}
 	
 	
-//	String _index_dir;
-//	static void select(String index_file){
-//		
-//		
-//	}
-	
-	static void insert(String screen_image_filename){
+	static void insert0(String screen_image_filename){
 		
 		File index_file = new File(_current_index_path);
 		
@@ -321,6 +414,36 @@ public class HistoryScreenDatabase{
 			
 		}catch(IOException e){
 			
+		}
+	}
+	
+	
+	static void createEmptyIndex(String path){
+		try{
+			IndexWriter writer = new IndexWriter(FSDirectory.open(new File(path)), 
+					new StandardAnalyzer(Version.LUCENE_30), true, 
+					IndexWriter.MaxFieldLength.LIMITED);
+			writer.close();
+		} catch (IOException e) {
+			log.errorException(e);
+		}
+	}
+	
+
+	
+	static void indexOCRDocument(int id, OCRDocument doc){
+		
+		try {			
+			IndexWriter writer = new IndexWriter(FSDirectory.open(new File(_current_index_path)), 
+					new StandardAnalyzer(Version.LUCENE_30), false, 
+					IndexWriter.MaxFieldLength.LIMITED);
+
+			writer.addDocument(FileDocument.Document(doc.getString(), "", id));
+			writer.optimize();
+			writer.close();
+			
+		} catch (IOException e) {
+			log.errorException(e);
 		}
 	}
 	
@@ -365,12 +488,9 @@ public class HistoryScreenDatabase{
 
 	}
 
-	
-	static public String getImageFilename(int id){
-		return _filenames.get(id);
-	}
-	
 	static public ArrayList<HistoryScreen> find(String query_string){
+		
+		log.infoObject("query_string",query_string);
 		
 		ArrayList<HistoryScreen> ret = new ArrayList<HistoryScreen>();
 
@@ -409,9 +529,9 @@ public class HistoryScreenDatabase{
 				
 				int j = _ids.indexOf(new Integer(id));
 				
-				HistoryScreen hs = _db.findScreen(id);
+				HistoryScreen hs = _sqldb.findScreen(id);
 				if (hs != null){
-					System.out.println("" + (i+1) +" : [lucene] id = " + id + "\t [derby] filename = " + hs.getFilename());
+					log.info("" + (i+1) +" : [lucene] id = " + id + "\t [derby] filename = " + hs.getFilename());
 				}
 				ret.add(hs);
 			}
@@ -426,15 +546,156 @@ public class HistoryScreenDatabase{
 		return ret;
 	}
 
+	public void testRecorder(){
+		
+		Recorder r = new Recorder();
+		r.run();
 
+	}
+	
+	
+	String getScreenImageFilename(int id){
+		return _image_save_path + "/" + id + ".png";
+	}
+	
+	void import_one_screen_from_old_version(String src_image_filename, String src_ocr_filename){
+		int id = getNewId();
 
+		String dest_image_filename = _image_save_path + "/" + id + ".png";
+		String dest_ocr_filename = _image_save_path + "/" + id + ".ocr";
+			
+		(new File(_image_save_path)).mkdir();
+		
+		try {
+			Process p;
+			p = Runtime.getRuntime().exec("cp " + src_image_filename + " " + dest_image_filename);
+			
+			p.waitFor();
+			
+			p = Runtime.getRuntime().exec("cp " + src_ocr_filename + " " + dest_ocr_filename);
+			
+			p.waitFor();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		OCRDocument doc = new OCRDocument(dest_ocr_filename);
+		indexOCRDocument(id, doc);
+		
+		// Add the screenshot's meta data to Derby
+		HistoryScreen hs = new HistoryScreen(id, dest_image_filename);
+		//_history_screens.add(hs);
+		_sqldb.insertScreen(hs);
+	}
+	
+	void insert(BufferedImage screen_image){
+		int id = getNewId();
+
+		// Save the screenshot in the file system
+		String output_screen_image_filename = _image_save_path + "/" + id + ".png";
+		
+		try {
+			ImageIO.write(screen_image, "png", new File(output_screen_image_filename));
+		} catch (IOException e1) {
+			log.errorException(e1);
+		}
+		log.info("Saved a screenshot at: " + output_screen_image_filename);
+						
+		// Save the ocr content in the file system
+		OCRDocument doc = new OCRDocument(screen_image);
+		
+		String output_filename = _image_save_path + "/" + id + ".ocr"; 
+		doc.save(output_filename);
+		
+		// Add the screenshot's ocr content to the Lucene index
+		indexOCRDocument(id, doc);
+			
+		// Add the screenshot's meta data to Derby
+		HistoryScreen hs = new HistoryScreen(id, output_screen_image_filename);
+		_history_screens.add(hs);
+		
+		_sqldb.insertScreen(hs);
+	}
+	
+	
+	
+	class Recorder{
+		
+		Robot _robot;
+		
+		
+		public Recorder(){
+			try {
+				_robot = new Robot();
+			} catch (AWTException e) {
+				e.printStackTrace();
+			} 
+		}
+		
+	
+		
+		public void run(){
+			log.entry("run");
+		
+			createEmptyIndex(_current_index_path);
+			_sqldb.reset();
+			
+			for (int i=0;i<2;++i){
+				
+				//BufferedImage screen = _robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+				BufferedImage screen_image = _robot.createScreenCapture(new Rectangle(0,0,800,600));
+				insert(screen_image);
+
+//				try {
+//					Thread.sleep(100);
+//				} catch (InterruptedException e) {
+//				}
+				
+			
+			}
+			
+			try {
+				_sqldb.list();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			log.exit("run");
+
+		}
+
+		
+	}
+	
 	public static void main(String[] args) throws Exception {
-
+		
+		HistoryScreenDatabase db = new HistoryScreenDatabase();
+		//db.import_from_old("captured/chi","databases/chi");
+		db.create("databases/chi");
+		db.import_from_old("captured/chi","databases/chi");
+		db.import_from_old("captured/facebook","databases/chi");
+		db.import_from_old("captured/login","databases/chi");
+		db.import_from_old("captured/inbox","databases/chi");
+		db.import_from_old("captured/video","databases/chi");
+		
+		_sqldb.list();
+		
+		//db.testRecorder();
+		
+		HistoryScreenDatabase.find("deadline");
+		
+		
+		
 		//HistoryScreenDatabase.load("facebook", 19);
 		//HistoryScreenDatabase.load("pilyoung", 1000);
 
-		HistoryScreenDatabase.load("chi", 30, true);
-		HistoryScreenDatabase.find("deadline");
+		//HistoryScreenDatabase.load("chi", 30, true);
+		//HistoryScreenDatabase.find("deadline");
 		
 		
 		//HistoryScreenDatabase.insert("screen.png");

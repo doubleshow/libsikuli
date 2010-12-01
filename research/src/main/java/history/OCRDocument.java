@@ -3,7 +3,9 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -12,11 +14,17 @@ import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
+import org.grlea.log.SimpleLogger;
+
 import vision.OCRText;
 import vision.OCRWords;
 
 public class OCRDocument {
 
+	private static final SimpleLogger log = new SimpleLogger(OCRDocument.class);
+
+	private OCRText _ocr_text = null;
+	
 	class OCRWord {
 
 		OCRWord(String string, Rectangle rectangle){
@@ -51,9 +59,9 @@ public class OCRDocument {
 		
 		_word_to_rectangles = new Hashtable<String,Rectangles>();
 		
-		OCRText ocrtext = SikuliVision.ocr(image);
+		_ocr_text = SikuliVision.ocr(image);
 
-		OCRWords ws = ocrtext.getWords();
+		OCRWords ws = _ocr_text.getWords();
 		
 		for (int i=0; i < ws.size(); ++i){
 			vision.OCRWord w = (vision.OCRWord) ws.get(i);
@@ -77,6 +85,28 @@ public class OCRDocument {
 
 			_words.add(word);
 			
+		}
+	}
+	
+	
+	public void save(String filename){
+		try {
+			FileWriter outFile = new FileWriter(filename);
+			PrintWriter out = new PrintWriter(outFile);
+			
+			for (int j=0;j<_words.size();++j){
+				OCRWord word = (OCRWord) _words.get(j);
+				
+			Rectangle r = word.getRectangle();
+			out.print((int)r.getX() + " " + (int)r.getY() + " " + (int)r.getWidth() + " " + (int)r.getHeight());
+			out.println(" " + word.getString());
+			}
+			
+			out.close();
+			log.info("Saved at: " + filename);
+			
+		} catch (IOException e){
+			e.printStackTrace();
 		}
 	}
 
@@ -107,9 +137,9 @@ public class OCRDocument {
 		}
 	}
 
-	public OCRDocument(String filename){
+	public OCRDocument(String ocr_filename){
 
-		parseFile(filename);
+		parseFile(ocr_filename);
 	}
 
 	String normalize(String in){
@@ -129,11 +159,17 @@ public class OCRDocument {
 		scanner.useDelimiter(" ");
 
 		int x = scanner.nextInt();
+
+		if (x==-1)
+			return;
+		
 		int y = scanner.nextInt();
 		int w = scanner.nextInt();
 		int h = scanner.nextInt();
 		String word = scanner.next();
 
+		
+		
 		word = normalize(word);
 		//System.out.println("("+word+")");
 
@@ -161,6 +197,20 @@ public class OCRDocument {
 		return _words;
 	}
 
+	public String getString(){
+		if (_ocr_text != null)
+			return _ocr_text.getString();
+		else{
+			String ret = "";
+			for (OCRWord word : _words){
+				
+				ret = ret + " " + word.getString();
+			}
+			
+			return ret;
+		}
+	}
+	
 	public boolean hasWord(String word){
 		return _word_to_rectangles.containsKey(word);
 	}
