@@ -2,6 +2,7 @@ package org.sikuli;
 import java.awt.AWTException;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -24,203 +25,192 @@ import java.lang.reflect.Array;
 import javax.swing.JWindow;
 
 
+
 class ClickOverlay extends JWindow{
-		
-		Rectangle target;
-		BufferedImage screen = null;
-		Robot robot;
-		String message;
-		
-		GraphicsDevice gdev;
-		Object o;
-		
-		public ClickOverlay(Object o_, Rectangle target_){
-			this(o_, target_, "Click Here");
-		}
-		
-		public ClickOverlay(Object o_, Rectangle target_, String message_){
-			this.target = target_;
-			this.o = o_;
-			this.message = message_;
-			
-			try {
-				robot = new Robot();
-			} catch (AWTException e1) {
-				e1.printStackTrace();
-			} 
 
-			addMouseListener(new MouseAdapter(){
-				
-				public void mouseClicked(MouseEvent e){
-					System.out.println(e.getX() + "," + e.getY());
-					
-					if (target.contains(e.getPoint())){
-						System.out.println("inside");
-						gdev.setFullScreenWindow(null);
-						setVisible(false);
-						screen = null;
-//						toBack();
-					}				
-				}
-						
-			});
-			
-			addComponentListener(new ComponentAdapter() {
-				public void componentHidden(ComponentEvent e) 
-				{
-					System.out.println("I'm hidden");
-					dispose();
-					synchronized(o){
-						o.notify();
-					}
-				}
-				});
+	Rectangle target;
+	BufferedImage screen = null;
+	Robot robot;
+	String message;
 
-			start();
-		}
-		
-		public void start(){
-			screen = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-			
-			gdev = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+	GraphicsDevice gdev;
+	Object o;
 
-	         setVisible(true);
-			  if(gdev.isFullScreenSupported() ){
-		            gdev.setFullScreenWindow(this);
-		         }
-
-		}
-				
-		
-		public void paint(Graphics g) {
-
-			if (screen != null){
-				super.paint(g);
-				Graphics2D g2d = (Graphics2D) g;
-				
-				
-				RescaleOp op = new RescaleOp(0.8f, 0, null); 
-				BufferedImage image_really_darken = op.filter(screen, null);
-				g2d.drawImage(image_really_darken, 0, 0, null);
-				
-				BufferedImage subimage = screen.getSubimage(target.x,target.y,target.width,target.height);
-				//g2d.drawImage(subimage, target.x, target.y, null);
-				
-		        //g2d.drawImage(subimage, target.x-target.width/2, target.y-target.height/2, (int)2*target.width, (int)2*target.height, null);
-				g2d.drawImage(subimage, target.x, target.y-target.height/2, (int)2*target.width, (int)2*target.height, null);
-		        
-				
-		        //Point p = new Point(target.x-target.width/2,target.y-target.height/2);
-		        Point p = new Point(target.x,target.y-target.height/2);
-		        //
-		        //p.move(target.x-target.width/2, -target.height/2);
-		        
-
-				
-				Stroke pen = new BasicStroke(3.0F);
-				g2d.setStroke(pen);
-				g2d.setColor(Color.red);
-				g2d.drawRect(p.x, p.y, 2*target.width, 2*target.height);
-
-				
-				Point pt = new Point(10, target.y-10);
-				
-				Font f = new Font("sansserif", Font.BOLD, 32);
-				
-				 FontMetrics fm = getFontMetrics(f);
-				  int width = fm.stringWidth(message);
-				  int height = fm.getHeight();
-				  
-				  g2d.setColor(new Color(255,250,205));
-				  g2d.fillRect(pt.x,pt.y-height+4, width, height);
-
-				  
-				  g2d.setColor(new Color(238,221,130));
-				  g2d.drawRect(pt.x,pt.y-height+4, width, height);
-				
-				g2d.setStroke(pen);
-				g2d.setColor(Color.black);
-				
-				g2d.setFont(f);
-			
-//				Point from = pt;
-//				Point to = new Point(target.x,target.y);
-//				drawPolylineArrow(g2d, 
-//						new int[]{from.x,to.x}, new int[]{from.y,to.y}, 3, 3);
-
-				
-				
-				//g2d.drawString(message, target.x + target.width + 10, target.y+target.height);
-				g2d.drawString(message, pt.x, pt.y);
-				setVisible(true);
-			}else{
-				setVisible(false);
-			}
-
-		}
-		
-		
-		private void drawPolylineArrow(Graphics g, int[] xPoints, int[] yPoints, int headLength, int headwidth){
-
-			double theta1;
-
-			//calculate the length of the line - convert from Object to Integer to int value
-
-			Object tempX1 = ((Array.get(xPoints, ((xPoints.length)-2))) );
-
-			Object tempX2 = ((Array.get(xPoints, ((xPoints.length)-1))) );
-
-			Integer fooX1 = (Integer)tempX1;
-
-			int x1 = fooX1.intValue();
-
-			Integer fooX2 = (Integer)tempX2;
-
-			int x2 = fooX2.intValue();
-
-			Object tempY1 = ((Array.get(yPoints, ((yPoints.length)-2))) );
-
-			Object tempY2 = ((Array.get(yPoints, ((yPoints.length)-1))) );
-
-			Integer fooY1 = (Integer)tempY1;
-
-			int y1 = fooY1.intValue();
-
-			Integer fooY2 = (Integer)tempY2;
-
-			int y2 = fooY2.intValue();
-
-			int deltaX = (x2-x1);
-
-			int deltaY = (y2-y1);
-
-			double theta = Math.atan((double)(deltaY)/(double)(deltaX));
-
-			if (deltaX < 0.0){
-
-				theta1 = theta+Math.PI; //If theta is negative make it positive
-
-			}
-
-			else{
-
-				theta1 = theta; //else leave it alone
-
-			}
-
-			int lengthdeltaX =- (int)(Math.cos(theta1)*headLength);
-
-			int lengthdeltaY =- (int)(Math.sin(theta1)*headLength);
-
-			int widthdeltaX = (int)(Math.sin(theta1)*headwidth);
-
-			int widthdeltaY = (int)(Math.cos(theta1)*headwidth);
-
-			g.drawPolyline(xPoints, yPoints, xPoints.length);
-
-			g.drawLine(x2,y2,x2+lengthdeltaX+widthdeltaX,y2+lengthdeltaY-widthdeltaY);
-
-			g.drawLine(x2,y2,x2+lengthdeltaX-widthdeltaX,y2+lengthdeltaY+widthdeltaY);
-
-		}//end drawPolylineArrow
+	public ClickOverlay(Object o_, Rectangle target_){
+		this(o_, target_, "Click Here");
 	}
+
+	public ClickOverlay(Object o_, Rectangle target_, String message_){
+		this.target = target_;
+		this.o = o_;
+		this.message = message_;
+
+		try {
+			robot = new Robot();
+		} catch (AWTException e1) {
+			e1.printStackTrace();
+		} 
+
+		addMouseListener(new MouseAdapter(){
+
+			public void mouseClicked(MouseEvent e){
+				System.out.println(e.getX() + "," + e.getY());
+
+				if (target.contains(e.getPoint())){
+					System.out.println("inside");
+					gdev.setFullScreenWindow(null);
+					setVisible(false);
+					screen = null;
+					//						toBack();
+				}				
+			}
+
+		});
+
+		addComponentListener(new ComponentAdapter() {
+			public void componentHidden(ComponentEvent e) 
+			{
+				System.out.println("I'm hidden");
+				dispose();
+				synchronized(o){
+					o.notify();
+				}
+			}
+		});
+
+		start();
+	}
+
+	public void start(){
+		screen = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+
+		gdev = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+		setVisible(true);
+		if(gdev.isFullScreenSupported() ){
+			gdev.setFullScreenWindow(this);
+		}
+
+	}
+
+
+	public void paint(Graphics g) {
+
+		if (screen != null){
+			super.paint(g);
+			Graphics2D g2d = (Graphics2D) g;
+
+
+			RescaleOp op = new RescaleOp(0.8f, 0, null); 
+			BufferedImage image_really_darken = op.filter(screen, null);
+			g2d.drawImage(image_really_darken, 0, 0, null);
+
+			BufferedImage subimage = screen.getSubimage(target.x,target.y,target.width,target.height);
+
+			// original size
+			g2d.drawImage(subimage, target.x, target.y, null);
+
+			//g2d.drawImage(subimage, target.x-target.width/2, target.y-target.height/2, (int)2*target.width, (int)2*target.height, null);
+			//g2d.drawImage(subimage, target.x, target.y-target.height/2, (int)2*target.width, (int)2*target.height, null);
+
+
+			//Point p = new Point(target.x-target.width/2,target.y-target.height/2);
+			//Point p = new Point(target.x,target.y-target.height/2);
+			//
+			//p.move(target.x-target.width/2, -target.height/2);
+
+
+
+//			Stroke pen = new BasicStroke(3.0F);
+//			g2d.setStroke(pen);
+//			g2d.setColor(Color.red);
+//			//g2d.drawRect(p.x, p.y, 2*target.width, 2*target.height);
+
+
+			//Point pt = new Point(10, target.y-10);
+
+			Point pt = new Point(target.x+target.width/2, target.y);
+			
+			if (false){			
+				CalloutBox o = new CalloutBox(message,pt);
+				o.paint(g2d);
+			}else{
+				
+				SimpleBox o = new SimpleBox(message,pt);
+				o.paint(g2d);
+				
+			}
+			
+	
+			setVisible(true);
+		}else{
+			setVisible(false);
+		}
+
+	}
+
+
+	private void drawPolylineArrow(Graphics g, int[] xPoints, int[] yPoints, int headLength, int headwidth){
+
+		double theta1;
+
+		//calculate the length of the line - convert from Object to Integer to int value
+
+		Object tempX1 = ((Array.get(xPoints, ((xPoints.length)-2))) );
+
+		Object tempX2 = ((Array.get(xPoints, ((xPoints.length)-1))) );
+
+		Integer fooX1 = (Integer)tempX1;
+
+		int x1 = fooX1.intValue();
+
+		Integer fooX2 = (Integer)tempX2;
+
+		int x2 = fooX2.intValue();
+
+		Object tempY1 = ((Array.get(yPoints, ((yPoints.length)-2))) );
+
+		Object tempY2 = ((Array.get(yPoints, ((yPoints.length)-1))) );
+
+		Integer fooY1 = (Integer)tempY1;
+
+		int y1 = fooY1.intValue();
+
+		Integer fooY2 = (Integer)tempY2;
+
+		int y2 = fooY2.intValue();
+
+		int deltaX = (x2-x1);
+
+		int deltaY = (y2-y1);
+
+		double theta = Math.atan((double)(deltaY)/(double)(deltaX));
+
+		if (deltaX < 0.0){
+
+			theta1 = theta+Math.PI; //If theta is negative make it positive
+
+		}
+
+		else{
+
+			theta1 = theta; //else leave it alone
+
+		}
+
+		int lengthdeltaX =- (int)(Math.cos(theta1)*headLength);
+
+		int lengthdeltaY =- (int)(Math.sin(theta1)*headLength);
+
+		int widthdeltaX = (int)(Math.sin(theta1)*headwidth);
+
+		int widthdeltaY = (int)(Math.cos(theta1)*headwidth);
+
+		g.drawPolyline(xPoints, yPoints, xPoints.length);
+
+		g.drawLine(x2,y2,x2+lengthdeltaX+widthdeltaX,y2+lengthdeltaY-widthdeltaY);
+
+		g.drawLine(x2,y2,x2+lengthdeltaX-widthdeltaX,y2+lengthdeltaY+widthdeltaY);
+
+	}//end drawPolylineArrow
+}
