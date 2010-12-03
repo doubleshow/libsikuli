@@ -173,19 +173,22 @@ int match_main(int argc, const char* argv[]){
 
 
 int index_main(int argc, const char* argv[]){
-   if (argc < 4)
+   if (argc < 5)
       return -1;
+   
+   VisualLogger::setEnabled(false);
    
    Database db;
    
    const char* inputdir = argv[1];
-   int n = atoi(argv[2]);
-   const char* output = argv[3];
-   
+   const char* output = argv[2];
+   int a = atoi(argv[3]);
+   int b = atoi(argv[4]);
+
    char filename[200];
    
-   for (int i=0;i<n;++i){
-      sprintf(filename, "%s/screen%d.png", inputdir, i);
+   for (int i=a;i<=b;++i){
+      sprintf(filename, "%s/%d.png", inputdir, i);
       cout << "indexing " << filename << endl;
       
       db.insert_file(filename, i);
@@ -208,21 +211,34 @@ int query_main(int argc, const char* argv[]){
    const char* index_filename = argv[1];   
    const char* query_image_filename = argv[2];
    
-   ifstream in(index_filename, ios::binary);
-   db.read(in);
-   in.close();
- 
+   cv::Mat image = imread(query_image_filename,1);
    
-   vector<ImageRecord> results = db.find(query_image_filename);
+   string results = Vision::query(index_filename, image);
    
-   for (vector<ImageRecord>::iterator r = results.begin(); 
-        r != results.end(); ++r){
+   cout << results;
+//   for (vector<string>::iterator r = results.begin(); 
+//        r != results.end(); ++r){
+//      
+//      cout << *r;
       
-      ImageRecord& record = *r;
-      
-      cout << "ui" << record.id << " ";
-      
-   }
+//   }
+   
+   
+//   ifstream in(index_filename, ios::binary);
+//   db.read(in);
+//   in.close();
+// 
+//   
+//   vector<ImageRecord> results = db.find(query_image_filename);
+//   
+//   for (vector<ImageRecord>::iterator r = results.begin(); 
+//        r != results.end(); ++r){
+//      
+//      ImageRecord& record = *r;
+//      
+//      cout << "ui" << record.id << " ";
+//      
+//   }
    
    return 1;
 }

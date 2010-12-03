@@ -63,15 +63,14 @@ public class SikuliVision {
 	}
 
 	public static ArrayList<Rectangle> find(String screen_image_filename, BufferedImage target_image) throws IOException{
-
-
 		BufferedImage screen_image = ImageIO.read(new File(screen_image_filename));
 		return find(screen_image, target_image);
-
-
 	}
 	
-	
+	public static String find_ui(BufferedImage ui_image){		
+		Mat ui_mat = convertBufferedImageToMat(ui_image);
+		return Vision.query("img.db", ui_mat);
+	}
 
 
 	public static BufferedImage createBufferedImage(int w, int h)

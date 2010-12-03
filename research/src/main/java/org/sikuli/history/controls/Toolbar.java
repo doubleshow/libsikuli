@@ -44,6 +44,15 @@ public class Toolbar extends Box{
 			}			
 		});
 		
+		JButton captureBtn = new JButton("Capture");
+		captureBtn.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				_viewer.doCaptureQueryImage();
+			}			
+		});
+		
+		add(captureBtn);
 		add(copyBtn);
 		add(readBtn);
 		add(compareBtn);

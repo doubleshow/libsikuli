@@ -280,7 +280,7 @@ OCRText::getString(){
    for (vector<string>::iterator it = word_strings.begin() + 1;
         it != word_strings.end(); ++it){
     
-      ret = ret + " " + *it;
+      ret = ret + *it + " ";
    }
    
    return ret;

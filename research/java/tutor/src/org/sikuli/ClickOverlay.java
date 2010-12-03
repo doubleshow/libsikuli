@@ -20,8 +20,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JWindow;
 
 
@@ -81,6 +89,9 @@ class ClickOverlay extends JWindow{
 		start();
 	}
 
+
+
+	
 	public void start(){
 		screen = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
 
@@ -131,7 +142,7 @@ class ClickOverlay extends JWindow{
 
 			Point pt = new Point(target.x+target.width/2, target.y);
 			
-			if (false){			
+			if (true){			
 				CalloutBox o = new CalloutBox(message,pt);
 				o.paint(g2d);
 			}else{

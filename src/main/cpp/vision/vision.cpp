@@ -10,6 +10,7 @@
 #include "vision.h"
 #include "finder.h"
 #include "tessocr.h"
+#include "imgdb.h"
 #include <sys/stat.h> 
 
 using namespace sikuli;
@@ -377,6 +378,33 @@ Vision::recognize(Mat image){
    OCRText text = OCR::recognize(image);
    return text.getString();
 }
+
+string
+Vision::query(const char* index_filename, cv::Mat image){
+   
+   Database db;   
+   ifstream in(index_filename, ios::binary);
+   db.read(in);
+   in.close();
+   
+   
+   string ret = "";
+   
+   vector<ImageRecord> results = db.find(image);   
+   for (vector<ImageRecord>::iterator r = results.begin(); 
+        r != results.end(); ++r){
+      
+      ImageRecord& record = *r;
+      
+      //cout << "ui" << record.id << " ";
+      char buf[50];
+      sprintf(buf,"ui%d",record.id);
+      ret = ret + string(buf) + " ";
+   }
+   
+   return ret;
+}
+
 
 OCRText
 Vision::recognize_as_ocrtext(Mat image){

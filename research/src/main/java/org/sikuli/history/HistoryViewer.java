@@ -302,11 +302,11 @@ public class HistoryViewer extends JPanel implements KeyListener {
 			setLocationRelativeTo(controls);
 			setTitle("Image query");
 			pack();
-
+			setAlwaysOnTop(true);
 
 			addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent ev) {
-					findBox.removeQueryImage();
+					_query.setImage(null);
 				}
 			});
 		}
@@ -314,7 +314,8 @@ public class HistoryViewer extends JPanel implements KeyListener {
 	}
 
 	QueryImageFrame queryImageFrame = null;
-	private void doCaptureQueryImage(){
+	public void doCaptureQueryImage(){
+		_toolbar.hideFrame();
 
 		if (queryImageFrame != null)
 			queryImageFrame.dispose();
@@ -329,7 +330,7 @@ public class HistoryViewer extends JPanel implements KeyListener {
 				BufferedImage newimg = screen.crop(rectangle);
 
 				queryImageFrame = new QueryImageFrame(newimg);		
-				findBox.setQueryImage(newimg);			
+				_query.setImage(newimg);			
 				current_mode = Mode.BROWSE;
 			}			
 
@@ -964,16 +965,22 @@ public class HistoryViewer extends JPanel implements KeyListener {
 	}
 
 	public void doFind(HistoryQuery query){
-		_query = query;
+		if (_query == null)
+			_query = query;
+		else
+			_query.setText(query.getText());
 		
 		current_mode = Mode.FIND;
 
-		String query_string = query.getText();
-		BufferedImage query_image = query.getImage();
+		String query_string = _query.getText();
+		BufferedImage query_image = _query.getImage();
+
+		log.infoObject("query_string", query_string);
+		log.infoObject("query_image", query_image);
 
 		if (query_image != null){
-			String ui_query_string = Sikuli.find_ui(query_image); 
-
+			String ui_query_string = SikuliVision.find_ui(query_image); 
+			log.info("ui query string = " + ui_query_string);
 			if (query_string.length()>0)
 				query_string += " AND " + ui_query_string;
 			else
@@ -1093,6 +1100,7 @@ public class HistoryViewer extends JPanel implements KeyListener {
 		int id = history_screen.getId();
 		HistoryScreenIterator iter = HistoryScreenDatabase.getIterator(id);
 		_navigator.setIterator(iter);
+		screen.clear();
 		repaint();
 	}	
 	
@@ -1126,5 +1134,6 @@ public class HistoryViewer extends JPanel implements KeyListener {
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}
+
 
 }

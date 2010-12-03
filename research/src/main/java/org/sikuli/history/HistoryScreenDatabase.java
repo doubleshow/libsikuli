@@ -248,13 +248,13 @@ public class HistoryScreenDatabase{
 	
 	static public OCRDocument getOCRDocument(int id){
 		HistoryScreen hs = get(id);
-		String file = hs.getFilename().replaceFirst("png","ocr");
+		String file = hs.getFilename() + ".ocr";
 		return new OCRDocument(file);
 	}
 
 	static public OCRDocument getUIDocument(int id){
 		HistoryScreen hs = get(id);
-		String file = hs.getFilename() + ".ui.loc";
+		String file = hs.getFilename() + ".ui";
 		return new OCRDocument(file);
 	}
 
@@ -416,6 +416,22 @@ public class HistoryScreenDatabase{
 		}
 	}
 	
+	
+	static void indexOCRDocument(int id, OCRDocument doc, OCRDocument ui){
+		
+		try {			
+			IndexWriter writer = new IndexWriter(FSDirectory.open(new File(_current_index_path)), 
+					new StandardAnalyzer(Version.LUCENE_30), false, 
+					IndexWriter.MaxFieldLength.LIMITED);
+
+			writer.addDocument(FileDocument.Document(doc.getString(), ui.getString(), id));
+			writer.optimize();
+			writer.close();
+			
+		} catch (IOException e) {
+			log.errorException(e);
+		}
+	}
 
 	
 	static void indexOCRDocument(int id, OCRDocument doc){
@@ -549,20 +565,24 @@ public class HistoryScreenDatabase{
 		int id = getNewId();
 
 		String dest_image_filename = _image_save_path + "/" + id + ".png";
-		String dest_ocr_filename = _image_save_path + "/" + id + ".ocr";
+		String dest_ocr_filename = _image_save_path + "/" + id + ".png.ocr";
+		String dest_ui_filename = _image_save_path + "/" + id + ".png.ui";
 			
 		(new File(_image_save_path)).mkdir();
 		
 		try {
 			Process p;
-			p = Runtime.getRuntime().exec("cp " + src_image_filename + " " + dest_image_filename);
 			
-			p.waitFor();
-			
-			p = Runtime.getRuntime().exec("cp " + src_ocr_filename + " " + dest_ocr_filename);
-			
-			p.waitFor();
-			
+			if (!new File(dest_image_filename).exists()){
+				p = Runtime.getRuntime().exec("cp " + src_image_filename + " " + dest_image_filename);
+				p.waitFor();
+			}
+
+			if (!new File(dest_ocr_filename).exists()){
+				p = Runtime.getRuntime().exec("cp " + src_ocr_filename + " " + dest_ocr_filename);
+				p.waitFor();
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			
@@ -570,12 +590,13 @@ public class HistoryScreenDatabase{
 			e.printStackTrace();
 		}
 		
-		OCRDocument doc = new OCRDocument(dest_ocr_filename);
-		indexOCRDocument(id, doc);
+		OCRDocument doc = new OCRDocument(dest_ocr_filename);		
+		OCRDocument ui = new OCRDocument(dest_ui_filename);
 		
-		// Add the screenshot's meta data to Derby
+		indexOCRDocument(id, doc, ui);
+//		
+//		// Add the screenshot's meta data to Derby
 		HistoryScreen hs = new HistoryScreen(id, dest_image_filename);
-		//_history_screens.add(hs);
 		_sqldb.insertScreen(hs);
 	}
 	
@@ -669,14 +690,16 @@ public class HistoryScreenDatabase{
 	
 	public static void main(String[] args) throws Exception {
 		
-		//tool_import_to_new();
+//		tool_import_to_new();
 		
-		HistoryScreenDatabase db = new HistoryScreenDatabase();
-		db.testRecorder();
+//		HistoryScreenDatabase db = new HistoryScreenDatabase();
+//		db.testRecorder();
+//		
+//		HistoryScreenDatabase.find("deadline");
 		
-		HistoryScreenDatabase.find("deadline");
-		
-		
+		setRoot("databases/chi");
+		HistoryScreenDatabase.find("ui478");
+			
 				//HistoryScreenDatabase.find("vancouver && conference");
 		//HistoryScreenDatabase.find("ui64 AND volunteers");
 	    

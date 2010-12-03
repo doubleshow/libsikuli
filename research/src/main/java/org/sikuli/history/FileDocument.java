@@ -72,14 +72,14 @@ public class FileDocument {
     return doc;
   }
   
-  public static Document Document(String text, String path, int id){
+  public static Document Document(String text, String ui, int id){
 	    Document doc = new Document();
 	    
 	    doc.add(new Field("id", ""+id, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
 	    // Add the path of the file as a field named "path".  Use a field that is 
 	    // indexed (i.e. searchable), but don't tokenize the field into words.
-	    doc.add(new Field("path", path, Field.Store.YES, Field.Index.NOT_ANALYZED));
+	 //   doc.add(new Field("path", path, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
 	    // Add the last modified date of the file a field named "modified".  Use 
 	    // a field that is indexed (i.e. searchable), but don't tokenize the field
@@ -94,7 +94,7 @@ public class FileDocument {
 	    // If that's not the case searching for special characters will fail.
 	    doc.add(new Field("ocr", new StringReader(text)));
 	    
-	    doc.add(new Field("ui", new StringReader(text)));
+	    doc.add(new Field("ui", new StringReader(ui)));
 	    
 	    return doc; 
   }

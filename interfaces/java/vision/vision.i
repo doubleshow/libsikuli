@@ -182,6 +182,9 @@ namespace sikuli {
       
       static void initOCR(const char* ocrDataPath);
       
+      static std::string query(const char* index_filename, cv::Mat image);
+
+      
       static OCRText recognize_as_ocrtext(cv::Mat image);
       
       static std::string recognize(cv::Mat image);
