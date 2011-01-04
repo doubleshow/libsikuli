@@ -16,11 +16,10 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
-import edu.mit.csail.uid.FindFailed;
-import edu.mit.csail.uid.Match;
-import edu.mit.csail.uid.Screen;
-import edu.mit.csail.uid.SikuliScript;
-
+import org.sikuli.script.FindFailed;
+import org.sikuli.script.Match;
+import org.sikuli.script.Screen;
+import org.sikuli.script.SikuliScript;
 
 public class Tutor {
 
